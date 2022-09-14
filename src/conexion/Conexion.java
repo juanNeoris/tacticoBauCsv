@@ -7,6 +7,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -183,6 +185,9 @@ public class Conexion {
 		Statement sta = con.createStatement();
 		String str = "GARANTIA";
 		String systCode2 = "";
+		
+		List<String> operacion = new ArrayList<String>();
+		
 		String systCode = "SELECT to_char(INSTR(instrumentname,'GARANTIA')) GARANTIA,dealstamp, cpty,cptyname,cptycountry,cptyparent,cptyparentname,cptyparentcountry,cptyparentrating,lastparent,lastparentname,lastparentcountry,lastparentrating,instrumentname,foldername,foldercountryname,valuedate,maturitydate,guaranteepercent_cpty,currency,nominalvaluecur,nominalvalue,oneoff,guaranteedparentrating,cer,recequivalente,recbruto,lastparentfname,lastparentfcountryname,lastparentfrating,dispuesto,cer2,collateralagreement from PGT_MEX.T_PGT_MEX_CONSUMOSC_V WHERE LastParentF ='"
 				+ grupo + "' and FECHACARGA='" + fechaConsumo
 				+ "' UNION ALL SELECT to_char(INSTR(instrumentname,'GARANTIA')) GARANTIA,dealstamp,cpty,cptyname,cptycountry,cptyparent,cptyparentname,cptyparentcountry,cptyparentrating,lastparent, lastparentname,lastparentcountry,lastparentrating,instrumentname,foldername,foldercountryname,valuedate,maturitydate,guaranteepercent_cpty,currency,nominalvaluecur,nominalvalue,oneoff,guaranteedparentrating,cer,recequivalente,recbruto,lastparentfname,lastparentfcountryname,lastparentfrating,dispuesto,cer2,collateralagreement from PGT_MEX.T_PGT_MEX_CONSUMOSC_D WHERE LastParentF ='"
@@ -350,11 +355,12 @@ public class Conexion {
 			String dispuesto = rs.getString("dispuesto");
 			String cer2 = rs.getString("cer2");
 			String collateralagreement = rs.getString("collateralagreement");
+			
 			Row row = sheet.createRow(rowCount++);
 
 			int columnCount = 0;
+			
 			if(Garantia.equals("1")) {
-				
 				
 				Cell cell = row.createCell(columnCount++);
 				CellStyle cellStyle = workbook.createCellStyle();
