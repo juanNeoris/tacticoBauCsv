@@ -2,7 +2,7 @@ package view;
 
 import java.awt.EventQueue;
 import javax.swing.JFrame;
-import com.aspose.cells.Workbook;
+
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSch;
@@ -264,9 +264,12 @@ public class vista extends JFrame {
 						textField_1.setText("Generando interfaz consulta");
 						textField_1.update(textField_1.getGraphics());
 						String nombreInterfaz = "consulta_" + date + "_" + textField.getText() + ".csv";
+						
+						String excelFilePath = "consulta_" + date + "_" + textField.getText() + ".xlsx";
+					
 						String grupo = textField.getText();
 						conection.conecGBO();
-						String res = conection.getConsulta(grupo, nombreInterfaz, date);
+						String res = conection.getConsulta(grupo, excelFilePath, date);
 
 						if (res.equals("No existen registros para este grupo en la interfaz CONSULTA")) {
 							textField_1.setText("No se encontro el grupo");
@@ -894,4 +897,6 @@ public class vista extends JFrame {
 			}
 		}
 	}
+	
+	
 }
