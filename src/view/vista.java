@@ -43,7 +43,7 @@ public class vista extends JFrame {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private static final String PASSWORD = "GBOAug2022";
+	private static final String PASSWORD = "SepGBO2022";
 	private JTextField textField;
 	private JDateChooser dateChooser = new JDateChooser();
 	Date date = new Date();
@@ -490,7 +490,7 @@ public class vista extends JFrame {
 //			workbook.save(directoryName + "\\" + date + "_Inf_Cartera.csv");
 //
 //			Session session = jsch.getSession(username, host, 22);
-//			session.setPassword("GBOAug2022");
+//			session.setPassword("SepGBO2022");
 //
 //			Properties config = new Properties();
 //			config.put("StrictHostKeyChecking", "no");
@@ -569,7 +569,7 @@ public class vista extends JFrame {
 //			workbook.save(directoryName + "\\" + date + "_Inf_Cartera.csv");
 //
 //			Session session = jsch.getSession(username, host, 22);
-//			session.setPassword("GBOAug2022");
+//			session.setPassword("SepGBO2022");
 //
 //			Properties config = new Properties();
 //			config.put("StrictHostKeyChecking", "no");
@@ -714,7 +714,7 @@ public class vista extends JFrame {
 			 */
 
 			Session session = jsch.getSession(username, host, 22);
-			session.setPassword("GBOAug2022");
+			session.setPassword("SepGBO2022");
 
 			Properties config = new Properties();
 			config.put("StrictHostKeyChecking", "no");
@@ -833,7 +833,7 @@ public class vista extends JFrame {
 			 */
 
 			Session session = jsch.getSession(username, host, 22);
-			session.setPassword("GBOAug2022");
+			session.setPassword("SepGBO2022");
 
 			Properties config = new Properties();
 			config.put("StrictHostKeyChecking", "no");
