@@ -25,7 +25,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import oracle.jdbc.pool.OracleDataSource;
 
 /**
- * Clase conexi贸n para BD v铆a Wallet
+ * Clase conexi髇 para BD v韆 Wallet
  * 
  * @author hmh
  */
@@ -46,8 +46,8 @@ public class Conexion {
 	}
 
 	/**
-	 * Obtener una conexi贸n a la base de datos, obteniendo los valores de los
-	 * exports hecho a la sesi贸n
+	 * Obtener una conexi髇 a la base de datos, obteniendo los valores de los
+	 * exports hecho a la sesi髇
 	 * 
 	 * @throws Exception
 	 */
@@ -67,7 +67,7 @@ public class Conexion {
 	}
 
 	/**
-	 * Cierra la conexi贸n a la base de datos
+	 * Cierra la conexi髇 a la base de datos
 	 * 
 	 * @throws SQLException
 	 */
@@ -89,7 +89,7 @@ public class Conexion {
 	}
 
 	/**
-	 * Cierra la conexi贸n a la base de datos
+	 * Cierra la conexi髇 a la base de datos
 	 * 
 	 * @throws SQLException
 	 */
@@ -185,22 +185,27 @@ public class Conexion {
 		Statement sta = con.createStatement();
 		String str = "GARANTIA";
 		String systCode2 = "";
-
+		
 		List<String> operacion = new ArrayList<String>();
-
-		String systCode = "SELECT cptyparent,cptyparentrating,cptyparentname,dealstamp,instrumentname,valuedate,maturitydate,currency,nominalvaluecur,cer,nominalvalue,oneoff,cptyname,foldercountryname,cptycountry,cptyparentcountry,foldercountry FROM PGT_MEX.T_PGT_MEX_CONSUMOSC_V WHERE LastParentF ='"+ grupo + "' and FECHACARGA='" + fechaConsumo+ "' UNION ALL SELECT cptyparent,cptyparentrating,cptyparentname,dealstamp,instrumentname,valuedate,maturitydate,currency,nominalvaluecur,cer,nominalvalue,oneoff,cptyname,foldercountryname,cptycountry,cptyparentcountry,foldercountry FROM PGT_MEX.T_PGT_MEX_CONSUMOSC_D WHERE LastParentF ='"+ grupo + "' and FECHACARGA='" + fechaConsumo +"'";
+		
+		String systCode = "SELECT to_char(INSTR(instrumentname,'GARANTIA')) GARANTIA,dealstamp, cpty,cptyname,cptycountry,cptyparent,cptyparentname,cptyparentcountry,cptyparentrating,lastparent,lastparentname,lastparentcountry,lastparentrating,instrumentname,foldername,foldercountryname,valuedate,maturitydate,guaranteepercent_cpty,currency,nominalvaluecur,nominalvalue,oneoff,guaranteedparentrating,cer,recequivalente,recbruto,lastparentfname,lastparentfcountryname,lastparentfrating,dispuesto,cer2,collateralagreement from PGT_MEX.T_PGT_MEX_CONSUMOSC_V WHERE LastParentF ='"
+				+ grupo + "' and FECHACARGA='" + fechaConsumo
+				+ "' UNION ALL SELECT to_char(INSTR(instrumentname,'GARANTIA')) GARANTIA,dealstamp,cpty,cptyname,cptycountry,cptyparent,cptyparentname,cptyparentcountry,cptyparentrating,lastparent, lastparentname,lastparentcountry,lastparentrating,instrumentname,foldername,foldercountryname,valuedate,maturitydate,guaranteepercent_cpty,currency,nominalvaluecur,nominalvalue,oneoff,guaranteedparentrating,cer,recequivalente,recbruto,lastparentfname,lastparentfcountryname,lastparentfrating,dispuesto,cer2,collateralagreement from PGT_MEX.T_PGT_MEX_CONSUMOSC_D WHERE LastParentF ='"
+				+ grupo + "' and FECHACARGA='" + fechaConsumo + "'";
 		ResultSet rs = sta.executeQuery(systCode);
 
 		Workbook workbook = new XSSFWorkbook();
-		Sheet sheet = workbook.createSheet("rtras");
 
+		Sheet sheet = workbook.createSheet("rtras");
+		
+		
 		try {
 			writeHeaderLine(sheet);
 			writeDataLines(rs, workbook, sheet);
 			FileOutputStream outputStream = new FileOutputStream(excelFilePath);
 			workbook.write(outputStream);
 			workbook.close();
-
+			
 		} catch (Exception e) {
 			System.out.println("File IO error:");
 			e.printStackTrace();
@@ -214,101 +219,404 @@ public class Conexion {
 		Row headerRow = sheet.createRow(0);
 
 		Cell headerCell = headerRow.createCell(0);
-		headerCell = headerRow.createCell(0);
-		headerCell.setCellValue("cptyparent");
+		headerCell.setCellValue("Garantia");
 
 		headerCell = headerRow.createCell(1);
-		headerCell.setCellValue("cptyparentrating");
-
-		headerCell = headerRow.createCell(2);
-		headerCell.setCellValue("cptyparentname");
-
-		headerCell = headerRow.createCell(3);
 		headerCell.setCellValue("dealstamp");
 
-		headerCell = headerRow.createCell(4);
-		headerCell.setCellValue("instrumentname");
+		headerCell = headerRow.createCell(2);
+		headerCell.setCellValue("cpty");
 
-		headerCell = headerRow.createCell(5);
-		headerCell.setCellValue("valuedate");
-
-		headerCell = headerRow.createCell(6);
-		headerCell.setCellValue("maturitydate");
-
-		headerCell = headerRow.createCell(7);
-		headerCell.setCellValue("currency");
-
-		headerCell = headerRow.createCell(8);
-		headerCell.setCellValue("nominalvaluecur");
-
-		headerCell = headerRow.createCell(9);
-		headerCell.setCellValue("cer");
-
-		headerCell = headerRow.createCell(10);
-		headerCell.setCellValue("nominalvalue");
-
-		headerCell = headerRow.createCell(11);
-		headerCell.setCellValue("oneoff");
-
-		headerCell = headerRow.createCell(12);
+		headerCell = headerRow.createCell(3);
 		headerCell.setCellValue("cptyname");
 
-		headerCell = headerRow.createCell(13);
-		headerCell.setCellValue("foldercountryname");
-
-		headerCell = headerRow.createCell(14);
+		headerCell = headerRow.createCell(4);
 		headerCell.setCellValue("cptycountry");
 
-		headerCell = headerRow.createCell(15);
+        headerCell = headerRow.createCell(5);
+		headerCell.setCellValue("cptyparent");
+
+		headerCell = headerRow.createCell(6);
+		headerCell.setCellValue("cptyparentname");
+
+        headerCell = headerRow.createCell(7);
 		headerCell.setCellValue("cptyparentcountry");
 
-		headerCell = headerRow.createCell(16);
-		headerCell.setCellValue("foldercountry");
+		headerCell = headerRow.createCell(8);
+		headerCell.setCellValue("cptyparentrating");
 
+        headerCell = headerRow.createCell(9);
+		headerCell.setCellValue("lastparent");
+
+		headerCell = headerRow.createCell(10);
+		headerCell.setCellValue("lastparentname");
+
+        headerCell = headerRow.createCell(11);
+		headerCell.setCellValue("lastparentcountry");
+
+		headerCell = headerRow.createCell(12);
+		headerCell.setCellValue("lastparentrating");
+
+        headerCell = headerRow.createCell(13);
+		headerCell.setCellValue("instrumentname");
+
+		headerCell = headerRow.createCell(14);
+		headerCell.setCellValue("foldername");
+
+        headerCell = headerRow.createCell(15);
+		headerCell.setCellValue("foldercountryname");
+
+		headerCell = headerRow.createCell(16);
+		headerCell.setCellValue("valuedate");
+
+        headerCell = headerRow.createCell(17);
+		headerCell.setCellValue("maturitydate");
+
+		headerCell = headerRow.createCell(18);
+		headerCell.setCellValue("guaranteepercent_cpty");
+
+        headerCell = headerRow.createCell(19);
+		headerCell.setCellValue("currency");
+        
+        headerCell = headerRow.createCell(20);
+		headerCell.setCellValue("nominalvaluecur");
+
+        headerCell = headerRow.createCell(21);
+		headerCell.setCellValue("nominalvalue");
+
+        headerCell = headerRow.createCell(22);
+		headerCell.setCellValue("oneoff");
+
+        headerCell = headerRow.createCell(23);
+		headerCell.setCellValue("guaranteedparentrating");
+
+        headerCell = headerRow.createCell(24);
+		headerCell.setCellValue("cer");
+
+        headerCell = headerRow.createCell(25);
+		headerCell.setCellValue("recequivalente");
+
+        headerCell = headerRow.createCell(26);
+		headerCell.setCellValue("recbruto");
+
+        headerCell = headerRow.createCell(27);
+		headerCell.setCellValue("lastparentfname");
+
+        headerCell = headerRow.createCell(28);
+		headerCell.setCellValue("lastparentfcountryname");
+
+        headerCell = headerRow.createCell(29);
+		headerCell.setCellValue("lastparentfrating");
+
+        headerCell = headerRow.createCell(30);
+		headerCell.setCellValue("dispuesto");
+
+        headerCell = headerRow.createCell(31);
+		headerCell.setCellValue("cer2");
+
+        headerCell = headerRow.createCell(32);
+		headerCell.setCellValue("collateralagreement");
 	}
 
 	private void writeDataLines(ResultSet rs, Workbook workbook, Sheet sheet) throws SQLException {
 		int rowCount = 1;
 
 		while (rs.next()) {
+			String Garantia = rs.getString("Garantia");
+			String dealstamp =rs.getString("DEALSTAMP");
+			String cpty = rs.getString("cpty");
+			String cptyname = rs.getString("cptyname");
+			String cptycountry = rs.getString("cptycountry");
 			String cptyparent = rs.getString("cptyparent");
-			String cptyparentrating = rs.getString("cptyparentrating");
 			String cptyparentname = rs.getString("cptyparentname");
-			String dealstamp = rs.getString("dealstamp");
+			String cptyparentcountry = rs.getString("cptyparentcountry");
+			String cptyparentrating = rs.getString("cptyparentrating");
+			String lastparent = rs.getString("lastparent");
+			String lastparentname = rs.getString("lastparentname");
+			String lastparentcountry = rs.getString("lastparentcountry");
+			String lastparentrating = rs.getString("lastparentrating");
 			String instrumentname = rs.getString("instrumentname");
+			String foldername = rs.getString("foldername");
+			String foldercountryname = rs.getString("foldercountryname");
 			String valuedate = rs.getString("valuedate");
 			String maturitydate = rs.getString("maturitydate");
+			String guaranteepercent_cpty = rs.getString("guaranteepercent_cpty");
 			String currency = rs.getString("currency");
 			String nominalvaluecur = rs.getString("nominalvaluecur");
-			String cer = rs.getString("cer");
 			String nominalvalue = rs.getString("nominalvalue");
 			String oneoff = rs.getString("oneoff");
-			String cptyname = rs.getString("cptyname");
-			String foldercountryname = rs.getString("foldercountryname");
-			String cptycountry = rs.getString("cptycountry");
-			String cptyparentcountry = rs.getString("cptyparentcountry");
-			String foldercountry = rs.getString("foldercountry");
-
+			String guaranteedparentrating = rs.getString("guaranteedparentrating");
+			String cer = rs.getString("cer");
+			String recequivalente = rs.getString("recequivalente");
+			String recbruto = rs.getString("recbruto");
+			String lastparentfname = rs.getString("lastparentfname");
+			String lastparentfcountryname = rs.getString("lastparentfcountryname");
+			String lastparentfrating = rs.getString("lastparentfrating");
+			String dispuesto = rs.getString("dispuesto");
+			String cer2 = rs.getString("cer2");
+			String collateralagreement = rs.getString("collateralagreement");
+			
 			Row row = sheet.createRow(rowCount++);
 
 			int columnCount = 0;
+			
+			if(Garantia.equals("1")) {
+				
+				Cell cell = row.createCell(columnCount++);
+				CellStyle cellStyle = workbook.createCellStyle();
+	            CreationHelper creationHelper = workbook.getCreationHelper();
+	            cellStyle.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
+	            cellStyle.setFillPattern(FillPatternType.FINE_DOTS);
+	            cell.setCellStyle(cellStyle);    
+				cell.setCellValue(Garantia);
+				
+				
+				cell = row.createCell(columnCount++);
+	            cellStyle.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
+	            cellStyle.setFillPattern(FillPatternType.FINE_DOTS);
+	            cell.setCellStyle(cellStyle);
+				cell.setCellValue(dealstamp);
 
+				
+				cell = row.createCell(columnCount++);
+				cellStyle.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
+	            cellStyle.setFillPattern(FillPatternType.FINE_DOTS);
+	            cell.setCellStyle(cellStyle);
+				cell.setCellValue(cpty);
+
+				cell = row.createCell(columnCount++);
+				cellStyle.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
+	            cellStyle.setFillPattern(FillPatternType.FINE_DOTS);
+	            cell.setCellStyle(cellStyle);
+				cell.setCellValue(cptyname);
+
+				cell = row.createCell(columnCount++);
+				cellStyle.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
+	            cellStyle.setFillPattern(FillPatternType.FINE_DOTS);
+	            cell.setCellStyle(cellStyle);
+				cell.setCellValue(cptycountry);
+
+	            
+	            cell = row.createCell(columnCount++);
+	            cellStyle.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
+	            cellStyle.setFillPattern(FillPatternType.FINE_DOTS);
+	            cell.setCellStyle(cellStyle);
+				cell.setCellValue(cptyparent);
+
+				cell = row.createCell(columnCount++);
+				cellStyle.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
+	            cellStyle.setFillPattern(FillPatternType.FINE_DOTS);
+	            cell.setCellStyle(cellStyle);
+				cell.setCellValue(cptyparentname);
+
+				cell = row.createCell(columnCount++);
+				cellStyle.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
+	            cellStyle.setFillPattern(FillPatternType.FINE_DOTS);
+	            cell.setCellStyle(cellStyle);
+				cell.setCellValue(cptyparentcountry);
+
+				cell = row.createCell(columnCount++);
+				cellStyle.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
+	            cellStyle.setFillPattern(FillPatternType.FINE_DOTS);
+	            cell.setCellStyle(cellStyle);
+				cell.setCellValue(cptyparentrating);
+
+				cell = row.createCell(columnCount++);
+				cellStyle.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
+	            cellStyle.setFillPattern(FillPatternType.FINE_DOTS);
+	            cell.setCellStyle(cellStyle);
+				cell.setCellValue(lastparent);
+
+	            cell = row.createCell(columnCount++);
+	            cellStyle.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
+	            cellStyle.setFillPattern(FillPatternType.FINE_DOTS);
+	            cell.setCellStyle(cellStyle);
+				cell.setCellValue(lastparentname);
+
+				cell = row.createCell(columnCount++);
+				cellStyle.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
+	            cellStyle.setFillPattern(FillPatternType.FINE_DOTS);
+	            cell.setCellStyle(cellStyle);
+				cell.setCellValue(lastparentcountry);
+
+				cell = row.createCell(columnCount++);
+				cellStyle.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
+	            cellStyle.setFillPattern(FillPatternType.FINE_DOTS);
+	            cell.setCellStyle(cellStyle);
+				cell.setCellValue(lastparentrating);
+
+				cell = row.createCell(columnCount++);
+				cellStyle.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
+	            cellStyle.setFillPattern(FillPatternType.FINE_DOTS);
+	            cell.setCellStyle(cellStyle);
+				cell.setCellValue(instrumentname);
+
+				cell = row.createCell(columnCount++);
+				cellStyle.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
+	            cellStyle.setFillPattern(FillPatternType.FINE_DOTS);
+	            cell.setCellStyle(cellStyle);
+				cell.setCellValue(foldername);
+
+	            cell = row.createCell(columnCount++);
+	            cellStyle.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
+	            cellStyle.setFillPattern(FillPatternType.FINE_DOTS);
+	            cell.setCellStyle(cellStyle);
+				cell.setCellValue(foldercountryname);
+
+				cell = row.createCell(columnCount++);
+				cellStyle.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
+	            cellStyle.setFillPattern(FillPatternType.FINE_DOTS);
+	            cell.setCellStyle(cellStyle);
+				cell.setCellValue(valuedate);
+
+				cell = row.createCell(columnCount++);
+				cellStyle.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
+	            cellStyle.setFillPattern(FillPatternType.FINE_DOTS);
+	            cell.setCellStyle(cellStyle);
+				cell.setCellValue(maturitydate);
+
+				cell = row.createCell(columnCount++);
+				cellStyle.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
+	            cellStyle.setFillPattern(FillPatternType.FINE_DOTS);
+	            cell.setCellStyle(cellStyle);
+				cell.setCellValue(guaranteepercent_cpty);
+
+				cell = row.createCell(columnCount++);
+				cellStyle.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
+	            cellStyle.setFillPattern(FillPatternType.FINE_DOTS);
+	            cell.setCellStyle(cellStyle);
+				cell.setCellValue(currency);
+
+	            cell = row.createCell(columnCount++);
+	            cellStyle.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
+	            cellStyle.setFillPattern(FillPatternType.FINE_DOTS);
+	            cell.setCellStyle(cellStyle);
+				cell.setCellValue(nominalvaluecur);
+
+				cell = row.createCell(columnCount++);
+				cellStyle.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
+	            cellStyle.setFillPattern(FillPatternType.FINE_DOTS);
+	            cell.setCellStyle(cellStyle);
+				cell.setCellValue(nominalvalue);
+
+				cell = row.createCell(columnCount++);
+				cellStyle.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
+	            cellStyle.setFillPattern(FillPatternType.FINE_DOTS);
+	            cell.setCellStyle(cellStyle);
+				cell.setCellValue(oneoff);
+
+				cell = row.createCell(columnCount++);
+				cellStyle.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
+	            cellStyle.setFillPattern(FillPatternType.FINE_DOTS);
+	            cell.setCellStyle(cellStyle);
+				cell.setCellValue(guaranteedparentrating);
+
+				cell = row.createCell(columnCount++);
+				cellStyle.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
+	            cellStyle.setFillPattern(FillPatternType.FINE_DOTS);
+	            cell.setCellStyle(cellStyle);
+				cell.setCellValue(cer);
+
+	             cell = row.createCell(columnCount++);
+	             cellStyle.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
+		            cellStyle.setFillPattern(FillPatternType.FINE_DOTS);
+		            cell.setCellStyle(cellStyle);
+				cell.setCellValue(recequivalente);
+
+				cell = row.createCell(columnCount++);
+				cellStyle.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
+	            cellStyle.setFillPattern(FillPatternType.FINE_DOTS);
+	            cell.setCellStyle(cellStyle);
+				cell.setCellValue(recbruto);
+
+				cell = row.createCell(columnCount++);
+				cellStyle.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
+	            cellStyle.setFillPattern(FillPatternType.FINE_DOTS);
+	            cell.setCellStyle(cellStyle);
+				cell.setCellValue(lastparentfname);
+
+				cell = row.createCell(columnCount++);
+				cellStyle.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
+	            cellStyle.setFillPattern(FillPatternType.FINE_DOTS);
+	            cell.setCellStyle(cellStyle);
+				cell.setCellValue(lastparentfcountryname);
+
+				cell = row.createCell(columnCount++);
+				cellStyle.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
+	            cellStyle.setFillPattern(FillPatternType.FINE_DOTS);
+	            cell.setCellStyle(cellStyle);
+				cell.setCellValue(lastparentfrating);
+
+	             cell = row.createCell(columnCount++);
+	             cellStyle.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
+		            cellStyle.setFillPattern(FillPatternType.FINE_DOTS);
+		            cell.setCellStyle(cellStyle);
+				cell.setCellValue(dispuesto);
+
+				cell = row.createCell(columnCount++);
+				cellStyle.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
+	            cellStyle.setFillPattern(FillPatternType.FINE_DOTS);
+	            cell.setCellStyle(cellStyle);
+				cell.setCellValue(cer2);
+
+				cell = row.createCell(columnCount++);
+				cellStyle.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
+	            cellStyle.setFillPattern(FillPatternType.FINE_DOTS);
+	            cell.setCellStyle(cellStyle);
+				cell.setCellValue(collateralagreement);
+				
+				
+				
+			}else {
 			Cell cell = row.createCell(columnCount++);
-			CellStyle cellStyle = workbook.createCellStyle();
-			CreationHelper creationHelper = workbook.getCreationHelper();
-			cell.setCellValue(cptyparent);
-
-			cell = row.createCell(columnCount++);
-			cell.setCellValue(cptyparentrating);
-
-			cell = row.createCell(columnCount++);
-			cell.setCellValue(cptyparentname);
+			cell.setCellValue(Garantia);
+		
 
 			cell = row.createCell(columnCount++);
 			cell.setCellValue(dealstamp);
 
 			cell = row.createCell(columnCount++);
+			cell.setCellValue(cpty);
+
+			cell = row.createCell(columnCount++);
+			cell.setCellValue(cptyname);
+
+			cell = row.createCell(columnCount++);
+			cell.setCellValue(cptycountry);
+
+            
+            cell = row.createCell(columnCount++);
+			cell.setCellValue(cptyparent);
+
+			cell = row.createCell(columnCount++);
+			cell.setCellValue(cptyparentname);
+
+			cell = row.createCell(columnCount++);
+			cell.setCellValue(cptyparentcountry);
+
+			cell = row.createCell(columnCount++);
+			cell.setCellValue(cptyparentrating);
+
+			cell = row.createCell(columnCount++);
+			cell.setCellValue(lastparent);
+
+            cell = row.createCell(columnCount++);
+			cell.setCellValue(lastparentname);
+
+			cell = row.createCell(columnCount++);
+			cell.setCellValue(lastparentcountry);
+
+			cell = row.createCell(columnCount++);
+			cell.setCellValue(lastparentrating);
+
+			cell = row.createCell(columnCount++);
 			cell.setCellValue(instrumentname);
+
+			cell = row.createCell(columnCount++);
+			cell.setCellValue(foldername);
+
+            cell = row.createCell(columnCount++);
+			cell.setCellValue(foldercountryname);
 
 			cell = row.createCell(columnCount++);
 			cell.setCellValue(valuedate);
@@ -317,13 +625,13 @@ public class Conexion {
 			cell.setCellValue(maturitydate);
 
 			cell = row.createCell(columnCount++);
-			cell.setCellValue(currency);
+			cell.setCellValue(guaranteepercent_cpty);
 
 			cell = row.createCell(columnCount++);
+			cell.setCellValue(currency);
+
+            cell = row.createCell(columnCount++);
 			cell.setCellValue(nominalvaluecur);
-			
-			cell = row.createCell(columnCount++);
-			cell.setCellValue(cer);
 
 			cell = row.createCell(columnCount++);
 			cell.setCellValue(nominalvalue);
@@ -332,20 +640,35 @@ public class Conexion {
 			cell.setCellValue(oneoff);
 
 			cell = row.createCell(columnCount++);
-			cell.setCellValue(cptyname);
+			cell.setCellValue(guaranteedparentrating);
 
 			cell = row.createCell(columnCount++);
-			cell.setCellValue(foldercountryname);
+			cell.setCellValue(cer);
+
+             cell = row.createCell(columnCount++);
+			cell.setCellValue(recequivalente);
 
 			cell = row.createCell(columnCount++);
-			cell.setCellValue(cptycountry);
+			cell.setCellValue(recbruto);
 
 			cell = row.createCell(columnCount++);
-			cell.setCellValue(cptyparentcountry);
+			cell.setCellValue(lastparentfname);
 
 			cell = row.createCell(columnCount++);
-			cell.setCellValue(foldercountry);
+			cell.setCellValue(lastparentfcountryname);
 
+			cell = row.createCell(columnCount++);
+			cell.setCellValue(lastparentfrating);
+
+             cell = row.createCell(columnCount++);
+			cell.setCellValue(dispuesto);
+
+			cell = row.createCell(columnCount++);
+			cell.setCellValue(cer2);
+
+			cell = row.createCell(columnCount++);
+			cell.setCellValue(collateralagreement);
+			}
 		}
 	}
 
