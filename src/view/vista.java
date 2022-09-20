@@ -154,13 +154,13 @@ public class vista extends JFrame {
 
 				if (victoria.equals("No hay ultima carga") || dolphing.equals("No hay ultima carga")) {
 
-					validaFicherosDolphinVictoria();
-					cargaVictoriaDolphing();
+					//validaFicherosDolphinVictoria();
+					//cargaVictoriaDolphing();
 
 				} else if (!date.trim().equals(victoria.trim()) || !date.trim().equals(dolphing.trim())) {
 
-					validaFicherosDolphinVictoria();
-					cargaVictoriaDolphing();
+					//validaFicherosDolphinVictoria();
+					//cargaVictoriaDolphing();
 
 				} else {
 					try {
