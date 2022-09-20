@@ -263,7 +263,6 @@ public class vista extends JFrame {
 					if (!textField.getText().isEmpty()) {
 						textField_1.setText("Generando interfaz consulta");
 						textField_1.update(textField_1.getGraphics());
-						String nombreInterfaz = "consulta_" + date + "_" + textField.getText() + ".csv";
 						
 						String excelFilePath = "consulta_" + date + "_" + textField.getText() + ".xlsx";
 					

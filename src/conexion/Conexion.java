@@ -192,7 +192,6 @@ public class Conexion {
 		ResultSet rs = sta.executeQuery(systCode);
 
 		Workbook workbook = new XSSFWorkbook();
-
 		Sheet sheet = workbook.createSheet("rtras");
 
 		try {
