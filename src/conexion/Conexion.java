@@ -180,9 +180,9 @@ public class Conexion {
 		// bonos Mexico
 		List<String> MexicoBonos = new ArrayList<String>();
 		// bonos sumatoria Spain
-	
+
 		// bonos Spain
-	
+
 		// creditos documentariado Mexico
 		List<String> MexicoCredDocu = new ArrayList<String>();
 		// creditos documentariado sumatoria Mexico
@@ -197,7 +197,7 @@ public class Conexion {
 		List<String> MexicoComFor = new ArrayList<String>();
 		// Comex/Forfaiting sumatoria Mexico
 		// Comex/Forfaiting Spain
-     	// Sindicado Mexico
+		// Sindicado Mexico
 		List<String> MexicoSindicado = new ArrayList<String>();
 		// Sindicado sumatoria Mexico
 		// Sindicado Spain
@@ -220,25 +220,25 @@ public class Conexion {
 		// Tarjetas
 		List<String> MexicoTar = new ArrayList<String>();
 		// Tarjetas sumatoria Mexico
-			// Tarjetas Spain
+		// Tarjetas Spain
 
 		// Lineas Comprometidas Mexico
 		List<String> MexicoLinCom = new ArrayList<String>();
 		// Lineas Comprometidas sumatoria Mexico
-			// Lineas Comprometidas Spain
-	
+		// Lineas Comprometidas Spain
+
 		// Garantias Mexico
 		List<String> MexicoGaran = new ArrayList<String>();
 		// Garantias sumatoria Mexico
-	
+
 		// Avales Mexico
 		List<String> MexicoAval = new ArrayList<String>();
 		// Avales sumatoria Mexico
-	
-			// Derivados Mexico
+
+		// Derivados Mexico
 		List<String> MexicoDer = new ArrayList<String>();
 		// Derivados sumatoria Mexico
-		
+
 		List<String> encabezado = new ArrayList<>();
 		encabezado.add("cptyparent");
 		encabezado.add("cptyparentrating");
@@ -277,85 +277,76 @@ public class Conexion {
 				systCode = rs.getString(1) + "," + rs.getString(2) + "," + "\"" + rs.getString(3) + "\"" + ","
 						+ rs.getString(4) + "," + rs.getString(5) + "," + rs.getString(6) + "," + rs.getString(7) + ","
 						+ rs.getString(8) + "," + rs.getString(9) + "," + rs.getString(10) + "," + rs.getString(11)
-						+ "," + rs.getString(12) + "," + rs.getString(13) + "," + rs.getString(14) + "," + "\""
-						+ rs.getString(15) + "\"" + "," + rs.getString(16) + "," + rs.getString(17) + "\n";
+						+ "," + rs.getString(12) + "," + "\"" + rs.getString(13) + "\"" + "," + rs.getString(14) + ","
+						+ "\"" + rs.getString(15) + "\"" + "," + rs.getString(16) + "," + rs.getString(17) + "\n";
 
-				
-				
+				if (rs.getString(5).contains("BOND")) {
+					MexicoBonos.add(systCode);
 
-					if (rs.getString(5).contains("BOND")) {
-						MexicoBonos.add(systCode);
-						
+				} else if (rs.getString(5).contains(" CREDITO DOCUMENTARIO")) {
+					MexicoCredDocu.add(systCode);
 
-					} else if (rs.getString(5).contains(" CREDITO DOCUMENTARIO")) {
-						MexicoCredDocu.add(systCode);
-					
-					} else if (rs.getString(5).contains("EXPORTACION") || rs.getString(5).contains("IMPORTACION")) {
-						MexicoExportImport.add(systCode);
-				
-					} else if (rs.getString(5).contains("COMEX") || rs.getString(5).contains("FORFAITING")) {
-						MexicoComFor.add(systCode);
-					
-					} else if (rs.getString(5).contains("SINDICADO")) {
-						MexicoSindicado.add(systCode);
-					
-					} else if (rs.getString(5).contains("CONFIRMING")) {
-						MexicoConfir.add(systCode);
+				} else if (rs.getString(5).contains("EXPORTACION") || rs.getString(5).contains("IMPORTACION")) {
+					MexicoExportImport.add(systCode);
 
-					} else if (rs.getString(5).contains("DESCUENTOS")) {
-						MexicoDesc.add(systCode);
-					
-					} else if (rs.getString(5).contains("FACTORING")) {
-						MexicoFac.add(systCode);
-			
+				} else if (rs.getString(5).contains("COMEX") || rs.getString(5).contains("FORFAITING")) {
+					MexicoComFor.add(systCode);
 
-					} else if (rs.getString(5).contains("TARJETAS")) {
-						MexicoTar.add(systCode);
-					
-					} else if (rs.getString(5).contains("LINEA MULTIDEAL RESTO")
-							|| rs.getString(5).contains("CREDITOS - COMPROMETIDO")
-							|| rs.getString(5).contains("CREDITO BACKUP")
-							|| rs.getString(5).contains("CREDITO OTROS")) {
-						MexicoLinCom.add(systCode);
-				
-					} else if (rs.getString(5).contains("GARANTIA ACCIONES")
-							|| rs.getString(5).contains("GARANTIA AVAL")
-							|| rs.getString(5).contains("GARANTIA DERECHOS")
-							|| rs.getString(5).contains("GARANTIA PERSONAL")
-							|| rs.getString(5).contains("OTRAS GARANTIAS EN")
-							|| rs.getString(5).contains("OTRAS GARANTIAS REALES")
-							|| rs.getString(5).contains("OTHER GUARANTY")) {
-						MexicoGaran.add(systCode);
-			
-					} else if (rs.getString(5).contains("AVAL COMERCIAL")
-							|| rs.getString(5).contains("AVAL FINANCIERO - NO COMPROMETIDO")
-							|| rs.getString(5).contains("AVAL NO") || rs.getString(5).contains("AVAL TECNICO")
-							|| rs.getString(5).contains("GARANTIA LINE") || rs.getString(5).contains("STANDBY")
-							|| rs.getString(5).contains("LINEA DE AVALES")) {
-						MexicoAval.add(systCode);
-			
-					} else if (rs.getString(5).contains("ASSET") || rs.getString(5).contains("CALL")
-							|| rs.getString(5).contains("CERTIFICATES") || rs.getString(5).contains("COLLAR")
-							|| rs.getString(5).contains("EQUITY") || rs.getString(5).contains("COMMODITY")
-							|| rs.getString(5).contains("CREDIT DEFAULT") || rs.getString(5).contains("CURRENCY")
-							|| rs.getString(5).contains("FIXED") || rs.getString(5).contains("FLOATING")
-							|| rs.getString(5).contains("FX") || rs.getString(5).contains("INDEXED")
-							|| rs.getString(5).contains("INTEREST") || rs.getString(5).contains("ZERO")
-							|| rs.getString(5).contains("INITIAL MARGIN CASH") || rs.getString(5).contains("VARIATION")
-							|| rs.getString(5).contains("NOSTRO") || rs.getString(5).contains("VOSTRO")
-							|| rs.getString(5).contains("ACOTADO") || rs.getString(5).contains("SECURITIES")
-							|| rs.getString(5).contains("MONEY MARKET") || rs.getString(5).contains("SECURED")
-							|| rs.getString(5).contains("RECEIVER REVENUE") || rs.getString(5).contains("YEAR ON YEAR")
-							|| rs.getString(5).contains("GENERIC DEALS") || rs.getString(5).contains("OPTIONSPAYER")
-							|| rs.getString(5).contains("OPTIONS RECEIVER") || rs.getString(5).contains("BONIFICADO")
-							|| rs.getString(5).contains("SWAP FORWARD") || rs.getString(5).contains("TITULIZACION")
-							|| rs.getString(5).contains("DELIVERABLE") || rs.getString(5).contains("GENERIC DEALS")
-							|| rs.getString(5).contains("PAYER REVENUE")) {
-						MexicoDer.add(systCode);
-		
-					}
+				} else if (rs.getString(5).contains("SINDICADO")) {
+					MexicoSindicado.add(systCode);
 
-				
+				} else if (rs.getString(5).contains("CONFIRMING")) {
+					MexicoConfir.add(systCode);
+
+				} else if (rs.getString(5).contains("DESCUENTOS")) {
+					MexicoDesc.add(systCode);
+
+				} else if (rs.getString(5).contains("FACTORING")) {
+					MexicoFac.add(systCode);
+
+				} else if (rs.getString(5).contains("TARJETAS")) {
+					MexicoTar.add(systCode);
+
+				} else if (rs.getString(5).contains("LINEA MULTIDEAL RESTO")
+						|| rs.getString(5).contains("CREDITOS - COMPROMETIDO")
+						|| rs.getString(5).contains("CREDITO BACKUP") || rs.getString(5).contains("CREDITO OTROS")) {
+					MexicoLinCom.add(systCode);
+
+				} else if (rs.getString(5).contains("GARANTIA ACCIONES") || rs.getString(5).contains("GARANTIA AVAL")
+						|| rs.getString(5).contains("GARANTIA DERECHOS")
+						|| rs.getString(5).contains("GARANTIA PERSONAL")
+						|| rs.getString(5).contains("OTRAS GARANTIAS EN")
+						|| rs.getString(5).contains("OTRAS GARANTIAS REALES")
+						|| rs.getString(5).contains("OTHER GUARANTY")) {
+					MexicoGaran.add(systCode);
+
+				} else if (rs.getString(5).contains("AVAL COMERCIAL")
+						|| rs.getString(5).contains("AVAL FINANCIERO - NO COMPROMETIDO")
+						|| rs.getString(5).contains("AVAL NO") || rs.getString(5).contains("AVAL TECNICO")
+						|| rs.getString(5).contains("GARANTIA LINE") || rs.getString(5).contains("STANDBY")
+						|| rs.getString(5).contains("LINEA DE AVALES")) {
+					MexicoAval.add(systCode);
+
+				} else if (rs.getString(5).contains("ASSET") || rs.getString(5).contains("CALL")
+						|| rs.getString(5).contains("CERTIFICATES") || rs.getString(5).contains("COLLAR")
+						|| rs.getString(5).contains("EQUITY") || rs.getString(5).contains("COMMODITY")
+						|| rs.getString(5).contains("CREDIT DEFAULT") || rs.getString(5).contains("CURRENCY")
+						|| rs.getString(5).contains("FIXED") || rs.getString(5).contains("FLOATING")
+						|| rs.getString(5).contains("FX") || rs.getString(5).contains("INDEXED")
+						|| rs.getString(5).contains("INTEREST") || rs.getString(5).contains("ZERO")
+						|| rs.getString(5).contains("INITIAL MARGIN CASH") || rs.getString(5).contains("VARIATION")
+						|| rs.getString(5).contains("NOSTRO") || rs.getString(5).contains("VOSTRO")
+						|| rs.getString(5).contains("ACOTADO") || rs.getString(5).contains("SECURITIES")
+						|| rs.getString(5).contains("MONEY MARKET") || rs.getString(5).contains("SECURED")
+						|| rs.getString(5).contains("RECEIVER REVENUE") || rs.getString(5).contains("YEAR ON YEAR")
+						|| rs.getString(5).contains("GENERIC DEALS") || rs.getString(5).contains("OPTIONSPAYER")
+						|| rs.getString(5).contains("OPTIONS RECEIVER") || rs.getString(5).contains("BONIFICADO")
+						|| rs.getString(5).contains("SWAP FORWARD") || rs.getString(5).contains("TITULIZACION")
+						|| rs.getString(5).contains("DELIVERABLE") || rs.getString(5).contains("GENERIC DEALS")
+						|| rs.getString(5).contains("PAYER REVENUE")) {
+					MexicoDer.add(systCode);
+
+				}
 
 			} while (rs.next());
 			if (systCode.isEmpty()) {
@@ -366,49 +357,42 @@ public class Conexion {
 
 			// Bonos
 			String CadenaBonosMex = MexicoBonos.stream().collect(Collectors.joining(""));
-	
+
 			// Creditos Documentariados
 			String CadenaMexicoCredDoc = MexicoCredDocu.stream().collect(Collectors.joining(""));
-		
+
 			// Exportaciones / importacions
 			String CadenaMexicoExportImport = MexicoExportImport.stream().collect(Collectors.joining(""));
-			
+
 			// Comex/Forfaiting
 			String CadenaMexicoComFor = MexicoComFor.stream().collect(Collectors.joining(""));
-			
+
 			// Sindicado
 			String CadenaMexicoSindicado = MexicoSindicado.stream().collect(Collectors.joining(""));
-		
-		
+
 			// Confirming
 			String CadenaMexicoConfir = MexicoConfir.stream().collect(Collectors.joining(""));
-		
-		
+
 			// Descuentos
 			String CadenaMexicoDesc = MexicoDesc.stream().collect(Collectors.joining(""));
-		
-				// Descuentos
+
+			// Descuentos
 			String CadenaMexicoFac = MexicoFac.stream().collect(Collectors.joining(""));
 			// Tarjetas
 			String CadenaMexicoTar = MexicoTar.stream().collect(Collectors.joining(""));
-		
+
 			// Lineas Comprometidas
 			String CadenaMexicoLinCom = MexicoLinCom.stream().collect(Collectors.joining(""));
-		
+
 			// Garantias
 			String CadenaMexicoGaran = MexicoGaran.stream().collect(Collectors.joining(""));
-		
-		
+
 			// Aval
 			String CadenaMexicoAval = MexicoAval.stream().collect(Collectors.joining(""));
-		
+
 			// Derivados
 			String CadenaMexicoDer = MexicoDer.stream().collect(Collectors.joining(""));
-			
-		
-			
-		
-	
+
 			// Bonos Mexico
 			if (!MexicoBonos.isEmpty()) {
 				writer.write("Bonos\n");
@@ -502,7 +486,7 @@ public class Conexion {
 				writer.write("\n");
 
 			}
-			
+
 			writer.close();
 
 		}
