@@ -262,7 +262,7 @@ public class Conexion {
 		String systCode = "SELECT cptyparent,cptyparentrating,cptyparentname,dealstamp,instrumentname,valuedate,maturitydate,currency,DECODE(nominalvaluecur,null, '0.0',nominalvaluecur) AS nominalvaluecur,DECODE(CER,null, '0.0',CER) AS CER,DECODE(nominalvalue,null, '0.0',nominalvalue) AS nominalvalue,oneoff,cptyname,foldercountryname,cptycountry,cptyparentcountry,foldercountry from PGT_MEX.T_PGT_MEX_CONSUMOSC_V WHERE LastParentF ='"
 				+ grupo + "' and FECHACARGA='" + fechaConsumo
 				+ "' UNION ALL SELECT cptyparent,cptyparentrating,cptyparentname,dealstamp,instrumentname,valuedate,maturitydate,currency,DECODE(nominalvaluecur,null, '0.0',nominalvaluecur) AS nominalvaluecur,DECODE(CER,null, '0.0',CER) AS CER,DECODE(nominalvalue,null, '0.0',nominalvalue) AS nominalvalue,oneoff,cptyname,foldercountryname,cptycountry,cptyparentcountry,foldercountry from PGT_MEX.T_PGT_MEX_CONSUMOSC_D WHERE LastParentF ='"
-				+ grupo + "' and FECHACARGA='" + fechaConsumo + "'";
+				+ grupo + "' and FECHACARGA='" + fechaConsumo + "' ORDER BY foldercountry,instrumentname";
 		ResultSet rs = sta.executeQuery(systCode);
 
 		if (rs.equals(null) || rs.next() == false) {
@@ -281,7 +281,7 @@ public class Conexion {
 						+ rs.getString(15) + "\"" + "," + rs.getString(16) + "," + rs.getString(17) + "\n";
 
 				
-				if (rs.getString(14).contains("Mexico")) {
+				
 
 					if (rs.getString(5).contains("BOND")) {
 						MexicoBonos.add(systCode);
@@ -355,7 +355,7 @@ public class Conexion {
 		
 					}
 
-				}
+				
 
 			} while (rs.next());
 			if (systCode.isEmpty()) {
@@ -411,7 +411,7 @@ public class Conexion {
 	
 			// Bonos Mexico
 			if (!MexicoBonos.isEmpty()) {
-				writer.write("Bonos-Mexico\n");
+				writer.write("Bonos\n");
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaBonosMex);
 				writer.write("\n");
@@ -419,21 +419,21 @@ public class Conexion {
 				// Credito Documentariado Mexico
 			}
 			if (!MexicoCredDocu.isEmpty()) {
-				writer.write("Creditos Documentariado-Mexico\n");
+				writer.write("Creditos Documentariado\n");
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaMexicoCredDoc);
 				writer.write("\n");
 				// Exportacion/Importacion Mexio
 			}
 			if (!MexicoExportImport.isEmpty()) {
-				writer.write("Financiamiento IMP/EXP-Mexico\n");
+				writer.write("Financiamiento IMP/EXP\n");
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaMexicoExportImport);
 				writer.write("\n");
 				// Comex/forfaiting Mexico
 			}
 			if (!MexicoComFor.isEmpty()) {
-				writer.write("Financiamiento Comex-Mexico\n");
+				writer.write("Financiamiento Comex\n");
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaMexicoComFor);
 				writer.write("\n");
@@ -441,62 +441,62 @@ public class Conexion {
 				// Sindicado Mexico
 			}
 			if (!MexicoSindicado.isEmpty()) {
-				writer.write("Creditos Sindicados-Mexico\n");
+				writer.write("Creditos Sindicados\n");
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaMexicoSindicado);
 				writer.write("\n");
 				// Confirming Mexico
 			}
 			if (!MexicoConfir.isEmpty()) {
-				writer.write("Confirming-Mexico\n");
+				writer.write("Confirming\n");
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaMexicoConfir);
 				writer.write("\n");
 				// Descuentos Mexico
 			}
 			if (!MexicoDesc.isEmpty()) {
-				writer.write("Descuentos-Mexico\n");
+				writer.write("Descuentos\n");
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaMexicoDesc);
 				writer.write("\n");
 				// Factoring Mexico
 			}
 			if (!MexicoFac.isEmpty()) {
-				writer.write("Factoring-Mexico\n");
+				writer.write("Factoring\n");
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaMexicoFac);
 				writer.write("\n");
 				// Tarjetas Mexico
 			}
 			if (!MexicoTar.isEmpty()) {
-				writer.write("Tarjeta de Credito-Mexico\n");
+				writer.write("Tarjeta de Credito\n");
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaMexicoTar);
 				writer.write("\n");
 				// Lineas Comprometidas Mexico
 			}
 			if (!MexicoLinCom.isEmpty()) {
-				writer.write("Lineas Comprometidas-Mexico\n");
+				writer.write("Lineas Comprometidas\n");
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaMexicoLinCom);
 				writer.write("\n");
 				// Garantias Mexico
 			}
 			if (!MexicoGaran.isEmpty()) {
-				writer.write("Garantias-Mexico\n");
+				writer.write("Garantias\n");
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaMexicoGaran);
 				writer.write("\n");
 				// Aval Mexico
 			}
 			if (!MexicoAval.isEmpty()) {
-				writer.write("Aval-Mexico\n");
+				writer.write("Aval\n");
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaMexicoAval);
 				writer.write("\n");
 			}
 			if (!MexicoDer.isEmpty()) {
-				writer.write("Derivados-Mexico\n");
+				writer.write("Derivados\n");
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaMexicoDer);
 				writer.write("\n");
