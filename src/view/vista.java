@@ -11,6 +11,9 @@ import conexion.Conexion;
 import conexion.SSHConnector;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JTextField;
 
 import org.apache.poi.sl.draw.geom.Path;
@@ -36,6 +39,7 @@ import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.Color;
+import view.*;
 
 public class vista extends JFrame {
 
@@ -61,6 +65,7 @@ public class vista extends JFrame {
 	String dn2 = System.getProperty("user.dir");
 	SimpleDateFormat sdf2 = new SimpleDateFormat("dd/MM/yyyy");
 	private static final String ERROR_VPN = "No se pudo establecer la conexion, valide su VPN";
+	
 
 	/**
 	 * Launch the application.
@@ -77,6 +82,7 @@ public class vista extends JFrame {
 			}
 		});
 	}
+
 
 	/**
 	 * Create the frame.

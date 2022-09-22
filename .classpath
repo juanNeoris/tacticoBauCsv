@@ -25,5 +25,6 @@
 	<classpathentry kind="lib" path="C:/Users/z363772/Downloads/software/aspose-cells-8.1.0.jar"/>
 	<classpathentry kind="lib" path="C:/Users/z363772/Downloads/software/bcprov-jdk16-146.jar"/>
 	<classpathentry kind="lib" path="C:/Users/z363772/Downloads/software/lombok.jar"/>
+	<classpathentry kind="lib" path="C:/Users/z363772/Downloads/software/librerias/javahelp-2.0.05.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
