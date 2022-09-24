@@ -567,8 +567,10 @@ public class Conexion {
 						MexicoTotNomValSum.add(sumatoriaNomVal);
 					}
 
-				} else if (rs.getString(14).contains("Spain")) {
-
+				} else  {
+                       
+					
+					
 					if (rs.getString(5).contains("BOND")) {
 						SpainBonos.add(systCode);
 						SpainBonosNomValCurSum.add(Double.valueOf(sumatoriaNomValCur));
