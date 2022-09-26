@@ -266,8 +266,8 @@ public class vista extends JFrame {
 						String nombreInterfaz = "consulta_" + date + "_" + textField.getText() + ".csv";
 						String grupo = textField.getText();
 						conection.conecGBO();
-						String res = conection.getConsulta(grupo, nombreInterfaz, date);
-						String res2 = conection.getConsulta(grupo, nombreInterfaz, date);
+						String res = conection.getConsultaMexico(grupo, nombreInterfaz, date);
+						String res2 = conection.getConsultaOtrosPaises(grupo, nombreInterfaz, date);
 
 						if (res.equals("No existen registros para este grupo en la interfaz CONSULTA")) {
 							textField_1.setText("No se encontro el grupo");
