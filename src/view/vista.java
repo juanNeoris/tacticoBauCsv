@@ -281,8 +281,8 @@ public class vista extends JFrame {
 						} else {
 							textField_1.setText("Interfaces Generadas con éxito.");
 							textField_1.update(textField_1.getGraphics());
-							Workbook workbook = new Workbook(nombreInterfaz);
-							workbook.save("consulta_" + date + "_" + textField.getText() +".xlsx");
+							//Workbook workbook = new Workbook(nombreInterfaz);
+						//	workbook.save("consulta_" + date + "_" + textField.getText() +".xlsx");
 						}
 					} else {
 						textField_1.setText("No puedes dejar el campo de grupo vacio");
@@ -666,9 +666,9 @@ public class vista extends JFrame {
 		SimpleDateFormat sdfx = new SimpleDateFormat("yyyyMMdd");
 		String fechaCal = sdfx.format(dateChooser.getDate().getTime());
 
-		File filDolphin = new File("\\\\mx2ct1hnascifnfsevs1.mx.corp\\ExtraccionesMIR\\rtra\\PRO\\"
+		File filDolphin = new File("\\\\mx2ct1hnascifnfsevs1.mx.corp\\ExtraccionesMIR\\rtra\\"
 				+ "rtra-cream-ges-dolphin-europa_mexico_" + fechaCal + ".txt");
-		File filVictoria = new File("\\\\mx2ct1hnascifnfsevs1.mx.corp\\ExtraccionesMIR\\rtra\\PRO\\"
+		File filVictoria = new File("\\\\mx2ct1hnascifnfsevs1.mx.corp\\ExtraccionesMIR\\rtra\\"
 				+ "rtra-cream-ges-victoria-europa_mexico_" + fechaCal + ".txt");
 
 		if (!filDolphin.exists() || !filVictoria.exists()) {
@@ -728,8 +728,8 @@ public class vista extends JFrame {
 			Channel channel = session.openChannel("sftp");
 			channel.connect(50000);
 			ChannelSftp sftpChannel = (ChannelSftp) channel;
-			sftpChannel.put("\\\\mx2ct1hnascifnfsevs1.mx.corp\\ExtraccionesMIR\\rtra\\PRO\\"+"rtra-cream-ges-dolphin-europa_mexico_" + dateShelRTRA + ".txt","/planPGTMEX/procesos/RISK/interfaces");
-			sftpChannel.put("\\\\mx2ct1hnascifnfsevs1.mx.corp\\ExtraccionesMIR\\rtra\\PRO\\"+ "rtra-cream-ges-victoria-europa_mexico_" + dateShelRTRA + ".txt","/planPGTMEX/procesos/RISK/interfaces");
+			sftpChannel.put("\\\\mx2ct1hnascifnfsevs1.mx.corp\\ExtraccionesMIR\\rtra\\"+"rtra-cream-ges-dolphin-europa_mexico_" + dateShelRTRA + ".txt","/planPGTMEX/procesos/RISK/interfaces");
+			sftpChannel.put("\\\\mx2ct1hnascifnfsevs1.mx.corp\\ExtraccionesMIR\\rtra\\"+ "rtra-cream-ges-victoria-europa_mexico_" + dateShelRTRA + ".txt","/planPGTMEX/procesos/RISK/interfaces");
 			sftpChannel.exit();
 			sftpChannel.disconnect();
 
@@ -847,8 +847,8 @@ public class vista extends JFrame {
 			Channel channel = session.openChannel("sftp");
 			channel.connect(50000);
 			ChannelSftp sftpChannel = (ChannelSftp) channel;
-			sftpChannel.put("\\\\mx2ct1hnascifnfsevs1.mx.corp\\ExtraccionesMIR\\rtra\\PRO\\"+ "rtra-cream-ges-dolphin-europa_mexico_" + dateShelRTRA + ".txt","/planPGTMEX/procesos/RISK/interfaces");
-			sftpChannel.put("\\\\mx2ct1hnascifnfsevs1.mx.corp\\ExtraccionesMIR\\rtra\\PRO\\"+ "rtra-cream-ges-victoria-europa_mexico_" + dateShelRTRA + ".txt","/planPGTMEX/procesos/RISK/interfaces");
+			sftpChannel.put("\\\\mx2ct1hnascifnfsevs1.mx.corp\\ExtraccionesMIR\\rtra\\"+ "rtra-cream-ges-dolphin-europa_mexico_" + dateShelRTRA + ".txt","/planPGTMEX/procesos/RISK/interfaces");
+			sftpChannel.put("\\\\mx2ct1hnascifnfsevs1.mx.corp\\ExtraccionesMIR\\rtra\\"+ "rtra-cream-ges-victoria-europa_mexico_" + dateShelRTRA + ".txt","/planPGTMEX/procesos/RISK/interfaces");
 			sftpChannel.exit();
 			sftpChannel.disconnect();
 

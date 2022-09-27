@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 
+
 import oracle.jdbc.pool.OracleDataSource;
 
 /**
@@ -316,14 +317,9 @@ public class Conexion {
 				// cadena
 				systCode = rs.getString(1) + "," + rs.getString(2) + "," + "\"" + rs.getString(3) + "\"" + ","
 						+ rs.getString(4) + "," + rs.getString(5) + "," + rs.getString(6) + "," + rs.getString(7) + ","
-						+ rs.getString(8) + "," + rs.getString(9) + "," + rs.getString(10) + "," 
-						+ rs.getString(11)+ "," 
-						+ rs.getString(12) + "," 
-						+ "\""+rs.getString(13)+ "\"" + "," 
-						+ rs.getString(14) + "," 
-						+ "\""+ rs.getString(15) + "\"" + "," 
-						+ rs.getString(16) + "," 
-						+ rs.getString(17) + "\n";
+						+ rs.getString(8) + "," + rs.getString(9) + "," + rs.getString(10) + "," + rs.getString(11)
+						+ "," + rs.getString(12) + "," + "\"" + rs.getString(13) + "\"" + "," + rs.getString(14) + ","
+						+ "\"" + rs.getString(15) + "\"" + "," + rs.getString(16) + "," + rs.getString(17) + "\n";
 
 				// cadena obtener la sumatoria
 				sumatoriaNomValCur = rs.getDouble(9);
@@ -433,7 +429,9 @@ public class Conexion {
 						|| rs.getString(5).contains("AVAL NO") || rs.getString(5).contains("AVAL TECNICO")
 						|| rs.getString(5).contains("GARANTIA LINE") || rs.getString(5).contains("STANDBY")
 						|| rs.getString(5).contains("LINEA DE AVALES")) {
+
 					MexicoAval.add(systCode);
+
 					MexicoAvalValCurSum.add(sumatoriaNomValCur);
 					MexicoAvalCerSum.add(sumatoriaCer);
 					MexicoAvalNomValSum.add(sumatoriaNomVal);
@@ -720,7 +718,7 @@ public class Conexion {
 		double sumatoriaNomValCur;
 		double sumatoriaCer;
 		double sumatoriaNomVal;
-
+		List<String> info =  new ArrayList<String>();
 		// bonos Spain
 		List<String> SpainBonos = new ArrayList<String>();
 		// bonos sumatoria Spain
@@ -853,23 +851,11 @@ public class Conexion {
 			String pais = null;
 			do {
 				// cadena
-				systCode = rs.getString(1) + "," 
-				         + rs.getString(2) + "," 
-						 + "\"" + rs.getString(3) + "\""  + ","
-						 + rs.getString(4) + "," 
-						 + rs.getString(5) + "," 
-						 + rs.getString(6) + "," 
-						 + rs.getString(7) + ","
-						 + rs.getString(8) + "," 
-						 + rs.getString(9) + "," 
-						 + rs.getString(10) + "," 
-						 + rs.getString(11)+ "," 
-						 + rs.getString(12) + "," 
-						 + "\""+ rs.getString(13) + "\"" + "," 
-						 + rs.getString(14) + "," 
-						 + "\""+ rs.getString(15) + "\"" + "," 
-						 + rs.getString(16) + "," 
-						 + rs.getString(17) + "\n";
+				systCode = rs.getString(1) + "," + rs.getString(2) + "," + "\"" + rs.getString(3) + "\"" + ","
+						+ rs.getString(4) + "," + rs.getString(5) + "," + rs.getString(6) + "," + rs.getString(7) + ","
+						+ rs.getString(8) + "," + rs.getString(9) + "," + rs.getString(10) + "," + rs.getString(11)
+						+ "," + rs.getString(12) + "," + "\"" + rs.getString(13) + "\"" + "," + rs.getString(14) + ","
+						+ "\"" + rs.getString(15) + "\"" + "," + rs.getString(16) + "," + rs.getString(17) + "\n";
 
 				// cadena obtener la sumatoria
 				sumatoriaNomValCur = rs.getDouble(9);
@@ -898,6 +884,12 @@ public class Conexion {
 						SpainTotNomValSum.add(sumatoriaNomVal);
 					} else if (rs.getString(5).contains("EXPORTACION") || rs.getString(5).contains("IMPORTACION")) {
 						SpainExportImport.add(systCode);
+						
+						info = this.getContraparte( grupo,  fechaConsumo,  rs.getString(4), rs.getString(14),rs.getString(6),rs.getString(7));
+						SpainExportImport.addAll(info);
+						
+						
+						
 						SpainExportImportNomValCurSum.add(sumatoriaNomValCur);
 						SpainExportImportCerSum.add(sumatoriaCer);
 						SpainExportImportNomValSum.add(sumatoriaNomVal);
@@ -914,6 +906,11 @@ public class Conexion {
 						SpainTotNomValSum.add(sumatoriaNomVal);
 					} else if (rs.getString(5).contains("SINDICADO")) {
 						SpainSindicado.add(systCode);
+						
+						info = this.getContraparte( grupo,  fechaConsumo,  rs.getString(4), rs.getString(14),rs.getString(6),rs.getString(7));
+						SpainSindicado.addAll(info);
+						
+						
 						SpainSindicadoNomValCurSum.add(sumatoriaNomValCur);
 						SpainSindicadoCerSum.add(sumatoriaCer);
 						SpainSindicadoNomValSum.add(sumatoriaNomVal);
@@ -939,6 +936,19 @@ public class Conexion {
 						SpainTotNomValSum.add(sumatoriaNomVal);
 					} else if (rs.getString(5).contains("FACTORING")) {
 						SpainFac.add(systCode);
+						
+						info = this.getContraparte( grupo,  fechaConsumo,  rs.getString(4), rs.getString(14),rs.getString(6),rs.getString(7));
+						SpainFac.addAll(info);
+						// validamos su contraparte
+						// llamamos el metodo si tiene contraparte
+						// regresa y se la añadimos debajo del su
+						// operacion return String
+						// if() {
+
+						// MexicoAval.add(contraparte );
+
+						// }
+
 						SpainFacNomValCurSum.add(sumatoriaNomValCur);
 						SpainFacCerSum.add(sumatoriaCer);
 						SpainFacNomValSum.add(sumatoriaNomVal);
@@ -1117,6 +1127,42 @@ public class Conexion {
 		return systCode;
 	}
 
+	public List<String> getContraparte(String grupo, String fechaConsumo, String deal, String pais,String valuedate,String maturitydate) {
+		strbSql = new StringBuilder();
+
+		List<String> registrosInterfaz;
+		registrosInterfaz = new ArrayList<String>();
+		String systCode = "";
+		strbSql.append(
+				"SELECT cptyparent,cptyparentrating,cptyparentname,dealstamp,instrumentname,TO_CHAR(TO_DATE(valuedate,  'YYYY-MM-DD'), 'DD/MON/YYYY'),TO_CHAR(TO_DATE(maturitydate,  'YYYY-MM-DD'), 'DD/MON/YYYY'),currency,DECODE(nominalvaluecur,null, '0.0',nominalvaluecur) AS nominalvaluecur,DECODE(CER,null, '0.0',CER) AS CER,DECODE(nominalvalue,null, '0.0',nominalvalue) AS nominalvalue,oneoff,cptyname,foldercountryname,cptycountry,cptyparentcountry,foldercountry from PGT_MEX.T_PGT_MEX_CONSUMOSC_V WHERE LastParentF ='"+ grupo + "' and FECHACARGA='"+ fechaConsumo + "' AND foldercountryname='"+ pais + "' AND DEALSTAMP='"+ deal + "' AND valuedate=TO_CHAR(TO_DATE('"+ valuedate +"',  'DD/MON/YYYY'), 'YYYY-MM-DD')AND maturitydate=TO_CHAR(TO_DATE('"+ maturitydate +"',  'DD/MON/YYYY'), 'YYYY-MM-DD')AND INSTRUMENTNAME IN('GARANTIA ACCIONES COTIZADAS','GARANTIA AVAL FINANCIERO - NO USAR (3Q 2016)','GARANTIA DERECHOS DE COBRO','GARANTIA PERSONAL MANCOMUNADA','GARANTIA PERSONAL SOLIDARIA','GARANTIA PERSONAL SOLIDARIA FINAN','OTRAS GARANTIAS EN EFECTIVO','OTRAS GARANTIAS REALES NO LIQUIDAS','OTHER GUARANTY CASH') UNION ALL  SELECT cptyparent,cptyparentrating,cptyparentname,dealstamp,instrumentname,TO_CHAR(TO_DATE(valuedate,  'YYYY-MM-DD'), 'DD/MON/YYYY'),TO_CHAR(TO_DATE(maturitydate,  'YYYY-MM-DD'), 'DD/MON/YYYY'),currency,DECODE(nominalvaluecur,null, '0.0',nominalvaluecur) AS nominalvaluecur,DECODE(CER,null, '0.0',CER) AS CER,DECODE(nominalvalue,null, '0.0',nominalvalue) AS nominalvalue,oneoff,cptyname,foldercountryname,cptycountry,cptyparentcountry,foldercountry from PGT_MEX.T_PGT_MEX_CONSUMOSC_D WHERE LastParentF ='"+ grupo + "' and FECHACARGA='"+ fechaConsumo + "' AND foldercountryname='"+ pais + "' AND DEALSTAMP='"+ deal + "' AND valuedate=TO_CHAR(TO_DATE('"+ valuedate +"',  'DD/MON/YYYY'), 'YYYY-MM-DD') AND maturitydate=TO_CHAR(TO_DATE('"+ maturitydate +"',  'DD/MON/YYYY'), 'YYYY-MM-DD')AND INSTRUMENTNAME IN('GARANTIA ACCIONES COTIZADAS','GARANTIA AVAL FINANCIERO - NO USAR (3Q 2016)','GARANTIA DERECHOS DE COBRO','GARANTIA PERSONAL MANCOMUNADA','GARANTIA PERSONAL SOLIDARIA','GARANTIA PERSONAL SOLIDARIA FINAN','OTRAS GARANTIAS EN EFECTIVO','OTRAS GARANTIAS REALES NO LIQUIDAS','OTHER GUARANTY CASH') ORDER BY foldercountry,instrumentname");
+		
+		try {
+			pstmt = con.prepareStatement(strbSql.toString());
+			rs = pstmt.executeQuery();
+			
+
+
+			
+			while (rs.next()) {
+				systCode = rs.getString(1) + "," + rs.getString(2) + "," + "\"" + rs.getString(3) + "\"" + ","
+						+ rs.getString(4) + "," + rs.getString(5) + "," + rs.getString(6) + "," + rs.getString(7)
+						+ "," + rs.getString(8) + "," + rs.getString(9) + "," + rs.getString(10) + ","
+						+ rs.getString(11) + "," + rs.getString(12) + "," + "\"" + rs.getString(13) + "\"" + ","
+						+ rs.getString(14) + "," + "\"" + rs.getString(15) + "\"" + "," + rs.getString(16) + ","
+						+ rs.getString(17) + "\n";
+				
+				System.out.println("registros"+systCode);
+				registrosInterfaz.add(systCode);
+			} 
+
+		} catch (SQLException e) {
+
+			System.out.println("error en query " + e);
+		}
+
+		return registrosInterfaz;
+	}
+
 	public void creaInterfaz(List<String> encabezado, List<String> spainBonos, List<Double> spainBonosNomValCurSum,
 			List<Double> spainBonosCerSum, List<Double> spainBonosNomValSum, List<String> spainCredDocu,
 			List<Double> spainCredDocuNomValCurSum, List<Double> spainCredDocuCerSum,
@@ -1216,7 +1262,6 @@ public class Conexion {
 		try {
 			FileWriter writer = new FileWriter(nombreInterfaz, true);
 
-			
 			if (!spainBonos.isEmpty()) {
 				writer.write("Bonos-" + pais + "\n");
 				writer.write(CadenaEncabeza);
@@ -1226,7 +1271,7 @@ public class Conexion {
 						+ Double.toString(totalSpainBonosNomVal));
 				writer.write("\n");
 				// Credito Documentariado Spain
-				
+
 			}
 			if (!spainBonos.isEmpty()) {
 				writer.write("Bonos-" + pais + "\n");
@@ -1236,7 +1281,7 @@ public class Conexion {
 						+ Double.toString(totalSpainBonosNomValCur) + "," + Double.toString(totalSpainBonosCer) + ","
 						+ Double.toString(totalSpainBonosNomVal));
 				writer.write("\n");
-				
+
 				// Credito Documentariado Spain
 			}
 			if (!spainCredDocu.isEmpty()) {
@@ -1251,7 +1296,7 @@ public class Conexion {
 				// Exportacion/Importacion Spain
 			}
 			if (!spainExportImport.isEmpty()) {
-				
+
 				writer.write("Financiamiento IMP/EXP-" + pais + "\n");
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaSpainExportImport);
@@ -1260,7 +1305,7 @@ public class Conexion {
 						+ Double.toString(totalSpainExportImportCerSum) + ","
 						+ Double.toString(totalSpainExportImportNomValSum));
 				writer.write("\n");
-				
+
 				// Comex/Forfaiting Spain
 			}
 			if (!spainComFor.isEmpty()) {
