@@ -279,6 +279,8 @@ public class Conexion {
 		List<Double> MexicoTotValCurSum = new ArrayList<Double>();
 		List<Double> MexicoTotCerSum = new ArrayList<Double>();
 		List<Double> MexicoTotNomValSum = new ArrayList<Double>();
+		
+		List<String> info =  new ArrayList<String>();
 
 		List<String> encabezado = new ArrayList<>();
 		encabezado.add("CPTYPARENT");
@@ -328,6 +330,8 @@ public class Conexion {
 
 				if (rs.getString(5).contains("BOND")) {
 					MexicoBonos.add(systCode);
+					info = this.getContraparte( grupo,  fechaConsumo,  rs.getString(4), rs.getString(14),rs.getString(6),rs.getString(7));
+					MexicoBonos.addAll(info);
 					MexicoBonosNomValCurSum.add(Double.valueOf(sumatoriaNomValCur));
 					MexicoBonosCerSum.add(Double.valueOf(sumatoriaCer));
 					MexicoBonosNomValSum.add(Double.valueOf(sumatoriaNomVal));
@@ -337,6 +341,8 @@ public class Conexion {
 
 				} else if (rs.getString(5).contains(" CREDITO DOCUMENTARIO")) {
 					MexicoCredDocu.add(systCode);
+					info = this.getContraparte( grupo,  fechaConsumo,  rs.getString(4), rs.getString(14),rs.getString(6),rs.getString(7));
+					MexicoCredDocu.addAll(info);
 					MexicoCredDocuNomValCurSum.add(sumatoriaNomValCur);
 					MexicoCredDocuCerSum.add(sumatoriaCer);
 					MexicoCredDocuNomValSum.add(sumatoriaNomVal);
@@ -345,6 +351,8 @@ public class Conexion {
 					MexicoTotNomValSum.add(sumatoriaNomVal);
 				} else if (rs.getString(5).contains("EXPORTACION") || rs.getString(5).contains("IMPORTACION")) {
 					MexicoExportImport.add(systCode);
+					info = this.getContraparte( grupo,  fechaConsumo,  rs.getString(4), rs.getString(14),rs.getString(6),rs.getString(7));
+					MexicoExportImport.addAll(info);
 					MexicoExportImportNomValCurSum.add(sumatoriaNomValCur);
 					MexicoExportImportCerSum.add(sumatoriaCer);
 					MexicoExportImportNomValSum.add(sumatoriaNomVal);
@@ -353,6 +361,8 @@ public class Conexion {
 					MexicoTotNomValSum.add(sumatoriaNomVal);
 				} else if (rs.getString(5).contains("COMEX") || rs.getString(5).contains("FORFAITING")) {
 					MexicoComFor.add(systCode);
+					info = this.getContraparte( grupo,  fechaConsumo,  rs.getString(4), rs.getString(14),rs.getString(6),rs.getString(7));
+					MexicoComFor.addAll(info);
 					MexicoComForNomValCurSum.add(sumatoriaNomValCur);
 					MexicoComForCerSum.add(sumatoriaCer);
 					MexicoComForNomValSum.add(sumatoriaNomVal);
@@ -361,6 +371,8 @@ public class Conexion {
 					MexicoTotNomValSum.add(sumatoriaNomVal);
 				} else if (rs.getString(5).contains("SINDICADO")) {
 					MexicoSindicado.add(systCode);
+					info = this.getContraparte( grupo,  fechaConsumo,  rs.getString(4), rs.getString(14),rs.getString(6),rs.getString(7));
+					MexicoSindicado.addAll(info);
 					MexicoSindicadoNomValCurSum.add(sumatoriaNomValCur);
 					MexicoSindicadoCerSum.add(sumatoriaCer);
 					MexicoSindicadoNomValSum.add(sumatoriaNomVal);
@@ -369,6 +381,8 @@ public class Conexion {
 					MexicoTotNomValSum.add(sumatoriaNomVal);
 				} else if (rs.getString(5).contains("CONFIRMING")) {
 					MexicoConfir.add(systCode);
+					info = this.getContraparte( grupo,  fechaConsumo,  rs.getString(4), rs.getString(14),rs.getString(6),rs.getString(7));
+					MexicoConfir.addAll(info);
 					MexicoConfirNomValCurSum.add(sumatoriaNomValCur);
 					MexicoConfirCerSum.add(sumatoriaCer);
 					MexicoConfirNomValSum.add(sumatoriaNomVal);
@@ -378,6 +392,8 @@ public class Conexion {
 
 				} else if (rs.getString(5).contains("DESCUENTOS")) {
 					MexicoDesc.add(systCode);
+					info = this.getContraparte( grupo,  fechaConsumo,  rs.getString(4), rs.getString(14),rs.getString(6),rs.getString(7));
+					MexicoDesc.addAll(info);
 					MexicoDescValCurSum.add(sumatoriaNomValCur);
 					MexicoDescCerSum.add(sumatoriaCer);
 					MexicoDescNomValSum.add(sumatoriaNomVal);
@@ -386,6 +402,8 @@ public class Conexion {
 					MexicoTotNomValSum.add(sumatoriaNomVal);
 				} else if (rs.getString(5).contains("FACTORING")) {
 					MexicoFac.add(systCode);
+					info = this.getContraparte( grupo,  fechaConsumo,  rs.getString(4), rs.getString(14),rs.getString(6),rs.getString(7));
+					MexicoFac.addAll(info);
 					MexicoFacValCurSum.add(sumatoriaNomValCur);
 					MexicoFacCerSum.add(sumatoriaCer);
 					MexicoFacNomValSum.add(sumatoriaNomVal);
@@ -395,6 +413,8 @@ public class Conexion {
 
 				} else if (rs.getString(5).contains("TARJETAS")) {
 					MexicoTar.add(systCode);
+					info = this.getContraparte( grupo,  fechaConsumo,  rs.getString(4), rs.getString(14),rs.getString(6),rs.getString(7));
+					MexicoTar.addAll(info);
 					MexicoTarValCurSum.add(sumatoriaNomValCur);
 					MexicoTarCerSum.add(sumatoriaCer);
 					MexicoTarNomValSum.add(sumatoriaNomVal);
@@ -405,6 +425,8 @@ public class Conexion {
 						|| rs.getString(5).contains("CREDITOS - COMPROMETIDO")
 						|| rs.getString(5).contains("CREDITO BACKUP") || rs.getString(5).contains("CREDITO OTROS")) {
 					MexicoLinCom.add(systCode);
+					info = this.getContraparte( grupo,  fechaConsumo,  rs.getString(4), rs.getString(14),rs.getString(6),rs.getString(7));
+					MexicoLinCom.addAll(info);
 					MexicoLinComValCurSum.add(sumatoriaNomValCur);
 					MexicoLinComCerSum.add(sumatoriaCer);
 					MexicoLinComNomValSum.add(sumatoriaNomVal);
@@ -431,7 +453,8 @@ public class Conexion {
 						|| rs.getString(5).contains("LINEA DE AVALES")) {
 
 					MexicoAval.add(systCode);
-
+					info = this.getContraparte( grupo,  fechaConsumo,  rs.getString(4), rs.getString(14),rs.getString(6),rs.getString(7));
+					MexicoAval.addAll(info);
 					MexicoAvalValCurSum.add(sumatoriaNomValCur);
 					MexicoAvalCerSum.add(sumatoriaCer);
 					MexicoAvalNomValSum.add(sumatoriaNomVal);
@@ -456,6 +479,8 @@ public class Conexion {
 						|| rs.getString(5).contains("DELIVERABLE") || rs.getString(5).contains("GENERIC DEALS")
 						|| rs.getString(5).contains("PAYER REVENUE")) {
 					MexicoDer.add(systCode);
+					info = this.getContraparte( grupo,  fechaConsumo,  rs.getString(4), rs.getString(14),rs.getString(6),rs.getString(7));
+					MexicoDer.addAll(info);
 					MexicoDerValCurSum.add(sumatoriaNomValCur);
 					MexicoDerCerSum.add(sumatoriaCer);
 					MexicoDerNomValSum.add(sumatoriaNomVal);
@@ -867,6 +892,11 @@ public class Conexion {
 
 					if (rs.getString(5).contains("BOND")) {
 						SpainBonos.add(systCode);
+						
+						info = this.getContraparte( grupo,  fechaConsumo,  rs.getString(4), rs.getString(14),rs.getString(6),rs.getString(7));
+						SpainBonos.addAll(info);
+						
+						
 						SpainBonosNomValCurSum.add(Double.valueOf(sumatoriaNomValCur));
 						SpainBonosCerSum.add(Double.valueOf(sumatoriaCer));
 						SpainBonosNomValSum.add(Double.valueOf(sumatoriaNomVal));
@@ -876,6 +906,11 @@ public class Conexion {
 
 					} else if (rs.getString(5).contains(" CREDITO DOCUMENTARIO")) {
 						SpainCredDocu.add(systCode);
+						
+						info = this.getContraparte( grupo,  fechaConsumo,  rs.getString(4), rs.getString(14),rs.getString(6),rs.getString(7));
+						SpainCredDocu.addAll(info);
+						
+						
 						SpainCredDocuNomValCurSum.add(sumatoriaNomValCur);
 						SpainCredDocuCerSum.add(sumatoriaCer);
 						SpainCredDocuNomValSum.add(sumatoriaNomVal);
@@ -898,6 +933,11 @@ public class Conexion {
 						SpainTotNomValSum.add(sumatoriaNomVal);
 					} else if (rs.getString(5).contains("COMEX") || rs.getString(5).contains("FORFAITING")) {
 						SpainComFor.add(systCode);
+						
+						info = this.getContraparte( grupo,  fechaConsumo,  rs.getString(4), rs.getString(14),rs.getString(6),rs.getString(7));
+						SpainComFor.addAll(info);
+						
+						
 						SpainComForNomValCurSum.add(sumatoriaNomValCur);
 						SpainComForCerSum.add(sumatoriaCer);
 						SpainComForNomValSum.add(sumatoriaNomVal);
@@ -920,6 +960,11 @@ public class Conexion {
 
 					} else if (rs.getString(5).contains("CONFIRMING")) {
 						SpainConfir.add(systCode);
+						
+						info = this.getContraparte( grupo,  fechaConsumo,  rs.getString(4), rs.getString(14),rs.getString(6),rs.getString(7));
+						SpainConfir.addAll(info);
+						
+						
 						SpainConfirNomValCurSum.add(sumatoriaNomValCur);
 						SpainConfirCerSum.add(sumatoriaCer);
 						SpainConfirNomValSum.add(sumatoriaNomVal);
@@ -928,6 +973,11 @@ public class Conexion {
 						SpainTotNomValSum.add(sumatoriaNomVal);
 					} else if (rs.getString(5).contains("DESCUENTOS")) {
 						SpainDesc.add(systCode);
+						
+						info = this.getContraparte( grupo,  fechaConsumo,  rs.getString(4), rs.getString(14),rs.getString(6),rs.getString(7));
+						SpainDesc.addAll(info);
+						
+						
 						SpainDescNomValCurSum.add(sumatoriaNomValCur);
 						SpainDescCerSum.add(sumatoriaCer);
 						SpainDescNomValSum.add(sumatoriaNomVal);
@@ -958,6 +1008,10 @@ public class Conexion {
 
 					} else if (rs.getString(5).contains("TARJETAS")) {
 						SpainTar.add(systCode);
+						
+						info = this.getContraparte( grupo,  fechaConsumo,  rs.getString(4), rs.getString(14),rs.getString(6),rs.getString(7));
+						SpainTar.addAll(info);
+						
 						SpainTarNomValCurSum.add(sumatoriaNomValCur);
 						SpainTarCerSum.add(sumatoriaCer);
 						SpainTarNomValSum.add(sumatoriaNomVal);
@@ -969,6 +1023,10 @@ public class Conexion {
 							|| rs.getString(5).contains("CREDITO BACKUP")
 							|| rs.getString(5).contains("CREDITO OTROS")) {
 						SpainLinCom.add(systCode);
+						
+						info = this.getContraparte( grupo,  fechaConsumo,  rs.getString(4), rs.getString(14),rs.getString(6),rs.getString(7));
+						SpainLinCom.addAll(info);
+						
 						SpainLinComNomValCurSum.add(sumatoriaNomValCur);
 						SpainLinComCerSum.add(sumatoriaCer);
 						SpainLinComNomValSum.add(sumatoriaNomVal);
@@ -995,6 +1053,10 @@ public class Conexion {
 							|| rs.getString(5).contains("GARANTIA LINE") || rs.getString(5).contains("STANDBY")
 							|| rs.getString(5).contains("LINEA DE AVALES")) {
 						SpainAval.add(systCode);
+						
+						info = this.getContraparte( grupo,  fechaConsumo,  rs.getString(4), rs.getString(14),rs.getString(6),rs.getString(7));
+						SpainAval.addAll(info);
+						
 						SpainAvalNomValCurSum.add(sumatoriaNomValCur);
 						SpainAvalCerSum.add(sumatoriaCer);
 						SpainAvalNomValSum.add(sumatoriaNomVal);
@@ -1019,6 +1081,9 @@ public class Conexion {
 							|| rs.getString(5).contains("DELIVERABLE") || rs.getString(5).contains("GENERIC DEALS")
 							|| rs.getString(5).contains("PAYER REVENUE")) {
 						SpainDer.add(systCode);
+						info = this.getContraparte( grupo,  fechaConsumo,  rs.getString(4), rs.getString(14),rs.getString(6),rs.getString(7));
+						SpainDer.addAll(info);
+						
 						SpainDerNomValCurSum.add(sumatoriaNomValCur);
 						SpainDerCerSum.add(sumatoriaCer);
 						SpainDerNomValSum.add(sumatoriaNomVal);
@@ -1151,7 +1216,7 @@ public class Conexion {
 						+ rs.getString(14) + "," + "\"" + rs.getString(15) + "\"" + "," + rs.getString(16) + ","
 						+ rs.getString(17) + "\n";
 				
-				System.out.println("registros"+systCode);
+				//System.out.println("registros"+systCode);
 				registrosInterfaz.add(systCode);
 			} 
 
