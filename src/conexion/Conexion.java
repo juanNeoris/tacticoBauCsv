@@ -10,6 +10,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -32,7 +33,9 @@ public class Conexion {
 	private Statement stmt;
 	private ResultSet rs;
 	private StringBuilder strbSql;
+	public static final DecimalFormat DFORMATO = new DecimalFormat("####.########");
 
+	
 	public Conexion() {
 		super();
 		this.con = null;
@@ -183,6 +186,8 @@ public class Conexion {
 		double sumatoriaNomValCur;
 		double sumatoriaCer;
 		double sumatoriaNomVal;
+		
+		 
 
 		// bonos Mexico
 		List<String> MexicoBonos = new ArrayList<String>();
@@ -283,6 +288,7 @@ public class Conexion {
 		List<String> info =  new ArrayList<String>();
 
 		List<String> encabezado = new ArrayList<>();
+		
 		encabezado.add("CPTYPARENT");
 		encabezado.add("CPTYPARENTRATING");
 		encabezado.add("CPTYPARENTNAME");
@@ -301,7 +307,8 @@ public class Conexion {
 		encabezado.add("CPTYPARENTCOUNTRY");
 		encabezado.add("FOLDERCOUNTRY");
 		encabezado.add("\n");
-
+		
+		
 		String systCode = "SELECT cptyparent,cptyparentrating,cptyparentname,dealstamp,instrumentname,TO_CHAR(TO_DATE(valuedate,  'YYYY-MM-DD'), 'DD/MON/YYYY'),TO_CHAR(TO_DATE(maturitydate,  'YYYY-MM-DD'), 'DD/MON/YYYY'),currency,DECODE(nominalvaluecur,null, '0.0',nominalvaluecur) AS nominalvaluecur,DECODE(CER,null, '0.0',CER) AS CER,DECODE(nominalvalue,null, '0.0',nominalvalue) AS nominalvalue,oneoff,cptyname,foldercountryname,cptycountry,cptyparentcountry,foldercountry from PGT_MEX.T_PGT_MEX_CONSUMOSC_V WHERE LastParentF ='"
 				+ grupo + "' and FECHACARGA='" + fechaConsumo
 				+ "' AND foldercountryname='Mexico' UNION ALL SELECT cptyparent,cptyparentrating,cptyparentname,dealstamp,instrumentname,TO_CHAR(TO_DATE(valuedate,  'YYYY-MM-DD'), 'DD/MON/YYYY'),TO_CHAR(TO_DATE(maturitydate,  'YYYY-MM-DD'), 'DD/MON/YYYY'),currency,DECODE(nominalvaluecur,null, '0.0',nominalvaluecur) AS nominalvaluecur,DECODE(CER,null, '0.0',CER) AS CER,DECODE(nominalvalue,null, '0.0',nominalvalue) AS nominalvalue,oneoff,cptyname,foldercountryname,cptycountry,cptyparentcountry,foldercountry from PGT_MEX.T_PGT_MEX_CONSUMOSC_D WHERE LastParentF ='"
@@ -500,8 +507,9 @@ public class Conexion {
 			String CadenaBonosMex = MexicoBonos.stream().collect(Collectors.joining(""));
 			double totalMexicoBonosNomValCur = MexicoBonosNomValCurSum.stream().mapToDouble(Double::doubleValue).sum();
 			double totalMexicoBonosCer = MexicoBonosCerSum.stream().mapToDouble(Double::doubleValue).sum();
-			double totalMexicoBonosNomVal = MexicoBonosNomValSum.stream().mapToDouble(Double::doubleValue).sum();
+			double  totalMexicoBonosNomVal = MexicoBonosNomValSum.stream().mapToDouble(Double::doubleValue).sum();
 
+			
 			// Creditos Documentariados
 			String CadenaMexicoCredDoc = MexicoCredDocu.stream().collect(Collectors.joining(""));
 			double totalMexicoCredDocuNomValCurSum = MexicoCredDocuNomValCurSum.stream()
@@ -594,8 +602,8 @@ public class Conexion {
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaBonosMex);
 				writer.write("," + "," + "," + "," + "Total Bonos" + "," + "," + "," + ","
-						+ Double.toString(totalMexicoBonosNomValCur) + "," + Double.toString(totalMexicoBonosCer) + ","
-						+ Double.toString(totalMexicoBonosNomVal));
+						+ DFORMATO.format(totalMexicoBonosNomValCur).toString() + "," +DFORMATO.format(totalMexicoBonosCer).toString() + ","
+						+ DFORMATO.format(totalMexicoBonosNomVal).toString());
 				writer.write("\n");
 
 				// Credito Documentariado Mexico
@@ -605,9 +613,9 @@ public class Conexion {
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaMexicoCredDoc);
 				writer.write("," + "," + "," + "," + "Total Creditos Documentariado" + "," + "," + "," + ","
-						+ Double.toString(totalMexicoCredDocuNomValCurSum) + ","
-						+ Double.toString(totalMexicoCredDocuCerSum) + ","
-						+ Double.toString(totalMexicoCredDocuNomValSum));
+						+ DFORMATO.format(totalMexicoCredDocuNomValCurSum).toString() + ","
+						+ DFORMATO.format(totalMexicoCredDocuCerSum).toString() + ","
+						+ DFORMATO.format(totalMexicoCredDocuNomValSum).toString());
 				writer.write("\n");
 				// Exportacion/Importacion Mexio
 			}
@@ -616,9 +624,9 @@ public class Conexion {
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaMexicoExportImport);
 				writer.write("," + "," + "," + "," + "Total Financiamiento IMP/EXP" + "," + "," + "," + ","
-						+ Double.toString(totalMexicoExportImportNomValCurSum) + ","
-						+ Double.toString(totalMexicoExportImportCerSum) + ","
-						+ Double.toString(totalMexicoExportImportNomValSum));
+						+ DFORMATO.format(totalMexicoExportImportNomValCurSum).toString() + ","
+						+DFORMATO.format(totalMexicoExportImportCerSum).toString() + ","
+						+ DFORMATO.format(totalMexicoExportImportNomValSum).toString());
 				writer.write("\n");
 				// Comex/forfaiting Mexico
 			}
@@ -627,8 +635,8 @@ public class Conexion {
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaMexicoComFor);
 				writer.write("," + "," + "," + "," + "Total Financiamiento Comex" + "," + "," + "," + ","
-						+ Double.toString(totalMexicoComForNomValCurSum) + ","
-						+ Double.toString(totalMexicoComForCerSum) + "," + Double.toString(totalMexicoComForNomValSum));
+						+ DFORMATO.format(totalMexicoComForNomValCurSum).toString() + ","
+						+ DFORMATO.format(totalMexicoComForCerSum).toString() + "," + DFORMATO.format(totalMexicoComForNomValSum).toString());
 				writer.write("\n");
 
 				// Sindicado Mexico
@@ -638,9 +646,9 @@ public class Conexion {
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaMexicoSindicado);
 				writer.write("," + "," + "," + "," + "Total Creditos Sindicados" + "," + "," + "," + ","
-						+ Double.toString(totalMexicoSindicadoNomValCurSum) + ","
-						+ Double.toString(totalMexicoSindicadoCerSum) + ","
-						+ Double.toString(totalMexicoSindicadoNomValSum));
+						+ DFORMATO.format(totalMexicoSindicadoNomValCurSum).toString() + ","
+						+ DFORMATO.format(totalMexicoSindicadoCerSum).toString() + ","
+						+ DFORMATO.format(totalMexicoSindicadoNomValSum).toString());
 				writer.write("\n");
 				// Confirming Mexico
 			}
@@ -649,8 +657,8 @@ public class Conexion {
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaMexicoConfir);
 				writer.write("," + "," + "," + "," + "Total Confirming" + "," + "," + "," + ","
-						+ Double.toString(totalMexicoConfirNomValCurSum) + ","
-						+ Double.toString(totalMexicoConfirCerSum) + "," + Double.toString(totalMexicoConfirNomValSum));
+						+ DFORMATO.format(totalMexicoConfirNomValCurSum).toString() + ","
+						+ DFORMATO.format(totalMexicoConfirCerSum).toString() + "," + DFORMATO.format(totalMexicoConfirNomValSum).toString());
 
 				writer.write("\n");
 				// Descuentos Mexico
@@ -660,8 +668,8 @@ public class Conexion {
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaMexicoDesc);
 				writer.write("," + "," + "," + "," + "Total Descuentos" + "," + "," + "," + ","
-						+ Double.toString(totalMexicoDescValCurSum) + "," + Double.toString(totalMexicoDescCerSum) + ","
-						+ Double.toString(totalMexicoDescNomValSum));
+						+ DFORMATO.format(totalMexicoDescValCurSum).toString() + "," + DFORMATO.format(totalMexicoDescCerSum).toString() + ","
+						+ DFORMATO.format(totalMexicoDescNomValSum).toString());
 				writer.write("\n");
 				// Factoring Mexico
 			}
@@ -670,8 +678,8 @@ public class Conexion {
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaMexicoFac);
 				writer.write("," + "," + "," + "," + "Total Factoring" + "," + "," + "," + ","
-						+ Double.toString(totalMexicoFacValCurSum) + "," + Double.toString(totalMexicoFacCerSum) + ","
-						+ Double.toString(totalMexicoFacNomValSum));
+						+ DFORMATO.format(totalMexicoFacValCurSum).toString() + "," + DFORMATO.format(totalMexicoFacCerSum).toString() + ","
+						+ DFORMATO.format(totalMexicoFacNomValSum).toString());
 				writer.write("\n");
 				// Tarjetas Mexico
 			}
@@ -680,8 +688,8 @@ public class Conexion {
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaMexicoTar);
 				writer.write("," + "," + "," + "," + "Tarjeta de Credito" + "," + "," + "," + ","
-						+ Double.toString(totalMexicoTarValCurSum) + "," + Double.toString(totalMexicoTarCerSum) + ","
-						+ Double.toString(totalMexicoTarNomValSum));
+						+ DFORMATO.format(totalMexicoTarValCurSum).toString() + "," + DFORMATO.format(totalMexicoTarCerSum).toString() + ","
+						+ DFORMATO.format(totalMexicoTarNomValSum).toString());
 				writer.write("\n");
 				// Lineas Comprometidas Mexico
 			}
@@ -690,8 +698,8 @@ public class Conexion {
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaMexicoLinCom);
 				writer.write("," + "," + "," + "," + "Lineas Comprometidas" + "," + "," + "," + ","
-						+ Double.toString(totalMexicoLinComValCurSum) + "," + Double.toString(totalMexicoLinComCerSum)
-						+ "," + Double.toString(totalMexicoLinComNomValSum));
+						+ DFORMATO.format(totalMexicoLinComValCurSum).toString() + "," + DFORMATO.format(totalMexicoLinComCerSum).toString()
+						+ "," + DFORMATO.format(totalMexicoLinComNomValSum).toString());
 				writer.write("\n");
 				// Garantias Mexico
 			}
@@ -700,8 +708,8 @@ public class Conexion {
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaMexicoGaran);
 				writer.write("," + "," + "," + "," + "Total Garantias" + "," + "," + "," + ","
-						+ Double.toString(totalMexicoGaranValCurSum) + "," + Double.toString(totalMexicoGaranCerSum)
-						+ "," + Double.toString(totalMexicoGaranNomValSum));
+						+ DFORMATO.format(totalMexicoGaranValCurSum).toString() + "," + DFORMATO.format(totalMexicoGaranCerSum).toString()
+						+ "," + DFORMATO.format(totalMexicoGaranNomValSum).toString());
 				writer.write("\n");
 				// Aval Mexico
 			}
@@ -710,8 +718,8 @@ public class Conexion {
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaMexicoAval);
 				writer.write("," + "," + "," + "," + "Total Aval" + "," + "," + "," + ","
-						+ Double.toString(totalMexicoAvalValCurSum) + "," + Double.toString(totalMexicoAvalCerSum) + ","
-						+ Double.toString(totalMexicoAvalNomValSum));
+						+ DFORMATO.format(totalMexicoAvalValCurSum).toString() + "," + DFORMATO.format(totalMexicoAvalCerSum).toString() + ","
+						+ DFORMATO.format(totalMexicoAvalNomValSum).toString());
 				writer.write("\n");
 			}
 			if (!MexicoDer.isEmpty()) {
@@ -719,15 +727,15 @@ public class Conexion {
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaMexicoDer);
 				writer.write("," + "," + "," + "," + "Total Derivados" + "," + "," + "," + ","
-						+ Double.toString(totalMexicoDerValCurSum) + "," + Double.toString(totalMexicoDerCerSum) + ","
-						+ Double.toString(totalMexicoDerNomValSum));
+						+ DFORMATO.format(totalMexicoDerValCurSum).toString() + "," + DFORMATO.format(totalMexicoDerCerSum).toString() + ","
+						+ DFORMATO.format(totalMexicoDerNomValSum).toString());
 				writer.write("\n");
 
 			}
 
 			writer.write("TOTAL Mexico" + "," + "," + "," + "," + "Total general" + "," + "," + "," + ","
-					+ Double.toString(totalMexicoTotValCurSum) + "," + Double.toString(totalMexicoTotCerSum) + ","
-					+ Double.toString(totalMexicoTotNomValSum));
+					+ DFORMATO.format(totalMexicoTotValCurSum).toString() + "," + DFORMATO.format(totalMexicoTotCerSum).toString() + ","
+					+ DFORMATO.format(totalMexicoTotNomValSum).toString());
 			writer.write("\n");
 
 			writer.close();
@@ -1332,8 +1340,8 @@ public class Conexion {
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaBonosSpain);
 				writer.write("," + "," + "," + "," + "Total Bonos" + "," + "," + "," + ","
-						+ Double.toString(totalSpainBonosNomValCur) + "," + Double.toString(totalSpainBonosCer) + ","
-						+ Double.toString(totalSpainBonosNomVal));
+						+ DFORMATO.format(totalSpainBonosNomValCur).toString() + "," + DFORMATO.format(totalSpainBonosCer).toString() + ","
+						+ DFORMATO.format(totalSpainBonosNomVal).toString());
 				writer.write("\n");
 				// Credito Documentariado Spain
 
@@ -1343,8 +1351,8 @@ public class Conexion {
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaBonosSpain);
 				writer.write("," + "," + "," + "," + "Total Bonos" + "," + "," + "," + ","
-						+ Double.toString(totalSpainBonosNomValCur) + "," + Double.toString(totalSpainBonosCer) + ","
-						+ Double.toString(totalSpainBonosNomVal));
+						+ DFORMATO.format(totalSpainBonosNomValCur).toString()+ "," + DFORMATO.format(totalSpainBonosCer).toString() + ","
+						+ DFORMATO.format(totalSpainBonosNomVal).toString());
 				writer.write("\n");
 
 				// Credito Documentariado Spain
@@ -1354,9 +1362,9 @@ public class Conexion {
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaSpainCredDoc);
 				writer.write("," + "," + "," + "," + " Total Creditos Documentariado" + "," + "," + "," + ","
-						+ Double.toString(totalSpainCredDocuNomValCurSum) + ","
-						+ Double.toString(totalSpainCredDocuCerSum) + ","
-						+ Double.toString(totalSpainCredDocuNomValSum));
+						+ DFORMATO.format(totalSpainCredDocuNomValCurSum).toString() + ","
+						+ DFORMATO.format(totalSpainCredDocuCerSum).toString() + ","
+						+ DFORMATO.format(totalSpainCredDocuNomValSum).toString());
 				writer.write("\n");
 				// Exportacion/Importacion Spain
 			}
@@ -1366,9 +1374,9 @@ public class Conexion {
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaSpainExportImport);
 				writer.write("," + "," + "," + "," + "Total Financiamiento IMP/EXP" + "," + "," + "," + ","
-						+ Double.toString(totalSpainExportImportNomValCurSum) + ","
-						+ Double.toString(totalSpainExportImportCerSum) + ","
-						+ Double.toString(totalSpainExportImportNomValSum));
+						+ DFORMATO.format(totalSpainExportImportNomValCurSum).toString() + ","
+						+ DFORMATO.format(totalSpainExportImportCerSum).toString() + ","
+						+DFORMATO.format(totalSpainExportImportNomValSum).toString());
 				writer.write("\n");
 
 				// Comex/Forfaiting Spain
@@ -1378,8 +1386,8 @@ public class Conexion {
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaSpainComFor);
 				writer.write("," + "," + "," + "," + "Total Financiamiento Comex" + "," + "," + "," + ","
-						+ Double.toString(totalSpainComForNomValCurSum) + "," + Double.toString(totalSpainComForCerSum)
-						+ "," + Double.toString(totalSpainComForNomValSum));
+						+ DFORMATO.format(totalSpainComForNomValCurSum).toString() + "," + DFORMATO.format(totalSpainComForCerSum).toString()
+						+ "," + DFORMATO.format(totalSpainComForNomValSum).toString());
 				writer.write("\n");
 				// Sindicado Spain
 			}
@@ -1388,9 +1396,9 @@ public class Conexion {
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaSpainSindicado);
 				writer.write("," + "," + "," + "," + "Total Creditos Sindicados" + "," + "," + "," + ","
-						+ Double.toString(totalSpainSindicadoNomValCurSum) + ","
-						+ Double.toString(totalSpainSindicadoCerSum) + ","
-						+ Double.toString(totalSpainSindicadoNomValSum));
+						+ DFORMATO.format(totalSpainSindicadoNomValCurSum).toString() + ","
+						+ DFORMATO.format(totalSpainSindicadoCerSum).toString() + ","
+						+ DFORMATO.format(totalSpainSindicadoNomValSum).toString());
 				writer.write("\n");
 				// Confirming Spain
 			}
@@ -1399,8 +1407,8 @@ public class Conexion {
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaSpainConfir);
 				writer.write("," + "," + "," + "," + "Total Confirming" + "," + "," + "," + ","
-						+ Double.toString(totalSpainConfirNomValCurSum) + "," + Double.toString(totalSpainConfirCerSum)
-						+ "," + Double.toString(totalSpainConfirNomValSum));
+						+ DFORMATO.format(totalSpainConfirNomValCurSum).toString() + "," + DFORMATO.format(totalSpainConfirCerSum).toString()
+						+ "," + DFORMATO.format(totalSpainConfirNomValSum).toString());
 				writer.write("\n");
 				// Descuentos
 			}
@@ -1409,8 +1417,8 @@ public class Conexion {
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaSpainDesc);
 				writer.write("," + "," + "," + "," + "Toatal Descueltos" + "," + "," + "," + ","
-						+ Double.toString(totalSpainDescNomValCurSum) + "," + Double.toString(totalSpainDescCerSum)
-						+ "," + Double.toString(totalSpainDescNomValSum));
+						+ DFORMATO.format(totalSpainDescNomValCurSum).toString() + "," + DFORMATO.format(totalSpainDescCerSum).toString()
+						+ "," + DFORMATO.format(totalSpainDescNomValSum).toString());
 				writer.write("\n");
 				// Factoring
 			}
@@ -1419,8 +1427,8 @@ public class Conexion {
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaSpainFac);
 				writer.write("," + "," + "," + "," + "Total Factoring" + "," + "," + "," + ","
-						+ Double.toString(totalSpainFacNomValCurSum) + "," + Double.toString(totalSpainFacCerSum) + ","
-						+ Double.toString(totalSpainFacNomValSum));
+						+ DFORMATO.format(totalSpainFacNomValCurSum).toString() + "," + DFORMATO.format(totalSpainFacCerSum).toString() + ","
+						+ DFORMATO.format(totalSpainFacNomValSum).toString());
 				writer.write("\n");
 				// Tarjetas
 			}
@@ -1429,8 +1437,8 @@ public class Conexion {
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaSpainTar);
 				writer.write("," + "," + "," + "," + "Total Tarjeta de Credito" + "," + "," + "," + ","
-						+ Double.toString(totalSpainTarNomValCurSum) + "," + Double.toString(totalSpainTarCerSum) + ","
-						+ Double.toString(totalSpainTarNomValSum));
+						+ DFORMATO.format(totalSpainTarNomValCurSum).toString() + "," + Double.toString(totalSpainTarCerSum).toString() + ","
+						+ DFORMATO.format(totalSpainTarNomValSum).toString());
 				writer.write("\n");
 				// Lineas Comprometidas
 			}
@@ -1439,8 +1447,8 @@ public class Conexion {
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaSpainLinCom);
 				writer.write("," + "," + "," + "," + "Total Lineas Comprometidas" + "," + "," + "," + ","
-						+ Double.toString(totalSpainLinComNomValCurSum) + "," + Double.toString(totalSpainLinComCerSum)
-						+ "," + Double.toString(totalSpainLinComNomValSum));
+						+ DFORMATO.format(totalSpainLinComNomValCurSum).toString() + "," + DFORMATO.format(totalSpainLinComCerSum).toString()
+						+ "," + DFORMATO.format(totalSpainLinComNomValSum).toString());
 				writer.write("\n");
 			}
 			if (!spainGaran.isEmpty()) {
@@ -1448,8 +1456,8 @@ public class Conexion {
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaSpainGaran);
 				writer.write("," + "," + "," + "," + "Total Garantias" + "," + "," + "," + ","
-						+ Double.toString(totalSpainGaranNomValCurSum) + "," + Double.toString(totalSpainGaranCerSum)
-						+ "," + Double.toString(totalSpainGaranNomValSum));
+						+ DFORMATO.format(totalSpainGaranNomValCurSum).toString() + "," + DFORMATO.format(totalSpainGaranCerSum).toString()
+						+ "," + DFORMATO.format(totalSpainGaranNomValSum).toString());
 				writer.write("\n");
 			}
 			if (!spainAval.isEmpty()) {
@@ -1457,8 +1465,8 @@ public class Conexion {
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaSpainAval);
 				writer.write("," + "," + "," + "," + "Total Aval" + "," + "," + "," + ","
-						+ Double.toString(totalSpainAvalNomValCurSum) + "," + Double.toString(totalSpainAvalCerSum)
-						+ "," + Double.toString(totalSpainAvalNomValSum));
+						+ DFORMATO.format(totalSpainAvalNomValCurSum).toString() + "," + DFORMATO.format(totalSpainAvalCerSum).toString()
+						+ "," + DFORMATO.format(totalSpainAvalNomValSum).toString());
 				writer.write("\n");
 			}
 			if (!spainDer.isEmpty()) {
@@ -1466,14 +1474,14 @@ public class Conexion {
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaSpainDer);
 				writer.write("," + "," + "," + "," + "Total Derivados" + "," + "," + "," + ","
-						+ Double.toString(totalSpainDerNomValCurSum) + "," + Double.toString(totalSpainDerCerSum) + ","
-						+ Double.toString(totalSpainDerNomValSum));
+						+ DFORMATO.format(totalSpainDerNomValCurSum).toString() + "," + DFORMATO.format(totalSpainDerCerSum).toString() + ","
+						+ DFORMATO.format(totalSpainDerNomValSum).toString());
 				writer.write("\n");
 			}
 
 			writer.write("TOTAL " + pais + "," + "," + "," + "," + "Total general" + "," + "," + "," + ","
-					+ Double.toString(totalSpainTotNomValCurSum) + "," + Double.toString(totalSpainTotCerSum) + ","
-					+ Double.toString(totalSpainTotNomValSum));
+					+ DFORMATO.format(totalSpainTotNomValCurSum).toString() + "," + DFORMATO.format(totalSpainTotCerSum).toString() + ","
+					+ DFORMATO.format(totalSpainTotNomValSum).toString());
 			writer.write("\n");
 
 			writer.close();
