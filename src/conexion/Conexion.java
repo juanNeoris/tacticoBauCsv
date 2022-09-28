@@ -33,8 +33,7 @@ public class Conexion {
 	private Statement stmt;
 	private ResultSet rs;
 	private StringBuilder strbSql;
-	public static final DecimalFormat DFORMATO = new DecimalFormat("####.########");
-
+	public static final DecimalFormat DFORMATO = new DecimalFormat("####.########"); 
 	
 	public Conexion() {
 		super();
