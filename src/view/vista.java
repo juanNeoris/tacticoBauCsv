@@ -283,6 +283,7 @@ public class vista extends JFrame {
 							textField_1.update(textField_1.getGraphics());
 							//Workbook workbook = new Workbook(nombreInterfaz);
 						//	workbook.save("consulta_" + date + "_" + textField.getText() +".xlsx");
+							conection.csvToExcel(nombreInterfaz);
 						}
 					} else {
 						textField_1.setText("No puedes dejar el campo de grupo vacio");
