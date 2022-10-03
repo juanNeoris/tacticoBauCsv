@@ -30,7 +30,10 @@ import java.awt.SystemColor;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.net.URI;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.awt.Font;
 import java.awt.event.MouseAdapter;
@@ -279,11 +282,16 @@ public class vista extends JFrame {
 							textField_1.setText("Proceso finalizado, indique grupo");
 							textField_1.update(textField_1.getGraphics());
 						} else {
+							
+							conection.csvToExcel(nombreInterfaz);
+							
+							String directoryName = System.getProperty("user.dir");
+							File fichero = new File(directoryName+"\\"+nombreInterfaz);
+							fichero.delete();
 							textField_1.setText("Interfaces Generadas con éxito.");
 							textField_1.update(textField_1.getGraphics());
-							//Workbook workbook = new Workbook(nombreInterfaz);
-						//	workbook.save("consulta_" + date + "_" + textField.getText() +".xlsx");
-							conection.csvToExcel(nombreInterfaz);
+
+							
 						}
 					} else {
 						textField_1.setText("No puedes dejar el campo de grupo vacio");
@@ -300,6 +308,7 @@ public class vista extends JFrame {
 					}
 					e1.printStackTrace();
 				}
+
 			}
 		});
 		btnNewButton_1.setBounds(10, 234, 147, 23);
@@ -373,7 +382,7 @@ public class vista extends JFrame {
 					}
 
 					if (fechaVal.compareTo(fechaAct) > 0) {
-						//Se valida que no se procese una fecha mayor a la actual
+						// Se valida que no se procese una fecha mayor a la actual
 						textField_1.setText("No puedes procesar fechas mayores a la actual");
 						textField_1.update(textField_1.getGraphics());
 					} else {
@@ -405,9 +414,9 @@ public class vista extends JFrame {
 //							}
 //						}
 //						
-					/******************************************************
-					 * Realiza reproceso de Dolphing y victoria
-					 ******************************************************/
+						/******************************************************
+						 * Realiza reproceso de Dolphing y victoria
+						 ******************************************************/
 						try {
 							conection.conecGBO();
 							victoria = conection.getCargaVictoriaHistorico(date);
@@ -425,11 +434,11 @@ public class vista extends JFrame {
 
 						if (victoria.equals("No hay ultima carga") || dolphing.equals("No hay ultima carga")) {
 							validaFicherosDolphinVictoria();
-							
+
 							cargaVictoriaDolphingHistorico();
 						} else if (!date.trim().equals(victoria.trim()) || !date.trim().equals(dolphing.trim())) {
 							validaFicherosDolphinVictoria();
-							
+
 							cargaVictoriaDolphingHistorico();
 						} else {
 							try {
@@ -729,8 +738,14 @@ public class vista extends JFrame {
 			Channel channel = session.openChannel("sftp");
 			channel.connect(50000);
 			ChannelSftp sftpChannel = (ChannelSftp) channel;
-			sftpChannel.put("\\\\mx2ct1hnascifnfsevs1.mx.corp\\ExtraccionesMIR\\rtra\\"+"rtra-cream-ges-dolphin-europa_mexico_" + dateShelRTRA + ".txt","/planPGTMEX/procesos/RISK/interfaces");
-			sftpChannel.put("\\\\mx2ct1hnascifnfsevs1.mx.corp\\ExtraccionesMIR\\rtra\\"+ "rtra-cream-ges-victoria-europa_mexico_" + dateShelRTRA + ".txt","/planPGTMEX/procesos/RISK/interfaces");
+			sftpChannel.put(
+					"\\\\mx2ct1hnascifnfsevs1.mx.corp\\ExtraccionesMIR\\rtra\\"
+							+ "rtra-cream-ges-dolphin-europa_mexico_" + dateShelRTRA + ".txt",
+					"/planPGTMEX/procesos/RISK/interfaces");
+			sftpChannel.put(
+					"\\\\mx2ct1hnascifnfsevs1.mx.corp\\ExtraccionesMIR\\rtra\\"
+							+ "rtra-cream-ges-victoria-europa_mexico_" + dateShelRTRA + ".txt",
+					"/planPGTMEX/procesos/RISK/interfaces");
 			sftpChannel.exit();
 			sftpChannel.disconnect();
 
@@ -752,7 +767,7 @@ public class vista extends JFrame {
 				textField_1.setText("No existen tus ficheros RTRA's en el FileShare");
 				textField_1.update(textField_1.getGraphics());
 				Thread.sleep(3000);
-				
+
 			} else {
 				@SuppressWarnings("unused")
 				String result = sshConnector
@@ -784,12 +799,12 @@ public class vista extends JFrame {
 			if (!resultLogsVictoria.isEmpty()) {
 				textField_1.setText("Carga parcial archivo con registros erroneos ");
 				textField_1.update(textField_1.getGraphics());
-				
+
 			} else if (resultLogs.isEmpty()) {
 				textField_1.setText("Ocurrio un problema al cargar los RTRA's");
 				textField_1.update(textField_1.getGraphics());
 				Thread.sleep(4000);
-				
+
 			} else {
 				textField_1.setText("Proceso finalizado, indique grupo");
 				textField_1.update(textField_1.getGraphics());
@@ -800,7 +815,7 @@ public class vista extends JFrame {
 				textField_1.setText("No se pudo realizar la carga de archivos RTRA's");
 				textField_1.update(textField_1.getGraphics());
 				Thread.sleep(4000);
-				
+
 			} catch (Exception e) {
 				e1.printStackTrace();
 			}
@@ -848,8 +863,14 @@ public class vista extends JFrame {
 			Channel channel = session.openChannel("sftp");
 			channel.connect(50000);
 			ChannelSftp sftpChannel = (ChannelSftp) channel;
-			sftpChannel.put("\\\\mx2ct1hnascifnfsevs1.mx.corp\\ExtraccionesMIR\\rtra\\"+ "rtra-cream-ges-dolphin-europa_mexico_" + dateShelRTRA + ".txt","/planPGTMEX/procesos/RISK/interfaces");
-			sftpChannel.put("\\\\mx2ct1hnascifnfsevs1.mx.corp\\ExtraccionesMIR\\rtra\\"+ "rtra-cream-ges-victoria-europa_mexico_" + dateShelRTRA + ".txt","/planPGTMEX/procesos/RISK/interfaces");
+			sftpChannel.put(
+					"\\\\mx2ct1hnascifnfsevs1.mx.corp\\ExtraccionesMIR\\rtra\\"
+							+ "rtra-cream-ges-dolphin-europa_mexico_" + dateShelRTRA + ".txt",
+					"/planPGTMEX/procesos/RISK/interfaces");
+			sftpChannel.put(
+					"\\\\mx2ct1hnascifnfsevs1.mx.corp\\ExtraccionesMIR\\rtra\\"
+							+ "rtra-cream-ges-victoria-europa_mexico_" + dateShelRTRA + ".txt",
+					"/planPGTMEX/procesos/RISK/interfaces");
 			sftpChannel.exit();
 			sftpChannel.disconnect();
 
@@ -858,16 +879,24 @@ public class vista extends JFrame {
 			 */
 			SSHConnector sshConnector = new SSHConnector();
 			sshConnector.connect(username, PASSWORD, host, 22);
-			String resultVic = sshConnector.executeCommand("cd /planPGTMEX/procesos/RISK/interfaces; ls -ltr rtra-cream-ges-victoria-europa_mexico_"+ dateShelRTRA + ".txt ");
-			String resultDolp = sshConnector.executeCommand("cd /planPGTMEX/procesos/RISK/interfaces; ls -ltr rtra-cream-ges-dolphin-europa_mexico_"+ dateShelRTRA + ".txt ");
+			String resultVic = sshConnector.executeCommand(
+					"cd /planPGTMEX/procesos/RISK/interfaces; ls -ltr rtra-cream-ges-victoria-europa_mexico_"
+							+ dateShelRTRA + ".txt ");
+			String resultDolp = sshConnector.executeCommand(
+					"cd /planPGTMEX/procesos/RISK/interfaces; ls -ltr rtra-cream-ges-dolphin-europa_mexico_"
+							+ dateShelRTRA + ".txt ");
 
 			/*
 			 * Se borran las interfaces de la ruta: /planPGTMEX/procesos/RISK/salidas/ una
 			 * vez que han sido cargadas de manea exitosa
 			 */
 
-			sshConnector.executeCommand("cd /planPGTMEX/procesos/RISK/interfaces; rm rtra-cream-ges-victoria-europa_mexico_"+ dateShelRTRA + ".txt ");
-			sshConnector.executeCommand("cd /planPGTMEX/procesos/RISK/interfaces; rm rtra-cream-ges-dolphin-europa_mexico_"+ dateShelRTRA + ".txt ");
+			sshConnector
+					.executeCommand("cd /planPGTMEX/procesos/RISK/interfaces; rm rtra-cream-ges-victoria-europa_mexico_"
+							+ dateShelRTRA + ".txt ");
+			sshConnector
+					.executeCommand("cd /planPGTMEX/procesos/RISK/interfaces; rm rtra-cream-ges-dolphin-europa_mexico_"
+							+ dateShelRTRA + ".txt ");
 
 			if (resultVic.isEmpty() && resultDolp.isEmpty()) {
 				textField_1.setText("No existen tus ficheros RTRA's en el FileShare");
@@ -875,9 +904,11 @@ public class vista extends JFrame {
 				Thread.sleep(3000);
 			} else {
 				@SuppressWarnings("unused")
-				String result = sshConnector.executeCommand("cd /planPGTMEX/procesos/RISK/;./cargartrabau.sh " + date + "");
+				String result = sshConnector
+						.executeCommand("cd /planPGTMEX/procesos/RISK/;./cargartrabau.sh " + date + "");
 			}
-			String resultLogs = sshConnector.executeCommand("cd /planPGTMEX/procesos/RISK/salidas/" + dateShelRTRALog+ "/cargartrabau.sh; ls -ltr cargartrabau.sh.out");
+			String resultLogs = sshConnector.executeCommand("cd /planPGTMEX/procesos/RISK/salidas/" + dateShelRTRALog
+					+ "/cargartrabau.sh; ls -ltr cargartrabau.sh.out");
 			sshConnector.disconnect();
 
 			if (resultLogs.isEmpty()) {
