@@ -219,6 +219,9 @@ public class Conexion {
 		List<Double> MexicoBonosNomValCurSum = new ArrayList<Double>();
 		List<Double> MexicoBonosCerSum = new ArrayList<Double>();
 		List<Double> MexicoBonosNomValSum = new ArrayList<Double>();
+		List fechMaxBonos = new ArrayList<>();
+		List fechMinBonos = new ArrayList<>();
+		
 
 		// creditos documentariado Mexico
 		List<String> MexicoCredDocu = new ArrayList<String>();
@@ -366,7 +369,7 @@ public class Conexion {
 				sumatoriaNomValCur = DecimalFormat.getNumberInstance().parse(rs.getString(9).trim()).doubleValue();			
 				sumatoriaCer = DecimalFormat.getNumberInstance().parse(rs.getString(10).trim()).doubleValue();
 				sumatoriaNomVal = DecimalFormat.getNumberInstance().parse(rs.getString(11).trim()).doubleValue();
-
+				
 				if (rs.getString(5).contains("BOND")) {
 					MexicoBonos.add(systCode);
 					info = this.getContraparte(grupo, fechaConsumo, rs.getString(4), rs.getString(14), rs.getString(6),
@@ -592,7 +595,7 @@ public class Conexion {
 			double totalMexicoBonosCer = MexicoBonosCerSum.stream().mapToDouble(Double::doubleValue).sum();
 			double totalMexicoBonosNomVal = MexicoBonosNomValSum.stream().mapToDouble(Double::doubleValue).sum();
 
-			// Creditos Documentariados
+			// Creditos DOCUMENTARIOS
 			String CadenaMexicoCredDoc = MexicoCredDocu.stream().collect(Collectors.joining(""));
 			double totalMexicoCredDocuNomValCurSum = MexicoCredDocuNomValCurSum.stream()
 					.mapToDouble(Double::doubleValue).sum();
@@ -717,7 +720,7 @@ public class Conexion {
 				writer.write("MEXICO-CREDITOS DOCUMENTARIADO\n");
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaMexicoCredDoc);
-				writer.write("TOTAL MEXICO-CREDITOS DOCUMENTARIADOS" +"|" + "|" + "|" + "|" + "TOTAL CREDITOS DOCUMENTARIADOS" + "|" + "|" + "|" + "|"
+				writer.write("TOTAL MEXICO-CREDITOS DOCUMENTARIOS" +"|" + "|" + "|" + "|" + "TOTAL CREDITOS DOCUMENTARIOS" + "|" + "|" + "|" + "|"
 						+ DFORMATO.format(totalMexicoCredDocuNomValCurSum).toString() + "|"
 						+ DFORMATO.format(totalMexicoCredDocuCerSum).toString() + "|"
 						+ DFORMATO.format(totalMexicoCredDocuNomValSum).toString()+ "|"+ "|"+ "|"+ "|"+ "|"+"|"+"_");
@@ -1350,7 +1353,7 @@ public class Conexion {
 						+ "' AND INSTRUMENTNAME IN('GARANTIA ACCIONES COTIZADAS','GARANTIA AVAL FINANCIERO - NO USAR (3Q 2016)','GARANTIA DERECHOS DE COBRO','GARANTIA PERSONAL MANCOMUNADA','GARANTIA PERSONAL SOLIDARIA','GARANTIA PERSONAL SOLIDARIA FINAN','OTRAS GARANTIAS EN EFECTIVO','OTRAS GARANTIAS REALES NO LIQUIDAS','OTHER GUARANTY CASH') UNION ALL  SELECT cptyparent,cptyparentrating,cptyparentname,dealstamp,instrumentname,TO_CHAR(TO_DATE(valuedate,  'YYYY-MM-DD'), 'DD-mon-YY'),TO_CHAR(TO_DATE(maturitydate,  'YYYY-MM-DD'), 'DD-mon-YY'),currency,to_char(DECODE(nominalvaluecur,null, '0.0',nominalvaluecur), '999,999,999,999.99')  AS nominalvaluecur,to_char(DECODE(CER,null, '0.0',CER), '999,999,999,999.99')  AS CER,to_char(DECODE(nominalvalue,null, '0.0',nominalvalue), '999,999,999,999.99')  AS nominalvalue,oneoff,cptyname,foldercountryname,cptycountry,cptyparentcountry,foldercountry from PGT_MEX.T_PGT_MEX_CONSUMOSC_D WHERE LastParentF ='"
 						+ grupo + "' and FECHACARGA='" + fechaConsumo + "' AND foldercountryname='" + pais
 						+ "' AND DEALSTAMP='" + deal
-						+ "' AND INSTRUMENTNAME IN('GARANTIA ACCIONES COTIZADAS','GARANTIA AVAL FINANCIERO - NO USAR (3Q 2016)','GARANTIA DERECHOS DE COBRO','GARANTIA PERSONAL MANCOMUNADA','GARANTIA PERSONAL SOLIDARIA','GARANTIA PERSONAL SOLIDARIA FINAN','OTRAS GARANTIAS EN EFECTIVO','OTRAS GARANTIAS REALES NO LIQUIDAS','OTHER GUARANTY CASH') ORDER BY foldercountryname,instrumentname");
+						+ "' AND INSTRUMENTNAME IN('GARANTIA ACCIONES COTIZADAS','GARANTIA AVAL FINANCIERO - NO USAR (3Q 2016)','GARANTIA DERECHOS DE COBRO','GARANTIA PERSONAL MANCOMUNADA','GARANTIA PERSONAL SOLIDARIA','GARANTIA PERSONAL SOLIDARIA FINAN','OTRAS GARANTIAS EN EFECTIVO','OTRAS GARANTIAS REALES NO LIQUIDAS','OTHER GUARANTY CASH') ORDER BY foldercountryname,instrumentname,cptyparentname");
 
 		try {
 			pstmt = con.prepareStatement(strbSql.toString());
@@ -1527,7 +1530,7 @@ public class Conexion {
 				writer.write(pais.toUpperCase() + "-CREDITOS DOCUMENTARIADO" + "\n");
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaSpainCredDoc);
-				writer.write("TOTAL " + pais.toUpperCase()+"-CREDITOS DOCUMENTARIADOS"+"|" + "|" + "|" + "|" + "TOTAL CREDITOS DOCUMENTARIADOS" + "|" + "|" + "|" + "|"
+				writer.write("TOTAL " + pais.toUpperCase()+"-CREDITOS DOCUMENTARIOS"+"|" + "|" + "|" + "|" + "TOTAL CREDITOS DOCUMENTARIOS" + "|" + "|" + "|" + "|"
 						+ DFORMATO.format(totalSpainCredDocuNomValCurSum).toString() + "|"
 						+ DFORMATO.format(totalSpainCredDocuCerSum).toString() + "|"
 						+ DFORMATO.format(totalSpainCredDocuNomValSum).toString()+ "|"+ "|"+ "|"+ "|"+ "|"+"|"+"_");

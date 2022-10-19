@@ -22,6 +22,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.util.HSSFColor.HSSFColorPredefined;
 import org.apache.poi.sl.draw.geom.Path;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.DataFormat;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.IndexedColors;
 
@@ -570,6 +571,7 @@ public class vista extends JFrame {
 			HSSFFont font = hwb.createFont();
 			HSSFFont fontR = hwb.createFont();
 			HSSFFont fontW = hwb.createFont();
+			DataFormat fmt = hwb.createDataFormat();
 
 			for (int k = 0; k < arList.size(); k++) {
 				ArrayList ardata = (ArrayList) arList.get(k);
@@ -618,11 +620,31 @@ public class vista extends JFrame {
 
 					} else if (data.startsWith("\"")) {
 						data = data.replaceAll("\"", "");
+						if (ardata.toString().contains("GARANTIA")) {
+
+							if (p == 0 || p == 1 || p == 3 || p == 5 || p == 6 || p == 7 || p == 8 || p == 9 || p == 10
+									|| p == 11 || p == 13 || p == 14 || p == 15 || p == 16) {
+
+								cellStyle.setAlignment(org.apache.poi.ss.usermodel.HorizontalAlignment.CENTER);
+								fontR.setColor(HSSFColorPredefined.DARK_RED.getIndex());
+								cellStyle.setFont(fontR);
+								cell.setCellStyle(cellStyle);
+								cell.setCellValue(data);
+
+							} else if(p == 2||p == 4 || p == 12){
+								cellStyle3.setAlignment(org.apache.poi.ss.usermodel.HorizontalAlignment.LEFT);
+								fontR.setColor(HSSFColorPredefined.DARK_RED.getIndex());
+								cellStyle3.setFont(fontR);
+								cell.setCellStyle(cellStyle3);
+								cell.setCellValue(data);
+							}
+						}
 						cell.setCellValue(data);
 
 					} else {
 						data = data.replaceAll("\"", "");
 
+						//8-9-10 nominalvaluecur, cer, nominalvalue
 						// 0 , 1 ,3--centrado 5-11--centrado 13-16--centrado
 						if (ardata.toString().contains("GARANTIA")) {
 
@@ -635,7 +657,7 @@ public class vista extends JFrame {
 								cell.setCellStyle(cellStyle);
 								cell.setCellValue(data);
 
-							} else {
+							} else if(p == 2|| p == 4 || p == 12){
 								cellStyle3.setAlignment(org.apache.poi.ss.usermodel.HorizontalAlignment.LEFT);
 								fontR.setColor(HSSFColorPredefined.DARK_RED.getIndex());
 								cellStyle3.setFont(fontR);
@@ -663,7 +685,7 @@ public class vista extends JFrame {
 							|| ardata.toString().contains("TOTAL DESCUENTOS")
 							|| ardata.toString().contains("TOTAL DERIVADOS")
 							|| ardata.toString().contains("TOTAL CREDITOS SINDICADOS")
-							|| ardata.toString().contains("TOTAL CREDITOS DOCUMENTARIADOS")
+							|| ardata.toString().contains("TOTAL CREDITOS DOCUMENTARIOS")
 							|| ardata.toString().contains("TOTAL CONFIRMING")
 							|| ardata.toString().contains("TOTAL BONOS")
 							|| ardata.toString().contains("TOTAL AVALES")) {
