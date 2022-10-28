@@ -2,18 +2,21 @@ package view;
 
 import java.awt.EventQueue;
 import javax.swing.JFrame;
-import com.aspose.cells.Workbook;
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
 import conexion.Conexion;
 import conexion.SSHConnector;
+import ficheros.Validaficheros;
+import util.ConstantsUtil;
+
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JProgressBar;
 import javax.swing.JTextField;
 
+import org.apache.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFDataFormat;
 import org.apache.poi.hssf.usermodel.HSSFFont;
@@ -21,9 +24,7 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.util.HSSFColor.HSSFColorPredefined;
-import org.apache.poi.sl.draw.geom.Path;
 import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.CreationHelper;
 import org.apache.poi.ss.usermodel.DataFormat;
 import org.apache.poi.ss.usermodel.FillPatternType;
@@ -50,11 +51,7 @@ import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.net.URI;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -65,6 +62,9 @@ public class vista extends JFrame {
 	/**
 	 * 
 	 */
+	
+	private static final Logger LOGGER = Logger.getLogger(vista.class.getName());
+	
 	private static final long serialVersionUID = 1L;
 	private static final String PASSWORD = "GBO#Oct22";
 	private JTextField textField;
@@ -80,10 +80,10 @@ public class vista extends JFrame {
 	private JTextField textField_1;
 	String dolphing = null;
 	String victoria = null;
-	SimpleDateFormat sdf3 = new SimpleDateFormat("ddMMyyyy");
-	String dt2 = sdf3.format(new Date());
+	
+	String dt2 = ConstantsUtil.sdf3.format(new Date());
 	String dn2 = System.getProperty("user.dir");
-	SimpleDateFormat sdf2 = new SimpleDateFormat("dd/MM/yyyy");
+	
 	private static final String ERROR_VPN = "No se pudo establecer la conexion, valide su VPN";
 	private final JProgressBar progressBar = new JProgressBar();
 	public static final DecimalFormat DFORMATO = new DecimalFormat("###,###,###.##");
@@ -118,53 +118,7 @@ public class vista extends JFrame {
 				SimpleDateFormat sdf = new SimpleDateFormat("ddMMyyyy");
 				String date = sdf.format(dateChooser.getDate().getTime());
 
-				/*********************************************************
-				 * Carga excel Cartera Contrapartida
-				 ****************************************************************/
-
-//				try {
-//					conection.conecGBO();
-//					cartera = conection.getCargaCartera();
-//
-//					contrapartida = conection.getCargaContrapartida();
-//
-//				} catch (Exception e2) {
-//					try {
-//						textField_1.setText(ERROR_VPN);
-//						textField_1.update(textField_1.getGraphics());
-//						Thread.sleep(5000);
-//						System.exit(ABORT);
-//					} catch (Exception e3) {
-//						e3.getMessage();
-//					}
-//				}
-
-//				if (contrapartida.equals("No hay ultima carga") && cartera.equals("No hay ultima carga")) {
-//					validaFicheros();
-//					cargarCarteraContrapartida();
-//				} else if (!date.trim().equals(cartera.trim()) && !date.trim().equals(contrapartida.trim())) {
-//					validaFicheros();
-//					cargarCarteraContrapartida();
-//				} else {
-//					try {
-//						// Parsea la fecha que viene de la consulta sql y la muestra en el textField_1
-//						Date carteraCr = sdf.parse(cartera);
-//						String Carterafrt = sdf2.format(carteraCr);
-//
-//						Date contrapartidaCr = sdf.parse(contrapartida);
-//						String contrapartidafrt = sdf2.format(contrapartidaCr);
-//
-//						try {
-//							textField_1.setText("Ultima carga cartera: " + Carterafrt + " contrapartida: " + contrapartidafrt + "");
-//							textField_1.update(textField_1.getGraphics());
-//							Thread.sleep(5000);
-//						} catch (InterruptedException e1) {
-//							e1.printStackTrace();
-//						}
-//					} catch (ParseException e3) {
-//						e3.printStackTrace();
-//					}
-//				}
+			
 				try {
 					conection.conecGBO();
 					textField_1.setText("Validando su conexón espere...");
@@ -185,22 +139,36 @@ public class vista extends JFrame {
 
 				if (victoria.equals("No hay ultima carga") || dolphing.equals("No hay ultima carga")) {
 
-					validaFicherosDolphinVictoria();
+					try {
+						String res= Validaficheros.validaFicherosDolphinVictoria(dateChooser.getDate().getTime());
+						textField_1.setText(res);
+						textField_1.update(textField_1.getGraphics());
+						Thread.sleep(5000);
+					} catch (InterruptedException e1) {
+						LOGGER.info(e1);
+					}
 					cargaVictoriaDolphing();
 
 				} else if (!date.trim().equals(victoria.trim()) || !date.trim().equals(dolphing.trim())) {
 
-					validaFicherosDolphinVictoria();
+					try {
+						String res= Validaficheros.validaFicherosDolphinVictoria(dateChooser.getDate().getTime());
+						textField_1.setText(res);
+						textField_1.update(textField_1.getGraphics());
+						Thread.sleep(5000);
+					} catch (InterruptedException e1) {
+						LOGGER.info(e1);
+					}
 					cargaVictoriaDolphing();
 
 				} else {
 					try {
 						// Parsea la fecha que viene de la consulta sql y la muestra en el textField_1
 						Date victoriaCr = sdf.parse(victoria);
-						String victoriafrt = sdf2.format(victoriaCr);
+						String victoriafrt = ConstantsUtil.sdf2.format(victoriaCr);
 
 						Date dolphingCr = sdf.parse(dolphing);
-						String dolphingfrt = sdf2.format(dolphingCr);
+						String dolphingfrt = ConstantsUtil.sdf2.format(dolphingCr);
 
 						try {
 							textField_1.setText(
@@ -235,62 +203,7 @@ public class vista extends JFrame {
 				/*********************************************************
 				 * Genera interfaces REC, CER y CONSULTA
 				 *************************************************************/
-				// #################################### Creacion de la interfaz REC
-				// ####################################
-//				try {
-//					// Valida si el grupo esta vacio.
-//					if (!textField.getText().isEmpty()) {
-//						textField_1.setText("Generando interfaz REC");
-//						textField_1.update(textField_1.getGraphics());
-//
-//						String nombreInterfaz = "consulta_REC_" + date + "_" + textField.getText() + ".csv";
-//						String grupo = textField.getText();
-//						conection.conecGBO();
-//						String res = conection.getRec(grupo, nombreInterfaz, date);
-//						
-//						if (res.equals("No existen registros para este grupo en la interfaz Rec")) {
-//							textField_1.setText("No se encontro el grupo");
-//							textField_1.update(textField_1.getGraphics());
-//							Thread.sleep(3000);
-//							textField_1.setText("No se puede crear interfaz vacia");
-//							textField_1.update(textField_1.getGraphics());
-//							Thread.sleep(3000);
-//						}
-//					}
-//				} catch (Exception e1) {
-//					e1.printStackTrace();
-//
-//					textField_1.setText("No se pudo generar la interfaz REC");
-//					textField_1.update(textField_1.getGraphics());
-//				}
-				// #################################### creacion de la interfaz CER
-				// ####################################
-//				try {
-//					// Valida si el grupo esta vacio.
-//					if (!textField.getText().isEmpty()) {
-//						textField_1.setText("Generando interfaz CER");
-//						textField_1.update(textField_1.getGraphics());
-//						String nombreInterfaz = "consulta_CER_" + date + "_" + textField.getText() + ".csv";
-//						String grupo = textField.getText();
-//						conection.conecGBO();
-//						String res = conection.getCer(grupo, nombreInterfaz, date);
-//						
-//						if (res.equals("No existen registros para este grupo en la interfaz CER")) {
-//							textField_1.setText("No se encontro el grupo");
-//							textField_1.update(textField_1.getGraphics());
-//							Thread.sleep(3000);
-//							textField_1.setText("No se puede crear interfaz vacia");
-//							textField_1.update(textField_1.getGraphics());
-//							Thread.sleep(3000);
-//						}	
-//					}
-//				} catch (Exception e1) {
-//					e1.printStackTrace();
-//					textField_1.setText("No se pudo generar la interfaz CER");
-//					textField_1.update(textField_1.getGraphics());
-//				}
-				// #################################### creacion de la interfaz CONSULTA
-				// ####################################
+			
 				try {
 					// Valida si el grupo esta vacio.
 					if (!textField.getText().isEmpty()) {
@@ -419,24 +332,7 @@ public class vista extends JFrame {
 				if (e.getClickCount() == 2 && !e.isConsumed()) {
 					SimpleDateFormat sdf = new SimpleDateFormat("ddMMyyyy");
 					String date = sdf.format(dateChooser.getDate().getTime());
-					/*********************************************************
-					 * Carga excel Cartera Contrapartida
-					 ****************************************************************/
-//					try {
-//						conection.conecGBO();
-//						cartera = conection.getCargaCarteraHistorico(date);
-//						contrapartida = conection.getCargaContrapartidaHistorico(date);
-//					} catch (Exception e2) {
-//						try {
-//							textField_1.setText(ERROR_VPN);
-//							textField_1.update(textField_1.getGraphics());
-//							Thread.sleep(5000);
-//							System.exit(ABORT);
-//						} catch (Exception e3) {
-//							e3.getMessage();
-//						}
-//						
-//					}
+				
 
 					DateTimeFormatter dtf = DateTimeFormatter.ofPattern("ddMMyyyy");
 					LocalDateTime fechaSnForm = LocalDateTime.now();
@@ -454,34 +350,7 @@ public class vista extends JFrame {
 						textField_1.setText("No puedes procesar fechas mayores a la actual");
 						textField_1.update(textField_1.getGraphics());
 					} else {
-//						//Si se procesa solo si la fecha es igual o menor a la actual
-//						textField_1.setText("Procesando insumos locales de retrabajo");
-//						textField_1.update(textField_1.getGraphics());
-//						if (contrapartida.equals("No hay ultima carga") && cartera.equals("No hay ultima carga")) {
-//							//validaFicheros();
-//							//cargarCarteraContrapartidaHistorico();
-//						} else if (!date.trim().equals(cartera.trim()) && !date.trim().equals(contrapartida.trim())) {
-//							//validaFicheros();
-//						//	cargarCarteraContrapartidaHistorico();
-//						} else {
-//							try {
-//								Date carteraCr = sdf.parse(cartera);
-//								String Carterafrt = sdf2.format(carteraCr);
-//								Date contrapartidaCr = sdf.parse(contrapartida);
-//								String contrapartidafrt = sdf2.format(contrapartidaCr);
-//								try {
-//									textField_1.setText("Ultima carga cartera: " + Carterafrt + "  Contrapartida: "
-//											+ contrapartidafrt + "");
-//									textField_1.update(textField_1.getGraphics());
-//									Thread.sleep(5000);
-//								} catch (InterruptedException e1) {
-//									e1.printStackTrace();
-//								}
-//							} catch (ParseException e3) {
-//								e3.printStackTrace();
-//							}
-//						}
-//						
+					
 						/******************************************************
 						 * Realiza reproceso de Dolphing y victoria
 						 ******************************************************/
@@ -501,21 +370,34 @@ public class vista extends JFrame {
 						}
 
 						if (victoria.equals("No hay ultima carga") || dolphing.equals("No hay ultima carga")) {
-							validaFicherosDolphinVictoria();
-
+							
+							try {
+								String res= Validaficheros.validaFicherosDolphinVictoria(dateChooser.getDate().getTime());
+								textField_1.setText(res);
+								textField_1.update(textField_1.getGraphics());
+								Thread.sleep(5000);
+							} catch (InterruptedException e1) {
+								LOGGER.info(e1);
+							}
 							cargaVictoriaDolphingHistorico();
 						} else if (!date.trim().equals(victoria.trim()) || !date.trim().equals(dolphing.trim())) {
-							validaFicherosDolphinVictoria();
-
+							try {
+								String res= Validaficheros.validaFicherosDolphinVictoria(dateChooser.getDate().getTime());
+								textField_1.setText(res);
+								textField_1.update(textField_1.getGraphics());
+								Thread.sleep(5000);
+							} catch (InterruptedException e1) {
+								LOGGER.info(e1);
+							}
 							cargaVictoriaDolphingHistorico();
 						} else {
 							try {
 								// Parsea la fecha que viene de la consulta sql y la muestra en el textField_1
 								Date victoriaCr = sdf.parse(victoria);
-								String victoriafrt = sdf2.format(victoriaCr);
+								String victoriafrt = ConstantsUtil.sdf2.format(victoriaCr);
 
 								Date dolphingCr = sdf.parse(dolphing);
-								String dolphingfrt = sdf2.format(dolphingCr);
+								String dolphingfrt = ConstantsUtil.sdf2.format(dolphingCr);
 
 								try {
 									textField_1.setText(
@@ -706,7 +588,7 @@ public class vista extends JFrame {
 								if (!data.trim().equals(valor)) {
 									SimpleDateFormat formatter2 = new SimpleDateFormat("dd-MMM-yy");
 									Date date2 = formatter2.parse(data);
-									System.out.println(date2);
+									
 									my_style_1.setDataFormat(HSSFDataFormat.getBuiltinFormat("d-mmm-yy"));
 									my_style_1.setAlignment(org.apache.poi.ss.usermodel.HorizontalAlignment.CENTER);
 									my_style_1
@@ -723,7 +605,7 @@ public class vista extends JFrame {
 							} else if (p == 8 || p == 9 || p == 10) {
 
 								double d = DecimalFormat.getNumberInstance().parse(data.trim()).doubleValue();
-								System.out.println(d);
+								
 								my_style_4.setDataFormat(HSSFDataFormat.getBuiltinFormat("#,##0.00"));
 								my_style_4.setAlignment(org.apache.poi.ss.usermodel.HorizontalAlignment.RIGHT);
 								my_style_4.setVerticalAlignment(org.apache.poi.ss.usermodel.VerticalAlignment.CENTER);
@@ -757,7 +639,7 @@ public class vista extends JFrame {
 						} else if (p == 8 || p == 9 || p == 10) {
 
 							double d = DecimalFormat.getNumberInstance().parse(data.trim()).doubleValue();
-							System.out.println(d);
+							
 							my_style_3.setDataFormat(HSSFDataFormat.getBuiltinFormat("#,##0.00"));
 							my_style_3.setAlignment(org.apache.poi.ss.usermodel.HorizontalAlignment.RIGHT);
 							my_style_3.setVerticalAlignment(org.apache.poi.ss.usermodel.VerticalAlignment.CENTER);
@@ -805,7 +687,7 @@ public class vista extends JFrame {
 							} else if (p == 8 || p == 9 || p == 10) {
 
 								double d = DecimalFormat.getNumberInstance().parse(data.trim()).doubleValue();
-								System.out.println(d);
+								
 								my_style_4.setDataFormat(HSSFDataFormat.getBuiltinFormat("#,##0.00"));
 								my_style_4.setAlignment(org.apache.poi.ss.usermodel.HorizontalAlignment.RIGHT);
 								my_style_4.setVerticalAlignment(org.apache.poi.ss.usermodel.VerticalAlignment.CENTER);
@@ -840,7 +722,7 @@ public class vista extends JFrame {
 							} else if (p == 8 || p == 9 || p == 10) {
 
 								double d = DecimalFormat.getNumberInstance().parse(data.trim()).doubleValue();
-								System.out.println(d);
+								
 								my_style_3.setDataFormat(HSSFDataFormat.getBuiltinFormat("#,##0.00"));
 								my_style_3.setAlignment(org.apache.poi.ss.usermodel.HorizontalAlignment.RIGHT);
 								my_style_3.setVerticalAlignment(org.apache.poi.ss.usermodel.VerticalAlignment.CENTER);
@@ -857,7 +739,7 @@ public class vista extends JFrame {
 						 if (p == 8 || p == 9 || p == 10) {
 
 								double d = DecimalFormat.getNumberInstance().parse(data.trim()).doubleValue();
-								System.out.println(d);
+								
 								my_style_6.setFillForegroundColor(IndexedColors.BLACK.getIndex());
 								my_style_6.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 								my_style_6.setDataFormat(HSSFDataFormat.getBuiltinFormat("#,##0.00"));
@@ -901,7 +783,7 @@ public class vista extends JFrame {
 						 if (p == 8 || p == 9 || p == 10) {
 
 							double d = DecimalFormat.getNumberInstance().parse(data.trim()).doubleValue();
-							System.out.println(d);
+							
 							my_style_5.setFillForegroundColor(IndexedColors.GREY_40_PERCENT.getIndex());
 							my_style_5.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 							my_style_5.setDataFormat(HSSFDataFormat.getBuiltinFormat("#,##0.00"));
@@ -1004,221 +886,9 @@ public class vista extends JFrame {
 		}
 
 	}
-//	public void cargarCarteraContrapartida() {
-//		textField_1.setText("Sin carga, cargando cartera y contrapartida, espere...");
-//		textField_1.update(textField_1.getGraphics());
-//
-//		SimpleDateFormat sdf = new SimpleDateFormat("ddMMyyyy");
-//		String date = sdf.format(dateChooser.getDate().getTime());
-//
-//		Workbook workbook;
-//		String directoryName = System.getProperty("user.dir");
-//		JSch jsch = new JSch();
-//
-//		try {
-//
-//			workbook = new Workbook(directoryName + "\\" + date + " Rating de Contrapartida.xlsx");
-//			workbook.save(directoryName + "\\" + date + "_Rating_de_Contrapartida.csv");
-//			workbook = new Workbook(directoryName + "\\" + date + " Inf Cartera.xlsx");
-//			workbook.save(directoryName + "\\" + date + "_Inf_Cartera.csv");
-//
-//			Session session = jsch.getSession(username, host, 22);
-//			session.setPassword("GBO#Oct22");
-//
-//			Properties config = new Properties();
-//			config.put("StrictHostKeyChecking", "no");
-//			session.setConfig(config);
-//
-//			session.connect(10000);
-//
-//			Channel channel = session.openChannel("sftp");
-//			channel.connect(50000);
-//
-//			// se realiza put al servidor de GBO
-//			ChannelSftp sftpChannel = (ChannelSftp) channel;
-//			sftpChannel.put(date + "_Inf_Cartera.csv", "/planPGTMEX/procesos/RISK/interfaces");
-//			sftpChannel.put(date + "_Rating_de_Contrapartida.csv", "/planPGTMEX/procesos/RISK/interfaces");
-//			sftpChannel.exit();
-//			sftpChannel.disconnect();
-//
-//			SSHConnector sshConnector = new SSHConnector();
-//			sshConnector.connect(username, PASSWORD, host, 22);
-//			
-//			SimpleDateFormat sdfRtraLogExcel = new SimpleDateFormat("MMMdd", Locale.ENGLISH);
-//			String dateShelRTRALogExcel =  sdfRtraLogExcel.format(dateChooser.getDate().getTime());
-//			 // se ejecuta el shell que realiza la carga de las interfaces a la BBDD de GBO
-//			String result = sshConnector.executeCommand("cd /planPGTMEX/procesos/RISK/;./carga_csv_motor.sh " + date + "");
-//			String resultLogsexcels = sshConnector.executeCommand("cd /planPGTMEX/procesos/RISK/salidas/"+dateShelRTRALogExcel+"/carga_csv_motor.sh; ls -ltr carga_csv_motor.sh.out");
-//			
-//			/*Se borran las interfaces de la ruta: /planPGTMEX/procesos/RISK/salidas/
-//			 *  una vez que han sido cargadas de manea exitosa
-//			 * */
-//			
-//			sshConnector.executeCommand("cd /planPGTMEX/procesos/RISK/interfaces; rm "+date + "_Rating_de_Contrapartida.csv");
-//			sshConnector.executeCommand("cd /planPGTMEX/procesos/RISK/interfaces; rm "+date + "_Inf_Cartera.csv");
-//		
-//			
-//			sshConnector.disconnect();
-//
-//			if (resultLogsexcels.isEmpty()) {
-//				textField_1.setText("Ocurrio un problema al cargar cartera");
-//				textField_1.update(textField_1.getGraphics());
-//				Thread.sleep(3000);
-//				textField_1.setText("Ocurrio un problema al cargar contrapartida");
-//				textField_1.update(textField_1.getGraphics());
-//				Thread.sleep(3000);
-//				System.exit(ABORT);
-//			}
-//			textField_1.setText("Carga completada de cartera y contrapartida.");
-//			textField_1.update(textField_1.getGraphics());
-//			Thread.sleep(3000);
-//		} catch (Exception e1) {
-//			try {
-//				textField_1.setText("Problemas al convertir archivos de cartera y contrapartida.");
-//				textField_1.update(textField_1.getGraphics());
-//				Thread.sleep(4000);
-//				System.exit(ERROR);
-//			} catch (InterruptedException e2) {
-//				e1.printStackTrace();
-//			}
-//		}
-//	}
 
-//	public void cargarCarteraContrapartidaHistorico() {
-//		textField_1.setText("Sin carga, cargando cartera y contrapartida, espere...");
-//		textField_1.update(textField_1.getGraphics());
-//
-//		SimpleDateFormat sdf = new SimpleDateFormat("ddMMyyyy");
-//		String date = sdf.format(dateChooser.getDate().getTime());
-//
-//		Workbook workbook;
-//		String directoryName = System.getProperty("user.dir");
-//		JSch jsch = new JSch();
-//
-//		try {
-//			workbook = new Workbook(directoryName + "\\" + date + " Rating de Contrapartida.xlsx");
-//			workbook.save(directoryName + "\\" + date + "_Rating_de_Contrapartida.csv");
-//			workbook = new Workbook(directoryName + "\\" + date + " Inf Cartera.xlsx");
-//			workbook.save(directoryName + "\\" + date + "_Inf_Cartera.csv");
-//
-//			Session session = jsch.getSession(username, host, 22);
-//			session.setPassword("GBO#Oct22");
-//
-//			Properties config = new Properties();
-//			config.put("StrictHostKeyChecking", "no");
-//			session.setConfig(config);
-//
-//			session.connect(10000);
-//
-//			Channel channel = session.openChannel("sftp");
-//			channel.connect(50000);
-//
-//			// se realiza put al servidor de GBO
-//			ChannelSftp sftpChannel = (ChannelSftp) channel;
-//			sftpChannel.put(date + "_Inf_Cartera.csv", "/planPGTMEX/procesos/RISK/interfaces");
-//			sftpChannel.put(date + "_Rating_de_Contrapartida.csv", "/planPGTMEX/procesos/RISK/interfaces");
-//			sftpChannel.exit();
-//			sftpChannel.disconnect();
-//
-//			SSHConnector sshConnector = new SSHConnector();
-//			sshConnector.connect(username, PASSWORD, host, 22);
-//			
-//			DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MMMdd", Locale.ENGLISH);
-//			String dateShelRTRALogExcel =  dtf.format(LocalDateTime.now());
-//
-//			 // se ejecuta el shell que realiza la carga de las interfaces a la BBDD de GBO
-//			String result = sshConnector.executeCommand("cd /planPGTMEX/procesos/RISK/;./carga_csv_motor.sh " + date + "");
-//			String resultLogsexcels = sshConnector.executeCommand("cd /planPGTMEX/procesos/RISK/salidas/"+dateShelRTRALogExcel+"/carga_csv_motor.sh; ls -ltr carga_csv_motor.sh.out");
-//			
-//			/*Se borran las interfaces de la ruta: /planPGTMEX/procesos/RISK/salidas/
-//			 *  una vez que han sido cargadas de manea exitosa
-//			 * */
-//			
-//			sshConnector.executeCommand("cd /planPGTMEX/procesos/RISK/interfaces; rm "+date + "_Rating_de_Contrapartida.csv");
-//			sshConnector.executeCommand("cd /planPGTMEX/procesos/RISK/interfaces; rm "+date + "_Inf_Cartera.csv");
-//		
-//			
-//			sshConnector.disconnect();
-//           	
-//           
-//           if (resultLogsexcels.isEmpty()) {
-//				textField_1.setText("Ocurrio un problema al cargar cartera");
-//				textField_1.update(textField_1.getGraphics());
-//				Thread.sleep(3000);
-//				textField_1.setText("Ocurrio un problema al cargar contrapartida");
-//				textField_1.update(textField_1.getGraphics());
-//				Thread.sleep(3000);
-//				System.exit(ABORT);
-//			}
-//			textField_1.setText("Carga completada de cartera y contrapartida.");
-//			textField_1.update(textField_1.getGraphics());
-//			Thread.sleep(3000);
-//		} catch (Exception e1) {
-//			try {
-//				textField_1.setText("Problemas al convertir archivos en contrapartida y cartera");
-//				textField_1.update(textField_1.getGraphics());
-//				Thread.sleep(4000);
-//				System.exit(ABORT);
-//			} catch (InterruptedException e2) {
-//				e2.printStackTrace();
-//			}
-//		}
-//	}
 
-//	public void validaFicheros() {
-//		SimpleDateFormat sdfx = new SimpleDateFormat("ddMMyyyy");
-//		String fechaCal = sdfx.format(dateChooser.getDate().getTime());
-//		
-//		File filContrapartida = new File(fechaCal + " Rating de Contrapartida.xlsx");
-//		File filCartera = new File(fechaCal + " Inf Cartera.xlsx");
-//		
-//		if (!filContrapartida.exists() || !filCartera.exists()) {
-//			try {
-//				textField_1.setText("Sin excel de cartera o contrapartida, coloca tus ficheros.");
-//				textField_1.update(textField_1.getGraphics());
-//				Thread.sleep(5000);
-//				System.exit(ABORT);
-//			} catch (InterruptedException e) {
-//				e.printStackTrace();
-//			}
-//		} else {
-//			try {
-//				textField_1.setText("los insumos existen, cargando...");
-//				textField_1.update(textField_1.getGraphics());
-//				Thread.sleep(5000);
-//			} catch (InterruptedException e) {
-//				e.printStackTrace();
-//			}
-//		}
-//	}
 
-	public void validaFicherosDolphinVictoria() {
-		SimpleDateFormat sdfx = new SimpleDateFormat("yyyyMMdd");
-		String fechaCal = sdfx.format(dateChooser.getDate().getTime());
-
-		File filDolphin = new File("\\\\mx2ct1hnascifnfsevs1.mx.corp\\ExtraccionesMIR\\rtra\\"
-				+ "rtra-cream-ges-dolphin-europa_mexico_" + fechaCal + ".txt");
-		File filVictoria = new File("\\\\mx2ct1hnascifnfsevs1.mx.corp\\ExtraccionesMIR\\rtra\\"
-				+ "rtra-cream-ges-victoria-europa_mexico_" + fechaCal + ".txt");
-
-		if (!filDolphin.exists() || !filVictoria.exists()) {
-			try {
-				textField_1.setText("Sin rtra Victoria o Dolphing, coloca tus ficheros.");
-				textField_1.update(textField_1.getGraphics());
-				Thread.sleep(5000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		} else {
-			try {
-				textField_1.setText("los insumos existen, cargando...");
-				textField_1.update(textField_1.getGraphics());
-				Thread.sleep(5000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-	}
 
 	public void cargaVictoriaDolphing() {
 

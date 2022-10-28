@@ -1,11 +1,5 @@
 package conexion;
 
-import java.io.BufferedWriter;
-import java.io.Closeable;
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -15,34 +9,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
+
 import java.util.List;
-import java.util.Locale;
+
 import java.util.stream.Collectors;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFCellStyle;
-import org.apache.poi.hssf.usermodel.HSSFFont;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.hssf.util.HSSFColor;
-import org.apache.poi.hssf.util.HSSFColor.HSSFColorPredefined;
-import org.apache.poi.sl.usermodel.VerticalAlignment;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.CellType;
-import org.apache.poi.ss.usermodel.FillPatternType;
-import org.apache.poi.ss.usermodel.IndexedColors;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-
-import com.aspose.cells.Font;
 
 import oracle.jdbc.pool.OracleDataSource;
 
@@ -1723,61 +1694,6 @@ public class Conexion {
 	}
 
 	/*********************
-	 * validar carga cartera
-	 ****************************************************************/
-	public String getCargaCartera() throws Exception {
-		strbSql = new StringBuilder();
-		String systCode = "";
-
-		strbSql.append(
-				"SELECT FECHACARGA FROM PGT_MEX.T_PGT_CARTERA_BAU  WHERE TRUNC(FECHACARGA)<=(SELECT TO_CHAR(CURRENT_DATE ,'DDMMYYYY') FROM dual)Order by FECHACARGA DESC");
-		try {
-			pstmt = con.prepareStatement(strbSql.toString());
-			rs = pstmt.executeQuery();
-			if (rs.next()) {
-				systCode = rs.getString(1);
-				// SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
-				// date = simpleDateFormat.format(new Date());
-
-			} else {
-				systCode = "No hay ultima carga";
-			}
-		} catch (SQLException e) {
-			throw e;
-		} catch (Exception e) {
-			throw e;
-		}
-
-		return systCode;
-	}
-
-	/*********************
-	 * validar carga contrapartida
-	 ****************************************************************/
-
-	public String getCargaContrapartida() throws Exception {
-		strbSql = new StringBuilder();
-		String systCode = "";
-		strbSql.append(
-				"SELECT FECHACARGA FROM PGT_MEX.T_PGT_CONTRAPARTIDA_BAU  WHERE TRUNC(FECHACARGA)<=(SELECT TO_CHAR(CURRENT_DATE ,'DDMMYYYY') FROM dual)Order by FECHACARGA DESC");
-		try {
-			pstmt = con.prepareStatement(strbSql.toString());
-			rs = pstmt.executeQuery();
-			if (rs.next()) {
-				systCode = rs.getString(1);
-			} else {
-				systCode = "No hay ultima carga";
-			}
-		} catch (SQLException e) {
-			throw e;
-		} catch (Exception e) {
-			throw e;
-		}
-
-		return systCode;
-	}
-
-	/*********************
 	 * validar carga Victoria
 	 ****************************************************************/
 
@@ -1812,61 +1728,6 @@ public class Conexion {
 		String systCode = "";
 		strbSql.append(
 				"SELECT FECHACARGA FROM PGT_MEX.T_PGT_MEX_CONSUMOSC_D  WHERE TRUNC(FECHACARGA)<=(SELECT TO_CHAR(CURRENT_DATE ,'DDMMYYYY') FROM dual)Order by FECHACARGA DESC");
-		try {
-			pstmt = con.prepareStatement(strbSql.toString());
-			rs = pstmt.executeQuery();
-			if (rs.next()) {
-				systCode = rs.getString(1);
-			} else {
-				systCode = "No hay ultima carga";
-			}
-		} catch (SQLException e) {
-			throw e;
-		} catch (Exception e) {
-			throw e;
-		}
-
-		return systCode;
-	}
-
-	/*********************
-	 * validar carga cartera Historico
-	 ****************************************************************/
-	public String getCargaCarteraHistorico(String fecha) throws Exception {
-		strbSql = new StringBuilder();
-		String systCode = "";
-		// String date = "";
-
-		strbSql.append("SELECT FECHACARGA FROM PGT_MEX.T_PGT_CARTERA_BAU  WHERE TRUNC(FECHACARGA)='" + fecha + "'");
-		try {
-			pstmt = con.prepareStatement(strbSql.toString());
-			rs = pstmt.executeQuery();
-			if (rs.next()) {
-				systCode = rs.getString(1);
-				// SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
-				// date = simpleDateFormat.format(new Date());
-
-			} else {
-				systCode = "No hay ultima carga";
-			}
-		} catch (SQLException e) {
-			throw e;
-		} catch (Exception e) {
-			throw e;
-		}
-
-		return systCode;
-	}
-
-	/*********************
-	 * validar carga contrapartida Historico
-	 ****************************************************************/
-
-	public String getCargaContrapartidaHistorico(String fecha) throws Exception {
-		strbSql = new StringBuilder();
-		String systCode = "";
-		strbSql.append(
-				"SELECT FECHACARGA FROM PGT_MEX.T_PGT_CONTRAPARTIDA_BAU  WHERE TRUNC(FECHACARGA)='" + fecha + "'");
 		try {
 			pstmt = con.prepareStatement(strbSql.toString());
 			rs = pstmt.executeQuery();
