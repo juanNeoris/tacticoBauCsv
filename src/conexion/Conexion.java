@@ -221,7 +221,6 @@ public class Conexion {
 		List<Double> MexicoBonosNomValSum = new ArrayList<Double>();
 		List fechMaxBonos = new ArrayList<>();
 		List fechMinBonos = new ArrayList<>();
-		
 
 		// creditos documentariado Mexico
 		List<String> MexicoCredDocu = new ArrayList<String>();
@@ -343,9 +342,9 @@ public class Conexion {
 		encabezado.add("FOLDERCOUNTRY");
 		encabezado.add("\n");
 
-		String systCode = "SELECT cptyparent,cptyparentrating,cptyparentname,dealstamp,instrumentname,TO_CHAR(TO_DATE(valuedate,  'YYYY-MM-DD'), 'DD-mon-YY'),TO_CHAR(TO_DATE(maturitydate,  'YYYY-MM-DD'), 'DD-mon-YY'),currency,to_char(DECODE(nominalvaluecur,null, '0.0',nominalvaluecur), '999,999,999,999.99')  AS nominalvaluecur,to_char(DECODE(CER,null, '0.0',CER), '999,999,999,999.99')  AS CER,to_char(DECODE(nominalvalue,null, '0.0',nominalvalue), '999,999,999,999.99')  AS nominalvalue,oneoff,cptyname,foldercountryname,cptycountry,cptyparentcountry,foldercountry from PGT_MEX.T_PGT_MEX_CONSUMOSC_V WHERE LastParentF ='"
+		String systCode = "SELECT cptyparent, NVL(cptyparentrating, 'SIN RATING'),cptyparentname,dealstamp,instrumentname,TO_CHAR(TO_DATE(valuedate,  'YYYY-MM-DD'), 'DD-mon-YY'),TO_CHAR(TO_DATE(maturitydate,  'YYYY-MM-DD'), 'DD-mon-YY'),currency,to_char(DECODE(nominalvaluecur,null, '0.0',nominalvaluecur), '999,999,999,999.99')  AS nominalvaluecur,to_char(DECODE(CER,null, '0.0',CER), '999,999,999,999.99')  AS CER,to_char(DECODE(nominalvalue,null, '0.0',nominalvalue), '999,999,999,999.99')  AS nominalvalue,oneoff,cptyname,foldercountryname,cptycountry,cptyparentcountry,foldercountry from PGT_MEX.T_PGT_MEX_CONSUMOSC_V WHERE LastParentF ='"
 				+ grupo + "' and FECHACARGA='" + fechaConsumo
-				+ "' AND foldercountryname='Mexico' UNION ALL SELECT cptyparent,cptyparentrating,cptyparentname,dealstamp,instrumentname,TO_CHAR(TO_DATE(valuedate,  'YYYY-MM-DD'), 'DD-mon-YY'),TO_CHAR(TO_DATE(maturitydate,  'YYYY-MM-DD'), 'DD-mon-YY'),currency,to_char(DECODE(nominalvaluecur,null, '0.0',nominalvaluecur), '999,999,999,999.99')  AS nominalvaluecur,to_char(DECODE(CER,null, '0.0',CER), '999,999,999,999.99')  AS CER,to_char(DECODE(nominalvalue,null, '0.0',nominalvalue), '999,999,999,999.99')  AS nominalvalue,oneoff,cptyname,foldercountryname,cptycountry,cptyparentcountry,foldercountry from PGT_MEX.T_PGT_MEX_CONSUMOSC_D WHERE LastParentF ='"
+				+ "' AND foldercountryname='Mexico' UNION ALL SELECT cptyparent, NVL(cptyparentrating, 'SIN RATING'),cptyparentname,dealstamp,instrumentname,TO_CHAR(TO_DATE(valuedate,  'YYYY-MM-DD'), 'DD-mon-YY'),TO_CHAR(TO_DATE(maturitydate,  'YYYY-MM-DD'), 'DD-mon-YY'),currency,to_char(DECODE(nominalvaluecur,null, '0.0',nominalvaluecur), '999,999,999,999.99')  AS nominalvaluecur,to_char(DECODE(CER,null, '0.0',CER), '999,999,999,999.99')  AS CER,to_char(DECODE(nominalvalue,null, '0.0',nominalvalue), '999,999,999,999.99')  AS nominalvalue,oneoff,cptyname,foldercountryname,cptycountry,cptyparentcountry,foldercountry from PGT_MEX.T_PGT_MEX_CONSUMOSC_D WHERE LastParentF ='"
 				+ grupo + "' and FECHACARGA='" + fechaConsumo
 				+ "' AND foldercountryname='Mexico' ORDER BY foldercountryname,instrumentname ";
 		ResultSet rs = sta.executeQuery(systCode);
@@ -365,11 +364,11 @@ public class Conexion {
 						+ "|" + rs.getString(12) + "|" + "\"" + rs.getString(13) + "\"" + "|" + rs.getString(14) + "|"
 						+ "\"" + rs.getString(15) + "\"" + "|" + rs.getString(16) + "|" + rs.getString(17) + "\n";
 
-				// cadena obtener la sumatoria	
-				sumatoriaNomValCur = DecimalFormat.getNumberInstance().parse(rs.getString(9).trim()).doubleValue();			
+				// cadena obtener la sumatoria
+				sumatoriaNomValCur = DecimalFormat.getNumberInstance().parse(rs.getString(9).trim()).doubleValue();
 				sumatoriaCer = DecimalFormat.getNumberInstance().parse(rs.getString(10).trim()).doubleValue();
 				sumatoriaNomVal = DecimalFormat.getNumberInstance().parse(rs.getString(11).trim()).doubleValue();
-				
+
 				if (rs.getString(5).contains("BOND")) {
 					MexicoBonos.add(systCode);
 					info = this.getContraparte(grupo, fechaConsumo, rs.getString(4), rs.getString(14), rs.getString(6),
@@ -683,164 +682,182 @@ public class Conexion {
 
 			// Avales Mexico
 			if (!MexicoAval.isEmpty()) {
-				writer.write("MEXICO-AVAL\n");
+				writer.write("MEXICO - AVAL\n");
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaMexicoAval);
-				writer.write("TOTAL MEXICO-AVALES" +"|" + "|" + "|" + "|" + "TOTAL AVALES" + "|" + "|" + "|" + "|"
+				writer.write("TOTAL MEXICO - AVALES" + "|" + "|" + "|" + "|" + "TOTAL AVALES" + "|" + "|" + "|" + "|"
 						+ DFORMATO.format(totalMexicoAvalValCurSum).toString() + "|"
 						+ DFORMATO.format(totalMexicoAvalCerSum).toString() + "|"
-						+ DFORMATO.format(totalMexicoAvalNomValSum).toString()+ "|"+ "|"+ "|"+ "|"+ "|"+"|"+"_");
+						+ DFORMATO.format(totalMexicoAvalNomValSum).toString() + "|" + "|" + "|" + "|" + "|" + "|"
+						+ "_");
 				writer.write("\n");
 				writer.write("\n");
 			} // Bonos Mexico
 			if (!MexicoBonos.isEmpty()) {
-				writer.write("MEXICO-BONOS\n");
+				writer.write("MEXICO - BONOS\n");
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaBonosMex);
-				writer.write("TOTAL MEXICO-BONOS" +"|" + "|" + "|" + "|" + "TOTAL BONOS" + "|" + "|" + "|" + "|"
+				writer.write("TOTAL MEXICO - BONOS" + "|" + "|" + "|" + "|" + "TOTAL BONOS" + "|" + "|" + "|" + "|"
 						+ DFORMATO.format(totalMexicoBonosNomValCur).toString() + "|"
 						+ DFORMATO.format(totalMexicoBonosCer).toString() + "|"
-						+ DFORMATO.format(totalMexicoBonosNomVal).toString()+ "|"+ "|"+ "|"+ "|"+ "|"+"|"+"_");
+						+ DFORMATO.format(totalMexicoBonosNomVal).toString() + "|" + "|" + "|" + "|" + "|" + "|" + "_");
 				writer.write("\n");
 				writer.write("\n");
 			} // Confirming Mexico
 			if (!MexicoConfir.isEmpty()) {
-				writer.write("-MEXICO-CONFIRMING\n");
+				writer.write("-MEXICO - CONFIRMING\n");
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaMexicoConfir);
-				writer.write("TOTAL MEXICO-CONFIRMING" +"|" + "|" + "|" + "|" + "TOTAL CONFIRMING" + "|" + "|" + "|" + "|"
-						+ DFORMATO.format(totalMexicoConfirNomValCurSum).toString() + "|"
+				writer.write("TOTAL MEXICO - CONFIRMING" + "|" + "|" + "|" + "|" + "TOTAL CONFIRMING" + "|" + "|" + "|"
+						+ "|" + DFORMATO.format(totalMexicoConfirNomValCurSum).toString() + "|"
 						+ DFORMATO.format(totalMexicoConfirCerSum).toString() + "|"
-						+ DFORMATO.format(totalMexicoConfirNomValSum).toString()+ "|"+ "|"+ "|"+ "|"+ "|"+"|"+"_");
+						+ DFORMATO.format(totalMexicoConfirNomValSum).toString() + "|" + "|" + "|" + "|" + "|" + "|"
+						+ "_");
 
 				writer.write("\n");
 				writer.write("\n");
 			} // Creditos Documentariado Mexio
 			if (!MexicoCredDocu.isEmpty()) {
-				writer.write("MEXICO-CREDITOS DOCUMENTARIADO\n");
+				writer.write("MEXICO - CREDITOS DOCUMENTARIADO\n");
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaMexicoCredDoc);
-				writer.write("TOTAL MEXICO-CREDITOS DOCUMENTARIOS" +"|" + "|" + "|" + "|" + "TOTAL CREDITOS DOCUMENTARIOS" + "|" + "|" + "|" + "|"
-						+ DFORMATO.format(totalMexicoCredDocuNomValCurSum).toString() + "|"
-						+ DFORMATO.format(totalMexicoCredDocuCerSum).toString() + "|"
-						+ DFORMATO.format(totalMexicoCredDocuNomValSum).toString()+ "|"+ "|"+ "|"+ "|"+ "|"+"|"+"_");
+				writer.write(
+						"TOTAL MEXICO - CREDITOS DOCUMENTARIOS" + "|" + "|" + "|" + "|" + "TOTAL CREDITOS DOCUMENTARIOS"
+								+ "|" + "|" + "|" + "|" + DFORMATO.format(totalMexicoCredDocuNomValCurSum).toString()
+								+ "|" + DFORMATO.format(totalMexicoCredDocuCerSum).toString() + "|"
+								+ DFORMATO.format(totalMexicoCredDocuNomValSum).toString() + "|" + "|" + "|" + "|" + "|"
+								+ "|" + "_");
 				writer.write("\n");
 				writer.write("\n");
 			} // Creditos Sindicados-Mexico
 			if (!MexicoSindicado.isEmpty()) {
-				writer.write("MEXICO-CREDITOS SINDICADOS\n");
+				writer.write("MEXICO - CREDITOS SINDICADOS\n");
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaMexicoSindicado);
-				writer.write("TOTAL MEXICO-CREDITOS SINDICADOS" +"|" + "|" + "|" + "|" + "TOTAL CREDITOS SINDICADOS" + "|" + "|" + "|" + "|"
-						+ DFORMATO.format(totalMexicoSindicadoNomValCurSum).toString() + "|"
+				writer.write("TOTAL MEXICO - CREDITOS SINDICADOS" + "|" + "|" + "|" + "|" + "TOTAL CREDITOS SINDICADOS"
+						+ "|" + "|" + "|" + "|" + DFORMATO.format(totalMexicoSindicadoNomValCurSum).toString() + "|"
 						+ DFORMATO.format(totalMexicoSindicadoCerSum).toString() + "|"
-						+ DFORMATO.format(totalMexicoSindicadoNomValSum).toString()+ "|"+ "|"+ "|"+ "|"+ "|"+"|"+"_");
+						+ DFORMATO.format(totalMexicoSindicadoNomValSum).toString() + "|" + "|" + "|" + "|" + "|" + "|"
+						+ "_");
 				writer.write("\n");
 				writer.write("\n");
 			} // Derivados-Mexico
 			if (!MexicoDer.isEmpty()) {
-				writer.write("MEXICO-DERIVADOS\n");
+				writer.write("MEXICO - DERIVADOS\n");
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaMexicoDer);
-				writer.write("TOTAL MEXICO-DERIVADOS" +"|" + "|" + "|" + "|" + "TOTAL DERIVADOS" + "|" + "|" + "|" + "|"
-						+ DFORMATO.format(totalMexicoDerValCurSum).toString() + "|"
+				writer.write("TOTAL MEXICO - DERIVADOS" + "|" + "|" + "|" + "|" + "TOTAL DERIVADOS" + "|" + "|" + "|"
+						+ "|" + DFORMATO.format(totalMexicoDerValCurSum).toString() + "|"
 						+ DFORMATO.format(totalMexicoDerCerSum).toString() + "|"
-						+ DFORMATO.format(totalMexicoDerNomValSum).toString()+ "|"+ "|"+ "|"+ "|"+ "|"+"|"+"_");
+						+ DFORMATO.format(totalMexicoDerNomValSum).toString() + "|" + "|" + "|" + "|" + "|" + "|"
+						+ "_");
 				writer.write("\n");
 				writer.write("\n");
 			} // Descuentos-Mexico
 			if (!MexicoDesc.isEmpty()) {
-				writer.write("MEXICO-DESCUENTOS\n");
+				writer.write("MEXICO - DESCUENTOS\n");
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaMexicoDesc);
-				writer.write("TOTAL MEXICO-DESCUENTOS" +"|" + "|" + "|" + "|" + "TOTAL DESCUENTOS" + "|" + "|" + "|" + "|"
-						+ DFORMATO.format(totalMexicoDescValCurSum).toString() + "|"
+				writer.write("TOTAL MEXICO - DESCUENTOS" + "|" + "|" + "|" + "|" + "TOTAL DESCUENTOS" + "|" + "|" + "|"
+						+ "|" + DFORMATO.format(totalMexicoDescValCurSum).toString() + "|"
 						+ DFORMATO.format(totalMexicoDescCerSum).toString() + "|"
-						+ DFORMATO.format(totalMexicoDescNomValSum).toString()+ "|"+ "|"+ "|"+ "|"+ "|"+"|"+"_");
+						+ DFORMATO.format(totalMexicoDescNomValSum).toString() + "|" + "|" + "|" + "|" + "|" + "|"
+						+ "_");
 				writer.write("\n");
 				writer.write("\n");
 			} // Factoring Mexico
 			if (!MexicoFac.isEmpty()) {
-				writer.write("MEXICO-FACTORING\n");
+				writer.write("MEXICO - FACTORING\n");
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaMexicoFac);
-				writer.write("TOTAL MEXICO-FACTORING" +"|" + "|" + "|" + "|" + "TOTAL FACTORING" + "|" + "|" + "|" + "|"
-						+ DFORMATO.format(totalMexicoFacValCurSum).toString() + "|"
+				writer.write("TOTAL MEXICO - FACTORING" + "|" + "|" + "|" + "|" + "TOTAL FACTORING" + "|" + "|" + "|"
+						+ "|" + DFORMATO.format(totalMexicoFacValCurSum).toString() + "|"
 						+ DFORMATO.format(totalMexicoFacCerSum).toString() + "|"
-						+ DFORMATO.format(totalMexicoFacNomValSum).toString()+ "|"+ "|"+ "|"+ "|"+ "|"+"|"+"_");
+						+ DFORMATO.format(totalMexicoFacNomValSum).toString() + "|" + "|" + "|" + "|" + "|" + "|"
+						+ "_");
 				writer.write("\n");
 				writer.write("\n");
 			} // Financiamiento Comex
 			if (!MexicoComFor.isEmpty()) {
-				writer.write("MEXICO-FINANCIAMIENTO COMEX\n");
+				writer.write("MEXICO - FINANCIAMIENTO COMEX\n");
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaMexicoComFor);
-				writer.write("TOTAL MEXICO-FINANCIAMIENTO COMEX" +"|" + "|" + "|" + "|" + "TOTAL FINANCIAMIENTO COMEX" + "|" + "|" + "|" + "|"
-						+ DFORMATO.format(totalMexicoComForNomValCurSum).toString() + "|"
-						+ DFORMATO.format(totalMexicoComForCerSum).toString() + "|"
-						+ DFORMATO.format(totalMexicoComForNomValSum).toString()+ "|"+ "|"+ "|"+ "|"+ "|"+"|"+"_");
+				writer.write(
+						"TOTAL MEXICO - FINANCIAMIENTO COMEX" + "|" + "|" + "|" + "|" + "TOTAL FINANCIAMIENTO COMEX"
+								+ "|" + "|" + "|" + "|" + DFORMATO.format(totalMexicoComForNomValCurSum).toString()
+								+ "|" + DFORMATO.format(totalMexicoComForCerSum).toString() + "|"
+								+ DFORMATO.format(totalMexicoComForNomValSum).toString() + "|" + "|" + "|" + "|" + "|"
+								+ "|" + "_");
 				writer.write("\n");
 				writer.write("\n");
 			} // Financiamiento IMP/EXP-Mexico
 			if (!MexicoExportImport.isEmpty()) {
-				writer.write("MEXICO-FINANCIAMIENTO IMP/EXP\n");
+				writer.write("MEXICO - FINANCIAMIENTO IMP/EXP\n");
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaMexicoExportImport);
-				writer.write("TOTAL MEXICO-FINANCIAMIENTO IMP/EXP" +"|" + "|" + "|" + "|" + "TOTAL FINANCIAMIENTO IMP/EXP" + "|" + "|" + "|" + "|"
+				writer.write("TOTAL MEXICO - FINANCIAMIENTO IMP/EXP" + "|" + "|" + "|" + "|"
+						+ "TOTAL FINANCIAMIENTO IMP/EXP" + "|" + "|" + "|" + "|"
 						+ DFORMATO.format(totalMexicoExportImportNomValCurSum).toString() + "|"
 						+ DFORMATO.format(totalMexicoExportImportCerSum).toString() + "|"
-						+ DFORMATO.format(totalMexicoExportImportNomValSum).toString()+ "|"+ "|"+ "|"+ "|"+ "|"+"|"+"_");
+						+ DFORMATO.format(totalMexicoExportImportNomValSum).toString() + "|" + "|" + "|" + "|" + "|"
+						+ "|" + "_");
 				writer.write("\n");
 				writer.write("\n");
 			} // Garantias
 			if (!newList.isEmpty()) {
-				writer.write("MEXICO-GARANTIAS\n");
+				writer.write("MEXICO - GARANTIAS\n");
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaMexicoGaran);
-				writer.write("TOTAL MEXICO-GARANTIAS" +"|" + "|" + "|" + "|" + "TOTAL GARANTIAS" + "|" + "|" + "|" + "|"
-						+ DFORMATO.format(totalMexicoGaranValCurSum).toString() + "|"
+				writer.write("TOTAL MEXICO - GARANTIAS" + "|" + "|" + "|" + "|" + "TOTAL GARANTIAS" + "|" + "|" + "|"
+						+ "|" + DFORMATO.format(totalMexicoGaranValCurSum).toString() + "|"
 						+ DFORMATO.format(totalMexicoGaranCerSum).toString() + "|"
-						+ DFORMATO.format(totalMexicoGaranNomValSum).toString()+ "|"+ "|"+ "|"+ "|"+ "|"+"|"+"_");
+						+ DFORMATO.format(totalMexicoGaranNomValSum).toString() + "|" + "|" + "|" + "|" + "|" + "|"
+						+ "_");
 				writer.write("\n");
 				writer.write("\n");
 			} // Lineas Comprometidas
 			if (!MexicoLinCom.isEmpty()) {
-				writer.write("MEXICO-LINEAS COMPROMETIDAS\n");
+				writer.write("MEXICO - LINEAS COMPROMETIDAS\n");
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaMexicoLinCom);
-				writer.write("TOTAL MEXICO-LINEAS COMPROMETIDAS" +"|" + "|" + "|" + "|" + "TOTAL LINEAS COMPROMETIDAS" + "|" + "|" + "|" + "|"
-						+ DFORMATO.format(totalMexicoLinComValCurSum).toString() + "|"
-						+ DFORMATO.format(totalMexicoLinComCerSum).toString() + "|"
-						+ DFORMATO.format(totalMexicoLinComNomValSum).toString()+ "|"+ "|"+ "|"+ "|"+ "|"+"|"+"_");
+				writer.write(
+						"TOTAL MEXICO - LINEAS COMPROMETIDAS" + "|" + "|" + "|" + "|" + "TOTAL LINEAS COMPROMETIDAS"
+								+ "|" + "|" + "|" + "|" + DFORMATO.format(totalMexicoLinComValCurSum).toString() + "|"
+								+ DFORMATO.format(totalMexicoLinComCerSum).toString() + "|"
+								+ DFORMATO.format(totalMexicoLinComNomValSum).toString() + "|" + "|" + "|" + "|" + "|"
+								+ "|" + "_");
 				writer.write("\n");
 				writer.write("\n");
 			} // Lineas No Comprometidas
 			if (!MexicoLinNoCom.isEmpty()) {
-				writer.write("MEXICO-LINEAS NO COMPROMETIDAS\n");
+				writer.write("MEXICO - LINEAS NO COMPROMETIDAS\n");
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaLinNoComMex);
-				writer.write("TOTAL MEXICO-LINEAS NO COMPROMETIDAS" +"|" + "|" + "|" + "|" + "TOTAL LINEAS NO COMPROMETIDAS" + "|" + "|" + "|" + "|"
+				writer.write("TOTAL MEXICO - LINEAS NO COMPROMETIDAS" + "|" + "|" + "|" + "|"
+						+ "TOTAL LINEAS NO COMPROMETIDAS" + "|" + "|" + "|" + "|"
 						+ DFORMATO.format(totalMexicoLinNoComNomValCur).toString() + "|"
 						+ DFORMATO.format(totalMexicoLinNoComCer).toString() + "|"
-						+ DFORMATO.format(totalMexicoLinNoComNomVal).toString()+ "|"+ "|"+ "|"+ "|"+ "|"+"|"+"_");
+						+ DFORMATO.format(totalMexicoLinNoComNomVal).toString() + "|" + "|" + "|" + "|" + "|" + "|"
+						+ "_");
 				writer.write("\n");
 				writer.write("\n");
 			} // Tarjeta de Credito Mexico
 			if (!MexicoTar.isEmpty()) {
-				writer.write("MEXICO-TARJETA DE CREDITO\n");
+				writer.write("MEXICO - TARJETA DE CREDITO\n");
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaMexicoTar);
-				writer.write("TOTAL MEXICO-TARJETAS DE CREDITO" +"|" + "|" + "|" + "|" + "TOTAL TARJETAS DE CREDITO" + "|" + "|" + "|" + "|"
-						+ DFORMATO.format(totalMexicoTarValCurSum).toString() + "|"
+				writer.write("TOTAL MEXICO - TARJETAS DE CREDITO" + "|" + "|" + "|" + "|" + "TOTAL TARJETAS DE CREDITO"
+						+ "|" + "|" + "|" + "|" + DFORMATO.format(totalMexicoTarValCurSum).toString() + "|"
 						+ DFORMATO.format(totalMexicoTarCerSum).toString() + "|"
-						+ DFORMATO.format(totalMexicoTarNomValSum).toString()+ "|"+ "|"+ "|"+ "|"+ "|"+"|"+"_");
+						+ DFORMATO.format(totalMexicoTarNomValSum).toString() + "|" + "|" + "|" + "|" + "|" + "|"
+						+ "_");
 				writer.write("\n");
 				writer.write("\n");
 			}
 			writer.write("TOTAL MEXICO" + "|" + "|" + "|" + "|" + "TOTAL GENERAL" + "|" + "|" + "|" + "|"
 					+ DFORMATO.format(totalMexicoTotValCurSum).toString() + "|"
 					+ DFORMATO.format(totalMexicoTotCerSum).toString() + "|"
-					+ DFORMATO.format(totalMexicoTotNomValSum).toString() + "|"+ "|"+ "|"+ "|"+ "|"+"|"+"_");
+					+ DFORMATO.format(totalMexicoTotNomValSum).toString() + "|" + "|" + "|" + "|" + "|" + "|" + "_");
 			writer.write("\n");
 			writer.write("\n");
 			writer.flush();
@@ -984,9 +1001,9 @@ public class Conexion {
 		encabezado.add("FOLDERCOUNTRY");
 		encabezado.add("\n");
 
-		String systCode = "SELECT cptyparent,cptyparentrating,cptyparentname,dealstamp,instrumentname,TO_CHAR(TO_DATE(valuedate,  'YYYY-MM-DD'), 'DD-mon-YY'),TO_CHAR(TO_DATE(maturitydate,  'YYYY-MM-DD'), 'DD-mon-YY'),currency,to_char(DECODE(nominalvaluecur,null, '0.0',nominalvaluecur), '999,999,999,999.99')  AS nominalvaluecur,to_char(DECODE(CER,null, '0.0',CER), '999,999,999,999.99')  AS CER,to_char(DECODE(nominalvalue,null, '0.0',nominalvalue), '999,999,999,999.99')  AS nominalvalue,oneoff,cptyname,foldercountryname,cptycountry,cptyparentcountry,foldercountry from PGT_MEX.T_PGT_MEX_CONSUMOSC_V WHERE LastParentF ='"
+		String systCode = "SELECT cptyparent, NVL(cptyparentrating, 'SIN RATING'),cptyparentname,dealstamp,instrumentname,TO_CHAR(TO_DATE(valuedate,  'YYYY-MM-DD'), 'DD-mon-YY'),TO_CHAR(TO_DATE(maturitydate,  'YYYY-MM-DD'), 'DD-mon-YY'),currency,to_char(DECODE(nominalvaluecur,null, '0.0',nominalvaluecur), '999,999,999,999.99')  AS nominalvaluecur,to_char(DECODE(CER,null, '0.0',CER), '999,999,999,999.99')  AS CER,to_char(DECODE(nominalvalue,null, '0.0',nominalvalue), '999,999,999,999.99')  AS nominalvalue,oneoff,cptyname,foldercountryname,cptycountry,cptyparentcountry,foldercountry from PGT_MEX.T_PGT_MEX_CONSUMOSC_V WHERE LastParentF ='"
 				+ grupo + "' and FECHACARGA='" + fechaConsumo
-				+ "' AND foldercountryname<>'Mexico' UNION ALL SELECT cptyparent,cptyparentrating,cptyparentname,dealstamp,instrumentname,TO_CHAR(TO_DATE(valuedate,  'YYYY-MM-DD'), 'DD-mon-YY'),TO_CHAR(TO_DATE(maturitydate,  'YYYY-MM-DD'), 'DD-mon-YY'),currency,to_char(DECODE(nominalvaluecur,null, '0.0',nominalvaluecur), '999,999,999,999.99')  AS nominalvaluecur,to_char(DECODE(CER,null, '0.0',CER), '999,999,999,999.99')  AS CER,to_char(DECODE(nominalvalue,null, '0.0',nominalvalue), '999,999,999,999.99')  AS nominalvalue,oneoff,cptyname,foldercountryname,cptycountry,cptyparentcountry,foldercountry from PGT_MEX.T_PGT_MEX_CONSUMOSC_D WHERE LastParentF ='"
+				+ "' AND foldercountryname<>'Mexico' UNION ALL SELECT cptyparent, NVL(cptyparentrating, 'SIN RATING'),cptyparentname,dealstamp,instrumentname,TO_CHAR(TO_DATE(valuedate,  'YYYY-MM-DD'), 'DD-mon-YY'),TO_CHAR(TO_DATE(maturitydate,  'YYYY-MM-DD'), 'DD-mon-YY'),currency,to_char(DECODE(nominalvaluecur,null, '0.0',nominalvaluecur), '999,999,999,999.99')  AS nominalvaluecur,to_char(DECODE(CER,null, '0.0',CER), '999,999,999,999.99')  AS CER,to_char(DECODE(nominalvalue,null, '0.0',nominalvalue), '999,999,999,999.99')  AS nominalvalue,oneoff,cptyname,foldercountryname,cptycountry,cptyparentcountry,foldercountry from PGT_MEX.T_PGT_MEX_CONSUMOSC_D WHERE LastParentF ='"
 				+ grupo + "' and FECHACARGA='" + fechaConsumo
 				+ "' AND foldercountryname<>'Mexico' ORDER BY foldercountryname ,instrumentname ";
 		ResultSet rs = sta.executeQuery(systCode);
@@ -1004,8 +1021,7 @@ public class Conexion {
 						+ "|" + rs.getString(12) + "|" + "\"" + rs.getString(13) + "\"" + "|" + rs.getString(14) + "|"
 						+ "\"" + rs.getString(15) + "\"" + "|" + rs.getString(16) + "|" + rs.getString(17) + "\n";
 
-				
-				sumatoriaNomValCur = DecimalFormat.getNumberInstance().parse(rs.getString(9).trim()).doubleValue();			
+				sumatoriaNomValCur = DecimalFormat.getNumberInstance().parse(rs.getString(9).trim()).doubleValue();
 				sumatoriaCer = DecimalFormat.getNumberInstance().parse(rs.getString(10).trim()).doubleValue();
 				sumatoriaNomVal = DecimalFormat.getNumberInstance().parse(rs.getString(11).trim()).doubleValue();
 
@@ -1347,13 +1363,11 @@ public class Conexion {
 		registrosInterfaz = new ArrayList<String>();
 		String systCode = "";
 		strbSql.append(
-				"SELECT cptyparent,cptyparentrating,cptyparentname,dealstamp,instrumentname,TO_CHAR(TO_DATE(valuedate,  'YYYY-MM-DD'), 'DD-mon-YY'),TO_CHAR(TO_DATE(maturitydate,  'YYYY-MM-DD'), 'DD-mon-YY'),currency,to_char(DECODE(nominalvaluecur,null, '0.0',nominalvaluecur), '999,999,999,999.99')  AS nominalvaluecur,to_char(DECODE(CER,null, '0.0',CER), '999,999,999,999.99')  AS CER,to_char(DECODE(nominalvalue,null, '0.0',nominalvalue), '999,999,999,999.99')  AS nominalvalue,oneoff,cptyname,foldercountryname,cptycountry,cptyparentcountry,foldercountry from PGT_MEX.T_PGT_MEX_CONSUMOSC_V WHERE LastParentF ='"
-						+ grupo + "' and FECHACARGA='" + fechaConsumo + "' AND foldercountryname='" + pais
-						+ "' AND DEALSTAMP='" + deal
-						+ "' AND INSTRUMENTNAME IN('GARANTIA ACCIONES COTIZADAS','GARANTIA AVAL FINANCIERO - NO USAR (3Q 2016)','GARANTIA DERECHOS DE COBRO','GARANTIA PERSONAL MANCOMUNADA','GARANTIA PERSONAL SOLIDARIA','GARANTIA PERSONAL SOLIDARIA FINAN','OTRAS GARANTIAS EN EFECTIVO','OTRAS GARANTIAS REALES NO LIQUIDAS','OTHER GUARANTY CASH') UNION ALL  SELECT cptyparent,cptyparentrating,cptyparentname,dealstamp,instrumentname,TO_CHAR(TO_DATE(valuedate,  'YYYY-MM-DD'), 'DD-mon-YY'),TO_CHAR(TO_DATE(maturitydate,  'YYYY-MM-DD'), 'DD-mon-YY'),currency,to_char(DECODE(nominalvaluecur,null, '0.0',nominalvaluecur), '999,999,999,999.99')  AS nominalvaluecur,to_char(DECODE(CER,null, '0.0',CER), '999,999,999,999.99')  AS CER,to_char(DECODE(nominalvalue,null, '0.0',nominalvalue), '999,999,999,999.99')  AS nominalvalue,oneoff,cptyname,foldercountryname,cptycountry,cptyparentcountry,foldercountry from PGT_MEX.T_PGT_MEX_CONSUMOSC_D WHERE LastParentF ='"
-						+ grupo + "' and FECHACARGA='" + fechaConsumo + "' AND foldercountryname='" + pais
-						+ "' AND DEALSTAMP='" + deal
-						+ "' AND INSTRUMENTNAME IN('GARANTIA ACCIONES COTIZADAS','GARANTIA AVAL FINANCIERO - NO USAR (3Q 2016)','GARANTIA DERECHOS DE COBRO','GARANTIA PERSONAL MANCOMUNADA','GARANTIA PERSONAL SOLIDARIA','GARANTIA PERSONAL SOLIDARIA FINAN','OTRAS GARANTIAS EN EFECTIVO','OTRAS GARANTIAS REALES NO LIQUIDAS','OTHER GUARANTY CASH') ORDER BY foldercountryname,instrumentname,cptyparentname");
+				"SELECT cptyparent, NVL(cptyparentrating, 'SIN RATING'),cptyparentname,dealstamp,instrumentname,TO_CHAR(TO_DATE(valuedate,  'YYYY-MM-DD'), 'DD-mon-YY'),TO_CHAR(TO_DATE(maturitydate,  'YYYY-MM-DD'), 'DD-mon-YY'),currency,to_char(DECODE(nominalvaluecur,null, '0.0',nominalvaluecur), '999,999,999,999.99')  AS nominalvaluecur,to_char(DECODE(CER,null, '0.0',CER), '999,999,999,999.99')  AS CER,to_char(DECODE(nominalvalue,null, '0.0',nominalvalue), '999,999,999,999.99')  AS nominalvalue,oneoff,cptyname,foldercountryname,cptycountry,cptyparentcountry,foldercountry from PGT_MEX.T_PGT_MEX_CONSUMOSC_V WHERE FECHACARGA='"
+						+ fechaConsumo + "' AND foldercountryname='" + pais + "' AND DEALSTAMP='" + deal
+						+ "' AND INSTRUMENTNAME IN('GARANTIA ACCIONES COTIZADAS','GARANTIA AVAL FINANCIERO - NO USAR (3Q 2016)','GARANTIA DERECHOS DE COBRO','GARANTIA PERSONAL MANCOMUNADA','GARANTIA PERSONAL SOLIDARIA','GARANTIA PERSONAL SOLIDARIA FINAN','OTRAS GARANTIAS EN EFECTIVO','OTRAS GARANTIAS REALES NO LIQUIDAS','OTHER GUARANTY CASH','GARANTIA BONOS LIQUIDOS AAA/A-') UNION ALL  SELECT cptyparent, NVL(cptyparentrating, 'SIN RATING'),cptyparentname,dealstamp,instrumentname,TO_CHAR(TO_DATE(valuedate,  'YYYY-MM-DD'), 'DD-mon-YY'),TO_CHAR(TO_DATE(maturitydate,  'YYYY-MM-DD'), 'DD-mon-YY'),currency,to_char(DECODE(nominalvaluecur,null, '0.0',nominalvaluecur), '999,999,999,999.99')  AS nominalvaluecur,to_char(DECODE(CER,null, '0.0',CER), '999,999,999,999.99')  AS CER,to_char(DECODE(nominalvalue,null, '0.0',nominalvalue), '999,999,999,999.99')  AS nominalvalue,oneoff,cptyname,foldercountryname,cptycountry,cptyparentcountry,foldercountry from PGT_MEX.T_PGT_MEX_CONSUMOSC_D WHERE                  FECHACARGA='"
+						+ fechaConsumo + "' AND foldercountryname='" + pais + "' AND DEALSTAMP='" + deal
+						+ "' AND INSTRUMENTNAME IN('GARANTIA ACCIONES COTIZADAS','GARANTIA AVAL FINANCIERO - NO USAR (3Q 2016)','GARANTIA DERECHOS DE COBRO','GARANTIA PERSONAL MANCOMUNADA','GARANTIA PERSONAL SOLIDARIA','GARANTIA PERSONAL SOLIDARIA FINAN','OTRAS GARANTIAS EN EFECTIVO','OTRAS GARANTIAS REALES NO LIQUIDAS','OTHER GUARANTY CASH','GARANTIA BONOS LIQUIDOS AAA/A-') ORDER BY foldercountryname,instrumentname,cptyparentname");
 
 		try {
 			pstmt = con.prepareStatement(strbSql.toString());
@@ -1494,170 +1508,189 @@ public class Conexion {
 
 			// Aval
 			if (!spainAval.isEmpty()) {
-				writer.write( pais.toUpperCase() +"-AVAL" + "\n");
+				writer.write(pais.toUpperCase() + " - AVAL" + "\n");
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaSpainAval);
-				writer.write("TOTAL " + pais.toUpperCase()+"-AVALES"+"|" + "|" + "|" + "|" + "TOTAL AVALES" + "|" + "|" + "|" + "|"
-						+ DFORMATO.format(totalSpainAvalNomValCurSum).toString() + "|"
+				writer.write("TOTAL " + pais.toUpperCase() + " - AVALES" + "|" + "|" + "|" + "|" + "TOTAL AVALES" + "|"
+						+ "|" + "|" + "|" + DFORMATO.format(totalSpainAvalNomValCurSum).toString() + "|"
 						+ DFORMATO.format(totalSpainAvalCerSum).toString() + "|"
-						+ DFORMATO.format(totalSpainAvalNomValSum).toString()+ "|"+ "|"+ "|"+ "|"+ "|"+"|"+"_");
+						+ DFORMATO.format(totalSpainAvalNomValSum).toString() + "|" + "|" + "|" + "|" + "|" + "|"
+						+ "_");
 				writer.write("\n");
 				writer.write("\n");
 			} // Bonos
 			if (!spainBonos.isEmpty()) {
-				writer.write(pais.toUpperCase() + "-BONOS" + "\n");
+				writer.write(pais.toUpperCase() + " - BONOS" + "\n");
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaBonosSpain);
-				writer.write("TOTAL " + pais.toUpperCase()+"-BONOS"+"|" + "|" + "|" + "|" + "TOTAL BONOS" + "|" + "|" + "|" + "|"
-						+ DFORMATO.format(totalSpainBonosNomValCur).toString() + "|"
+				writer.write("TOTAL " + pais.toUpperCase() + " - BONOS" + "|" + "|" + "|" + "|" + "TOTAL BONOS" + "|"
+						+ "|" + "|" + "|" + DFORMATO.format(totalSpainBonosNomValCur).toString() + "|"
 						+ DFORMATO.format(totalSpainBonosCer).toString() + "|"
-						+ DFORMATO.format(totalSpainBonosNomVal).toString()+ "|"+ "|"+ "|"+ "|"+ "|"+"|"+"_");
+						+ DFORMATO.format(totalSpainBonosNomVal).toString() + "|" + "|" + "|" + "|" + "|" + "|" + "_");
 				writer.write("\n");
 				writer.write("\n");
 			} // Confirming Spain
 			if (!spainConfir.isEmpty()) {
-				writer.write(pais.toUpperCase() + "-CONFIRMING"+ "\n");
+				writer.write(pais.toUpperCase() + " - CONFIRMING" + "\n");
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaSpainConfir);
-				writer.write("TOTAL " + pais.toUpperCase()+"-CONFIRMING"+"|" + "|" + "|" + "|" + "TOTAL CONFIRMING" + "|" + "|" + "|" + "|"
-						+ DFORMATO.format(totalSpainConfirNomValCurSum).toString() + "|"
-						+ DFORMATO.format(totalSpainConfirCerSum).toString() + "|"
-						+ DFORMATO.format(totalSpainConfirNomValSum).toString()+ "|"+ "|"+ "|"+ "|"+ "|"+"|"+"_");
+				writer.write(
+						"TOTAL " + pais.toUpperCase() + " - CONFIRMING" + "|" + "|" + "|" + "|" + "TOTAL CONFIRMING"
+								+ "|" + "|" + "|" + "|" + DFORMATO.format(totalSpainConfirNomValCurSum).toString() + "|"
+								+ DFORMATO.format(totalSpainConfirCerSum).toString() + "|"
+								+ DFORMATO.format(totalSpainConfirNomValSum).toString() + "|" + "|" + "|" + "|" + "|"
+								+ "|" + "_");
 				writer.write("\n");
 				writer.write("\n");
 			} // Creditos Documentariado
 			if (!spainCredDocu.isEmpty()) {
-				writer.write(pais.toUpperCase() + "-CREDITOS DOCUMENTARIADO" + "\n");
+				writer.write(pais.toUpperCase() + " - CREDITOS DOCUMENTARIADO" + "\n");
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaSpainCredDoc);
-				writer.write("TOTAL " + pais.toUpperCase()+"-CREDITOS DOCUMENTARIOS"+"|" + "|" + "|" + "|" + "TOTAL CREDITOS DOCUMENTARIOS" + "|" + "|" + "|" + "|"
+				writer.write("TOTAL " + pais.toUpperCase() + " - CREDITOS DOCUMENTARIOS" + "|" + "|" + "|" + "|"
+						+ "TOTAL CREDITOS DOCUMENTARIOS" + "|" + "|" + "|" + "|"
 						+ DFORMATO.format(totalSpainCredDocuNomValCurSum).toString() + "|"
 						+ DFORMATO.format(totalSpainCredDocuCerSum).toString() + "|"
-						+ DFORMATO.format(totalSpainCredDocuNomValSum).toString()+ "|"+ "|"+ "|"+ "|"+ "|"+"|"+"_");
+						+ DFORMATO.format(totalSpainCredDocuNomValSum).toString() + "|" + "|" + "|" + "|" + "|" + "|"
+						+ "_");
 				writer.write("\n");
 				writer.write("\n");
 			} // Creditos Sindicados Spain
 			if (!spainSindicado.isEmpty()) {
-				writer.write(pais.toUpperCase() +"-CREDITOS SINDICADOS" + "\n");
+				writer.write(pais.toUpperCase() + " - CREDITOS SINDICADOS" + "\n");
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaSpainSindicado);
-				writer.write("TOTAL " + pais.toUpperCase()+"-CREDITOS SINDICADOS"+"|" + "|" + "|" + "|" + "TOTAL CREDITOS SINDICADOS" + "|" + "|" + "|" + "|"
+				writer.write("TOTAL " + pais.toUpperCase() + " - CREDITOS SINDICADOS" + "|" + "|" + "|" + "|"
+						+ "TOTAL CREDITOS SINDICADOS" + "|" + "|" + "|" + "|"
 						+ DFORMATO.format(totalSpainSindicadoNomValCurSum).toString() + "|"
 						+ DFORMATO.format(totalSpainSindicadoCerSum).toString() + "|"
-						+ DFORMATO.format(totalSpainSindicadoNomValSum).toString()+ "|"+ "|"+ "|"+ "|"+ "|"+"|"+"_");
+						+ DFORMATO.format(totalSpainSindicadoNomValSum).toString() + "|" + "|" + "|" + "|" + "|" + "|"
+						+ "_");
 				writer.write("\n");
 				writer.write("\n");
 			} // Derivados Spain
 			if (!spainDer.isEmpty()) {
-				writer.write(pais.toUpperCase() +"-DERIVADOS" + "\n");
+				writer.write(pais.toUpperCase() + " - DERIVADOS" + "\n");
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaSpainDer);
-				writer.write("TOTAL " + pais.toUpperCase()+"-DERIVADOS"+"|" + "|" + "|" + "|" + "TOTAL DERIVADOS" + "|" + "|" + "|" + "|"
-						+ DFORMATO.format(totalSpainDerNomValCurSum).toString() + "|"
+				writer.write("TOTAL " + pais.toUpperCase() + " - DERIVADOS" + "|" + "|" + "|" + "|" + "TOTAL DERIVADOS"
+						+ "|" + "|" + "|" + "|" + DFORMATO.format(totalSpainDerNomValCurSum).toString() + "|"
 						+ DFORMATO.format(totalSpainDerCerSum).toString() + "|"
-						+ DFORMATO.format(totalSpainDerNomValSum).toString()+ "|"+ "|"+ "|"+ "|"+ "|"+"|"+"_");
+						+ DFORMATO.format(totalSpainDerNomValSum).toString() + "|" + "|" + "|" + "|" + "|" + "|" + "_");
 				writer.write("\n");
 				writer.write("\n");
 			} // Descuentos
 			if (!spainDesc.isEmpty()) {
-				writer.write(pais.toUpperCase() +"-DESCUENTOS" + "\n");
+				writer.write(pais.toUpperCase() + " - DESCUENTOS" + "\n");
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaSpainDesc);
-				writer.write("TOTAL " + pais.toUpperCase()+"-DESCUENTOS"+"|" + "|" + "|" + "|" + "TOTAL DESCUENTOS" + "|" + "|" + "|" + "|"
-						+ DFORMATO.format(totalSpainDescNomValCurSum).toString() + "|"
-						+ DFORMATO.format(totalSpainDescCerSum).toString() + "|"
-						+ DFORMATO.format(totalSpainDescNomValSum).toString()+ "|"+ "|"+ "|"+ "|"+ "|"+"|"+"_");
+				writer.write(
+						"TOTAL " + pais.toUpperCase() + " - DESCUENTOS" + "|" + "|" + "|" + "|" + "TOTAL DESCUENTOS"
+								+ "|" + "|" + "|" + "|" + DFORMATO.format(totalSpainDescNomValCurSum).toString() + "|"
+								+ DFORMATO.format(totalSpainDescCerSum).toString() + "|"
+								+ DFORMATO.format(totalSpainDescNomValSum).toString() + "|" + "|" + "|" + "|" + "|"
+								+ "|" + "_");
 				writer.write("\n");
 				writer.write("\n");
 			} // Factoring
 			if (!spainFac.isEmpty()) {
-				writer.write(pais.toUpperCase() +"-FACTORING" + "\n");
+				writer.write(pais.toUpperCase() + " - FACTORING" + "\n");
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaSpainFac);
-				writer.write("TOTAL " + pais.toUpperCase()+"-FACTORING"+"|" + "|" + "|" + "|" + "TOTAL FACTORING" + "|" + "|" + "|" + "|"
-						+ DFORMATO.format(totalSpainFacNomValCurSum).toString() + "|"
+				writer.write("TOTAL " + pais.toUpperCase() + " - FACTORING" + "|" + "|" + "|" + "|" + "TOTAL FACTORING"
+						+ "|" + "|" + "|" + "|" + DFORMATO.format(totalSpainFacNomValCurSum).toString() + "|"
 						+ DFORMATO.format(totalSpainFacCerSum).toString() + "|"
-						+ DFORMATO.format(totalSpainFacNomValSum).toString()+ "|"+ "|"+ "|"+ "|"+ "|"+"|"+"_");
+						+ DFORMATO.format(totalSpainFacNomValSum).toString() + "|" + "|" + "|" + "|" + "|" + "|" + "_");
 				writer.write("\n");
 				writer.write("\n");
 			} // Financiamiento Comex
 			if (!spainComFor.isEmpty()) {
-				writer.write(pais.toUpperCase() + "-FINANCIAMIENTO COMEX"  + "\n");
+				writer.write(pais.toUpperCase() + " - FINANCIAMIENTO COMEX" + "\n");
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaSpainComFor);
-				writer.write("TOTAL " + pais.toUpperCase()+"-FINANCIAMIENTO COMEX"+"|" + "|" + "|" + "|" + "TOTAL FINANCIAMIENTO COMEX" + "|" + "|" + "|" + "|"
+				writer.write("TOTAL " + pais.toUpperCase() + " - FINANCIAMIENTO COMEX" + "|" + "|" + "|" + "|"
+						+ "TOTAL FINANCIAMIENTO COMEX" + "|" + "|" + "|" + "|"
 						+ DFORMATO.format(totalSpainComForNomValCurSum).toString() + "|"
 						+ DFORMATO.format(totalSpainComForCerSum).toString() + "|"
-						+ DFORMATO.format(totalSpainComForNomValSum).toString()+ "|"+ "|"+ "|"+ "|"+ "|"+"|"+"_");
+						+ DFORMATO.format(totalSpainComForNomValSum).toString() + "|" + "|" + "|" + "|" + "|" + "|"
+						+ "_");
 				writer.write("\n");
 				writer.write("\n");
 			} // Financiamiento IMP/EXP Spain
 			if (!spainExportImport.isEmpty()) {
 
-				writer.write(pais.toUpperCase() +"-FINANCIAMIENTO IMP/EXP" + "\n");
+				writer.write(pais.toUpperCase() + " - FINANCIAMIENTO IMP/EXP" + "\n");
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaSpainExportImport);
-				writer.write("TOTAL " + pais.toUpperCase()+"-FINANCIAMIENTO IMP/EXP"+"|" + "|" + "|" + "|" + "TOTAL FINANCIAMIENTO IMP/EXP" + "|" + "|" + "|" + "|"
+				writer.write("TOTAL " + pais.toUpperCase() + " - FINANCIAMIENTO IMP/EXP" + "|" + "|" + "|" + "|"
+						+ "TOTAL FINANCIAMIENTO IMP/EXP" + "|" + "|" + "|" + "|"
 						+ DFORMATO.format(totalSpainExportImportNomValCurSum).toString() + "|"
 						+ DFORMATO.format(totalSpainExportImportCerSum).toString() + "|"
-						+ DFORMATO.format(totalSpainExportImportNomValSum).toString()+ "|"+ "|"+ "|"+ "|"+ "|"+"|"+"_");
+						+ DFORMATO.format(totalSpainExportImportNomValSum).toString() + "|" + "|" + "|" + "|" + "|"
+						+ "|" + "_");
 				writer.write("\n");
 				writer.write("\n");
 			} // Garantias Spain
 			if (!newList.isEmpty()) {
-				writer.write(pais.toUpperCase() +"-GARANTIAS" + "\n");
+				writer.write(pais.toUpperCase() + " - GARANTIAS" + "\n");
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaSpainGaran);
-				writer.write("TOTAL " + pais.toUpperCase()+"-GARANTIAS"+"|" + "|" + "|" + "|" + "TOTAL GARANTIAS" + "|" + "|" + "|" + "|"
-						+ DFORMATO.format(totalSpainGaranNomValCurSum).toString() + "|"
+				writer.write("TOTAL " + pais.toUpperCase() + " - GARANTIAS" + "|" + "|" + "|" + "|" + "TOTAL GARANTIAS"
+						+ "|" + "|" + "|" + "|" + DFORMATO.format(totalSpainGaranNomValCurSum).toString() + "|"
 						+ DFORMATO.format(totalSpainGaranCerSum).toString() + "|"
-						+ DFORMATO.format(totalSpainGaranNomValSum).toString()+ "|"+ "|"+ "|"+ "|"+ "|"+"|"+"_");
+						+ DFORMATO.format(totalSpainGaranNomValSum).toString() + "|" + "|" + "|" + "|" + "|" + "|"
+						+ "_");
 				writer.write("\n");
 				writer.write("\n");
 			} // Lineas Comprometidas
 			if (!spainLinCom.isEmpty()) {
-				writer.write(pais.toUpperCase() +"-LINEAS COMPORMETIDAS" + "\n");
+				writer.write(pais.toUpperCase() + " - LINEAS COMPORMETIDAS" + "\n");
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaSpainLinCom);
-				writer.write("TOTAL " + pais.toUpperCase()+"-LINEAS COMPROMETIDAS"+"|" + "|" + "|" + "|" + "TOTAL LINEAS COMPROMETIDAS" + "|" + "|" + "|" + "|"
+				writer.write("TOTAL " + pais.toUpperCase() + " - LINEAS COMPROMETIDAS" + "|" + "|" + "|" + "|"
+						+ "TOTAL LINEAS COMPROMETIDAS" + "|" + "|" + "|" + "|"
 						+ DFORMATO.format(totalSpainLinComNomValCurSum).toString() + "|"
 						+ DFORMATO.format(totalSpainLinComCerSum).toString() + "|"
-						+ DFORMATO.format(totalSpainLinComNomValSum).toString()+ "|"+ "|"+ "|"+ "|"+ "|"+"|"+"_");
+						+ DFORMATO.format(totalSpainLinComNomValSum).toString() + "|" + "|" + "|" + "|" + "|" + "|"
+						+ "_");
 				writer.write("\n");
 				writer.write("\n");
 			} // Lineas No Comprometidas
 			if (!SpainLinNoCom.isEmpty()) {
-				writer.write(pais.toUpperCase() +"-LINEAS NO COMPORMETIDAS"  + "\n");
+				writer.write(pais.toUpperCase() + " - LINEAS NO COMPORMETIDAS" + "\n");
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaSpainNoLinCom);
-				writer.write("TOTAL " + pais.toUpperCase()+"-LINEAS NO COMPROMETIDAS"+"|" + "|" + "|" + "|" + "TOTAL LINEAS NO COMPROMETIDAS" + "|" + "|" + "|" + "|"
+				writer.write("TOTAL " + pais.toUpperCase() + " - LINEAS NO COMPROMETIDAS" + "|" + "|" + "|" + "|"
+						+ "TOTAL LINEAS NO COMPROMETIDAS" + "|" + "|" + "|" + "|"
 						+ DFORMATO.format(totalSpainLinNoComNomValCurSum).toString() + "|"
 						+ DFORMATO.format(totalSpainLinNoComCerSum).toString() + "|"
-						+ DFORMATO.format(totalSpainLinNoComNomValSum).toString()+ "|"+ "|"+ "|"+ "|"+ "|"+"|"+"_");
+						+ DFORMATO.format(totalSpainLinNoComNomValSum).toString() + "|" + "|" + "|" + "|" + "|" + "|"
+						+ "_");
 				writer.write("\n");
 				writer.write("\n");
 			} // Tarjeta de Credito
 			if (!spainTar.isEmpty()) {
-				writer.write(pais.toUpperCase() +"-TARJETA DE CREDITO" + "\n");
+				writer.write(pais.toUpperCase() + " - TARJETA DE CREDITO" + "\n");
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaSpainTar);
-				writer.write("TOTAL " + pais.toUpperCase()+"-TARJETAS DE CREDITO" +"|" + "|" + "|" + "|" + "TOTAL TARJETAS DE CREDITO" + "|" + "|" + "|" + "|"
+				writer.write("TOTAL " + pais.toUpperCase() + " - TARJETAS DE CREDITO" + "|" + "|" + "|" + "|"
+						+ "TOTAL TARJETAS DE CREDITO" + "|" + "|" + "|" + "|"
 						+ DFORMATO.format(totalSpainTarNomValCurSum).toString() + "|"
 						+ Double.toString(totalSpainTarCerSum).toString() + "|"
-						+ DFORMATO.format(totalSpainTarNomValSum).toString()+ "|"+ "|"+ "|"+ "|"+ "|"+"|"+"_");
+						+ DFORMATO.format(totalSpainTarNomValSum).toString() + "|" + "|" + "|" + "|" + "|" + "|" + "_");
 				writer.write("\n");
 				writer.write("\n");
 			}
-             if(totalSpainTotNomValCurSum != 0) {
-			writer.write("TOTAL " + pais.toUpperCase() + "|" + "|" + "|" + "|" + "TOTAL GENERAL" + "|" + "|" + "|" + "|"
-					+ DFORMATO.format(totalSpainTotNomValCurSum).toString() + "|"
-					+ DFORMATO.format(totalSpainTotCerSum).toString() + "|"
-					+ DFORMATO.format(totalSpainTotNomValSum).toString()+ "|"+ "|"+ "|"+ "|"+ "|"+"|"+"_");
-			writer.write("\n");
-			writer.write("\n");
-             }
-             
-         	writer.flush();
+			if (totalSpainTotNomValCurSum != 0) {
+				writer.write("TOTAL " + pais.toUpperCase() + "|" + "|" + "|" + "|" + "TOTAL GENERAL" + "|" + "|" + "|"
+						+ "|" + DFORMATO.format(totalSpainTotNomValCurSum).toString() + "|"
+						+ DFORMATO.format(totalSpainTotCerSum).toString() + "|"
+						+ DFORMATO.format(totalSpainTotNomValSum).toString() + "|" + "|" + "|" + "|" + "|" + "|" + "_");
+				writer.write("\n");
+				writer.write("\n");
+			}
+
+			writer.flush();
 			writer.close();
 		} catch (IOException e) {
 
@@ -1666,14 +1699,12 @@ public class Conexion {
 
 	}
 
-
-	
-	
-	public String getNombreGrupo(String grupo,String date) throws Exception {
+	public String getNombreGrupo(String grupo, String date) throws Exception {
 		strbSql = new StringBuilder();
 		String systCode = "";
-		strbSql.append("SELECT lastparentfname  AS nominalvalue\r\n" + 
-				"from PGT_MEX.T_PGT_MEX_CONSUMOSC_D WHERE LastParentF ='" + grupo + "' and FECHACARGA='" + date + "' AND foldercountryname='Mexico'");
+		strbSql.append("SELECT lastparentfname  AS nominalvalue\r\n"
+				+ "from PGT_MEX.T_PGT_MEX_CONSUMOSC_D WHERE LastParentF ='" + grupo + "' and FECHACARGA='" + date
+				+ "' AND foldercountryname='Mexico'");
 		try {
 			pstmt = con.prepareStatement(strbSql.toString());
 			rs = pstmt.executeQuery();
@@ -1690,9 +1721,6 @@ public class Conexion {
 
 		return systCode;
 	}
-	
-	
-	
 
 	/*********************
 	 * validar carga cartera
