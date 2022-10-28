@@ -656,7 +656,8 @@ public class vista extends JFrame {
 							|| ardata.toString().contains(" - FACTORING") || ardata.toString().contains(" - DESCUENTOS")
 							|| ardata.toString().contains(" - DERIVADOS") || ardata.toString().contains(" - CREDITOS")
 							|| ardata.toString().contains(" - CONFIRMING") || ardata.toString().contains(" - BONOS")
-							|| ardata.toString().contains(" - AVAL")) {
+							|| ardata.toString().contains(" - AVAL") || ardata.toString().contains(" - OVERDRAFTS")
+							|| ardata.toString().contains(" - LEASING")) {
 
 						cellStyle7.setAlignment(org.apache.poi.ss.usermodel.HorizontalAlignment.LEFT);
 						cellStyle7.setVerticalAlignment(org.apache.poi.ss.usermodel.VerticalAlignment.CENTER);
@@ -853,35 +854,35 @@ public class vista extends JFrame {
 						}
 					}
 					if (ardata.toString().contains("TOTAL GENERAL")) {
-						
-						 if (p == 8 || p == 9 || p == 10) {
 
-								double d = DecimalFormat.getNumberInstance().parse(data.trim()).doubleValue();
-								System.out.println(d);
-								my_style_6.setFillForegroundColor(IndexedColors.BLACK.getIndex());
-								my_style_6.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-								my_style_6.setDataFormat(HSSFDataFormat.getBuiltinFormat("#,##0.00"));
-								my_style_6.setAlignment(org.apache.poi.ss.usermodel.HorizontalAlignment.CENTER);
-								my_style_6.setVerticalAlignment(org.apache.poi.ss.usermodel.VerticalAlignment.CENTER);
-								fontW.setColor(HSSFColorPredefined.WHITE.getIndex());
-								fontW.setBold((true));
-								my_style_6.setFont(fontW);
-								cell.setCellStyle(my_style_6);
-								cell.setCellValue(d);
+						if (p == 8 || p == 9 || p == 10) {
 
-							}else {
-						cellStyle2.setFillForegroundColor(IndexedColors.BLACK.getIndex());
-						cellStyle2.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-						cellStyle2.setAlignment(org.apache.poi.ss.usermodel.HorizontalAlignment.CENTER);
-						cellStyle2.setVerticalAlignment(org.apache.poi.ss.usermodel.VerticalAlignment.CENTER);
+							double d = DecimalFormat.getNumberInstance().parse(data.trim()).doubleValue();
+							System.out.println(d);
+							my_style_6.setFillForegroundColor(IndexedColors.BLACK.getIndex());
+							my_style_6.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+							my_style_6.setDataFormat(HSSFDataFormat.getBuiltinFormat("#,##0.00"));
+							my_style_6.setAlignment(org.apache.poi.ss.usermodel.HorizontalAlignment.CENTER);
+							my_style_6.setVerticalAlignment(org.apache.poi.ss.usermodel.VerticalAlignment.CENTER);
+							fontW.setColor(HSSFColorPredefined.WHITE.getIndex());
+							fontW.setBold((true));
+							my_style_6.setFont(fontW);
+							cell.setCellStyle(my_style_6);
+							cell.setCellValue(d);
 
-						font.setColor(HSSFColorPredefined.WHITE.getIndex());
-						cellStyle2.setFont(font);
-						row.setHeightInPoints(20);
-						cell.setCellStyle(cellStyle2);
-						cell.setCellValue(data);
-							}
-						
+						} else {
+							cellStyle2.setFillForegroundColor(IndexedColors.BLACK.getIndex());
+							cellStyle2.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+							cellStyle2.setAlignment(org.apache.poi.ss.usermodel.HorizontalAlignment.CENTER);
+							cellStyle2.setVerticalAlignment(org.apache.poi.ss.usermodel.VerticalAlignment.CENTER);
+
+							font.setColor(HSSFColorPredefined.WHITE.getIndex());
+							cellStyle2.setFont(font);
+							row.setHeightInPoints(20);
+							cell.setCellStyle(cellStyle2);
+							cell.setCellValue(data);
+						}
+
 					} else if (ardata.toString().contains("TOTAL TARJETAS DE CREDITO")
 							|| ardata.toString().contains("TOTAL LINEAS NO COMPROMETIDAS")
 							|| ardata.toString().contains("TOTAL LINEAS COMPROMETIDAS")
@@ -894,11 +895,11 @@ public class vista extends JFrame {
 							|| ardata.toString().contains("TOTAL CREDITOS SINDICADOS")
 							|| ardata.toString().contains("TOTAL CREDITOS DOCUMENTARIOS")
 							|| ardata.toString().contains("TOTAL CONFIRMING")
-							|| ardata.toString().contains("TOTAL BONOS")
-							|| ardata.toString().contains("TOTAL AVALES")) {
+							|| ardata.toString().contains("TOTAL BONOS") || ardata.toString().contains("TOTAL AVALES")
+							|| ardata.toString().contains("TOTAL LEASING")
+							|| ardata.toString().contains("TOTAL OVERDRAFTS")) {
 
-						
-						 if (p == 8 || p == 9 || p == 10) {
+						if (p == 8 || p == 9 || p == 10) {
 
 							double d = DecimalFormat.getNumberInstance().parse(data.trim()).doubleValue();
 							System.out.println(d);
@@ -913,19 +914,19 @@ public class vista extends JFrame {
 							cell.setCellStyle(my_style_5);
 							cell.setCellValue(d);
 
-						}else {
-						
-						cellStyle4.setFillForegroundColor(IndexedColors.GREY_40_PERCENT.getIndex());
-						cellStyle4.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-						cellStyle4.setAlignment(org.apache.poi.ss.usermodel.HorizontalAlignment.CENTER);
-						cellStyle4.setVerticalAlignment(org.apache.poi.ss.usermodel.VerticalAlignment.CENTER);
-						fontW.setColor(HSSFColorPredefined.WHITE.getIndex());
-						fontW.setBold((true));
-						cellStyle4.setFont(fontW);
-						row.setHeightInPoints(15);
-						cell.setCellStyle(cellStyle4);
-						cell.setCellValue(data);
-						
+						} else {
+
+							cellStyle4.setFillForegroundColor(IndexedColors.GREY_40_PERCENT.getIndex());
+							cellStyle4.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+							cellStyle4.setAlignment(org.apache.poi.ss.usermodel.HorizontalAlignment.CENTER);
+							cellStyle4.setVerticalAlignment(org.apache.poi.ss.usermodel.VerticalAlignment.CENTER);
+							fontW.setColor(HSSFColorPredefined.WHITE.getIndex());
+							fontW.setBold((true));
+							cellStyle4.setFont(fontW);
+							row.setHeightInPoints(15);
+							cell.setCellStyle(cellStyle4);
+							cell.setCellValue(data);
+
 						}
 					}
 				}
