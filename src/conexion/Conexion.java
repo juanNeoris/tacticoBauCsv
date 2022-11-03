@@ -1,19 +1,27 @@
 package conexion;
 
+import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.DecimalFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
 
 import java.util.List;
-
+import java.util.Properties;
 import java.util.stream.Collectors;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+
+import interfaz.AvalBonos;
+import interfaz.DocumentariadoExpImp;
 import oracle.jdbc.pool.OracleDataSource;
 
 /**
@@ -28,16 +36,31 @@ public class Conexion {
 	private Statement stmt;
 	private ResultSet rs;
 	private StringBuilder strbSql;
-	// ###,###.##
-	// ####.########
+
 	public static final DecimalFormat DFORMATO = new DecimalFormat("###,###,###.##");
+	private static final Logger LOGGER = LogManager.getLogger(Conexion.class);
+
+	private Properties getPro = cargaProperties();
 
 	public Conexion() {
+
 		super();
 		this.con = null;
 		this.pstmt = null;
 		this.stmt = null;
 		this.rs = null;
+	}
+
+	private Properties cargaProperties() {
+		Properties properties = new Properties();
+		try (InputStream inStream = new FileInputStream(
+				System.getProperty("user.dir") + "\\" + "hostProperties.properties")) {
+			properties.load(inStream);
+		} catch (IOException e) {
+
+			LOGGER.info("Error al cargar el archivo properties" + e);
+		}
+		return properties;
 	}
 
 	/**
@@ -50,11 +73,12 @@ public class Conexion {
 
 		OracleDataSource ods = new OracleDataSource();
 
-		String connString = "jdbc:oracle:thin:@180.181.37.37:1651:mexmdr";
+		String connString = getPro.getProperty("bbdd.jdbc") + getPro.getProperty("bbdd.host") + ":"
+				+ getPro.getProperty("bbdd.puerto") + ":" + getPro.getProperty("bbdd.sid");
 
 		ods.setURL(connString);
-		ods.setUser("pgt_mex");
-		ods.setPassword("pgt_mex");
+		ods.setUser(getPro.getProperty("bbdd.usuario"));
+		ods.setPassword(getPro.getProperty("bbdd.contrasena"));
 		this.con = ods.getConnection();
 		this.con.setAutoCommit(false);
 		;
@@ -98,36 +122,50 @@ public class Conexion {
 		}
 	}
 
+	/*********************
+	 * validar carga Dolphing
+	 * @param fecha validar carga 
+	 * @throws SQLException problemas en el query 
+	 * @return systCode validar si tiene carga para ese dia
+	 ****************************************************************/
+
+	public String getCargaDolphingHistorico(String fecha) throws SQLException {
+		strbSql = new StringBuilder();
+		String systCode = "";
+		strbSql.append("SELECT FECHACARGA FROM PGT_MEX.T_PGT_MEX_CONSUMOSC_D  WHERE TRUNC(FECHACARGA)='" + fecha + "'");
+		try {
+			pstmt = con.prepareStatement(strbSql.toString());
+			rs = pstmt.executeQuery();
+			if (rs.next()) {
+				systCode = rs.getString(1);
+			} else {
+				systCode = "No hay ultima carga";
+			}
+		} catch (SQLException e) {
+			
+			LOGGER.info(e);
+		}
+
+		return systCode;
+	}
+
+	/*********************
+	 * validar getConsultaMexico
+	 * @param fechaConsumo fecha para extraccion 
+	 * @param nombreInterfaz generear csv 
+	 * @param grupo para extraccion
+	 * @return systCode validar si tiene registros la interfaz
+	 * @throws SQLException excepcion en el query 
+	 ****************************************************************/
 	public String getConsultaMexico(String grupo, String nombreInterfaz, String fechaConsumo) throws Exception {
 
 		Statement sta = con.createStatement();
+		AvalBonos eva = new AvalBonos();
+		DocumentariadoExpImp docuexpimp = new DocumentariadoExpImp();
 
 		double sumatoriaNomValCur;
 		double sumatoriaCer;
 		double sumatoriaNomVal;
-
-		// bonos Mexico
-		List<String> MexicoBonos = new ArrayList<String>();
-		// bonos sumatoria Mexico
-		List<Double> MexicoBonosNomValCurSum = new ArrayList<Double>();
-		List<Double> MexicoBonosCerSum = new ArrayList<Double>();
-		List<Double> MexicoBonosNomValSum = new ArrayList<Double>();
-		List fechMaxBonos = new ArrayList<>();
-		List fechMinBonos = new ArrayList<>();
-
-		// creditos documentariado Mexico
-		List<String> MexicoCredDocu = new ArrayList<String>();
-		// creditos documentariado sumatoria Mexico
-		List<Double> MexicoCredDocuNomValCurSum = new ArrayList<Double>();
-		List<Double> MexicoCredDocuCerSum = new ArrayList<Double>();
-		List<Double> MexicoCredDocuNomValSum = new ArrayList<Double>();
-
-		// Exportacion/Importacion Mexico
-		List<String> MexicoExportImport = new ArrayList<String>();
-		// Exportacion/Importacion sumatoria Mexico
-		List<Double> MexicoExportImportNomValCurSum = new ArrayList<Double>();
-		List<Double> MexicoExportImportCerSum = new ArrayList<Double>();
-		List<Double> MexicoExportImportNomValSum = new ArrayList<Double>();
 
 		// Comex/Forfaiting Mexico
 		List<String> MexicoComFor = new ArrayList<String>();
@@ -184,13 +222,6 @@ public class Conexion {
 		List<Double> MexicoGaranValCurSum = new ArrayList<Double>();
 		List<Double> MexicoGaranCerSum = new ArrayList<Double>();
 		List<Double> MexicoGaranNomValSum = new ArrayList<Double>();
-
-		// Avales Mexico
-		List<String> MexicoAval = new ArrayList<String>();
-		// Avales sumatoria Mexico
-		List<Double> MexicoAvalValCurSum = new ArrayList<Double>();
-		List<Double> MexicoAvalCerSum = new ArrayList<Double>();
-		List<Double> MexicoAvalNomValSum = new ArrayList<Double>();
 
 		// Derivados Mexico
 		List<String> MexicoDer = new ArrayList<String>();
@@ -277,39 +308,38 @@ public class Conexion {
 				sumatoriaNomVal = DecimalFormat.getNumberInstance().parse(rs.getString(11).trim()).doubleValue();
 
 				if (rs.getString(5).contains("BOND")) {
-					MexicoBonos.add(systCode);
+
+					eva.bonos(grupo, fechaConsumo, systCode, rs.getString(4), rs.getString(14), rs.getString(6),
+							rs.getString(7), rs.getString(9), rs.getString(10), rs.getString(11));
+
 					info = this.getContraparte(grupo, fechaConsumo, rs.getString(4), rs.getString(14), rs.getString(6),
 							rs.getString(7));
 					contraparte.addAll(info);
-					MexicoBonos.addAll(info);
-					MexicoBonosNomValCurSum.add(Double.valueOf(sumatoriaNomValCur));
-					MexicoBonosCerSum.add(Double.valueOf(sumatoriaCer));
-					MexicoBonosNomValSum.add(Double.valueOf(sumatoriaNomVal));
 					MexicoTotValCurSum.add(sumatoriaNomValCur);
 					MexicoTotCerSum.add(sumatoriaCer);
 					MexicoTotNomValSum.add(sumatoriaNomVal);
 
 				} else if (rs.getString(5).contains(" CREDITO DOCUMENTARIO")) {
-					MexicoCredDocu.add(systCode);
+
+					docuexpimp.documentariado(grupo, fechaConsumo, systCode, rs.getString(4), rs.getString(14),
+							rs.getString(6), rs.getString(7), rs.getString(9), rs.getString(10), rs.getString(11));
+
 					info = this.getContraparte(grupo, fechaConsumo, rs.getString(4), rs.getString(14), rs.getString(6),
 							rs.getString(7));
 					contraparte.addAll(info);
-					MexicoCredDocu.addAll(info);
-					MexicoCredDocuNomValCurSum.add(sumatoriaNomValCur);
-					MexicoCredDocuCerSum.add(sumatoriaCer);
-					MexicoCredDocuNomValSum.add(sumatoriaNomVal);
+
 					MexicoTotValCurSum.add(sumatoriaNomValCur);
 					MexicoTotCerSum.add(sumatoriaCer);
 					MexicoTotNomValSum.add(sumatoriaNomVal);
 				} else if (rs.getString(5).contains("EXPORTACION") || rs.getString(5).contains("IMPORTACION")) {
-					MexicoExportImport.add(systCode);
+
+					docuexpimp.exportImport(grupo, fechaConsumo, systCode, rs.getString(4), rs.getString(14),
+							rs.getString(6), rs.getString(7), rs.getString(9), rs.getString(10), rs.getString(11));
+
 					info = this.getContraparte(grupo, fechaConsumo, rs.getString(4), rs.getString(14), rs.getString(6),
 							rs.getString(7));
 					contraparte.addAll(info);
-					MexicoExportImport.addAll(info);
-					MexicoExportImportNomValCurSum.add(sumatoriaNomValCur);
-					MexicoExportImportCerSum.add(sumatoriaCer);
-					MexicoExportImportNomValSum.add(sumatoriaNomVal);
+
 					MexicoTotValCurSum.add(sumatoriaNomValCur);
 					MexicoTotCerSum.add(sumatoriaCer);
 					MexicoTotNomValSum.add(sumatoriaNomVal);
@@ -421,17 +451,16 @@ public class Conexion {
 						|| rs.getString(5).contains("GARANTIA LINE") || rs.getString(5).contains("STANDBY")
 						|| rs.getString(5).contains("LINEA DE AVALES")) {
 
-					MexicoAval.add(systCode);
+					eva.aval(grupo, fechaConsumo, systCode, rs.getString(4), rs.getString(14), rs.getString(6),
+							rs.getString(7), rs.getString(9), rs.getString(10), rs.getString(11));
+
 					info = this.getContraparte(grupo, fechaConsumo, rs.getString(4), rs.getString(14), rs.getString(6),
 							rs.getString(7));
 					contraparte.addAll(info);
-					MexicoAval.addAll(info);
-					MexicoAvalValCurSum.add(sumatoriaNomValCur);
-					MexicoAvalCerSum.add(sumatoriaCer);
-					MexicoAvalNomValSum.add(sumatoriaNomVal);
 					MexicoTotValCurSum.add(sumatoriaNomValCur);
 					MexicoTotCerSum.add(sumatoriaCer);
 					MexicoTotNomValSum.add(sumatoriaNomVal);
+
 				} else if (rs.getString(5).contains("ASSET") || rs.getString(5).contains("CALL")
 						|| rs.getString(5).contains("CERTIFICATES") || rs.getString(5).contains("COLLAR")
 						|| rs.getString(5).contains("EQUITY") || rs.getString(5).contains("COMMODITY")
@@ -524,28 +553,7 @@ public class Conexion {
 			double totalMexicoLinNoComCer = MexicoLinNoComCerSum.stream().mapToDouble(Double::doubleValue).sum();
 			double totalMexicoLinNoComNomVal = MexicoLinNoComNomValSum.stream().mapToDouble(Double::doubleValue).sum();
 
-			// Bonos
-			String CadenaBonosMex = MexicoBonos.stream().collect(Collectors.joining(""));
-			double totalMexicoBonosNomValCur = MexicoBonosNomValCurSum.stream().mapToDouble(Double::doubleValue).sum();
-			double totalMexicoBonosCer = MexicoBonosCerSum.stream().mapToDouble(Double::doubleValue).sum();
-			double totalMexicoBonosNomVal = MexicoBonosNomValSum.stream().mapToDouble(Double::doubleValue).sum();
-
-			// Creditos DOCUMENTARIOS
-			String CadenaMexicoCredDoc = MexicoCredDocu.stream().collect(Collectors.joining(""));
-			double totalMexicoCredDocuNomValCurSum = MexicoCredDocuNomValCurSum.stream()
-					.mapToDouble(Double::doubleValue).sum();
-			double totalMexicoCredDocuCerSum = MexicoCredDocuCerSum.stream().mapToDouble(Double::doubleValue).sum();
-			double totalMexicoCredDocuNomValSum = MexicoCredDocuNomValSum.stream().mapToDouble(Double::doubleValue)
-					.sum();
-
-			// Exportaciones / importacions
-			String CadenaMexicoExportImport = MexicoExportImport.stream().collect(Collectors.joining(""));
-			double totalMexicoExportImportNomValCurSum = MexicoExportImportNomValCurSum.stream()
-					.mapToDouble(Double::doubleValue).sum();
-			double totalMexicoExportImportCerSum = MexicoExportImportCerSum.stream().mapToDouble(Double::doubleValue)
-					.sum();
-			double totalMexicoExportImportNomValSum = MexicoExportImportNomValSum.stream()
-					.mapToDouble(Double::doubleValue).sum();
+			
 
 			// Comex/Forfaiting
 			String CadenaMexicoComFor = MexicoComFor.stream().collect(Collectors.joining(""));
@@ -599,11 +607,7 @@ public class Conexion {
 			double totalMexicoGaranCerSum = MexicoGaranCerSum.stream().mapToDouble(Double::doubleValue).sum();
 			double totalMexicoGaranNomValSum = MexicoGaranNomValSum.stream().mapToDouble(Double::doubleValue).sum();
 
-			// Aval
-			String CadenaMexicoAval = MexicoAval.stream().collect(Collectors.joining(""));
-			double totalMexicoAvalValCurSum = MexicoAvalValCurSum.stream().mapToDouble(Double::doubleValue).sum();
-			double totalMexicoAvalCerSum = MexicoAvalCerSum.stream().mapToDouble(Double::doubleValue).sum();
-			double totalMexicoAvalNomValSum = MexicoAvalNomValSum.stream().mapToDouble(Double::doubleValue).sum();
+			
 
 			// Derivados
 			String CadenaMexicoDer = MexicoDer.stream().collect(Collectors.joining(""));
@@ -634,26 +638,30 @@ public class Conexion {
 			double totalMexicoTotNomValSum = MexicoTotNomValSum.stream().mapToDouble(Double::doubleValue).sum();
 
 			// Avales Mexico
-			if (!MexicoAval.isEmpty()) {
+			if (!eva.getCadenaAvalMex().isEmpty()) {
 				writer.write("MEXICO - AVAL\n");
 				writer.write(CadenaEncabeza);
-				writer.write(CadenaMexicoAval);
+				writer.write(eva.getCadenaAvalMex().toString());
 				writer.write("TOTAL MEXICO - AVALES" + "|" + "|" + "|" + "|" + "TOTAL AVALES" + "|" + "|" + "|" + "|"
-						+ DFORMATO.format(totalMexicoAvalValCurSum).toString() + "|"
-						+ DFORMATO.format(totalMexicoAvalCerSum).toString() + "|"
-						+ DFORMATO.format(totalMexicoAvalNomValSum).toString() + "|" + "|" + "|" + "|" + "|" + "|"
+						+ DFORMATO.format(eva.getTotalMexicoAvalNomValCur()).toString() + "|"
+						+ DFORMATO.format(eva.getTotalMexicoAvalCer()).toString() + "|"
+						+ DFORMATO.format(eva.getTotalMexicoAvalNomVal()).toString() + "|" + "|" + "|" + "|" + "|" + "|"
 						+ "_");
 				writer.write("\n");
 				writer.write("\n");
 			} // Bonos Mexico
-			if (!MexicoBonos.isEmpty()) {
+			if (!eva.getCadenaBonosMex().isEmpty()) {
 				writer.write("MEXICO - BONOS\n");
 				writer.write(CadenaEncabeza);
-				writer.write(CadenaBonosMex);
+				writer.write(eva.getCadenaBonosMex().toString());
+				
+				System.out.println(eva.getCadenaAvalMex().toString());
+				
 				writer.write("TOTAL MEXICO - BONOS" + "|" + "|" + "|" + "|" + "TOTAL BONOS" + "|" + "|" + "|" + "|"
-						+ DFORMATO.format(totalMexicoBonosNomValCur).toString() + "|"
-						+ DFORMATO.format(totalMexicoBonosCer).toString() + "|"
-						+ DFORMATO.format(totalMexicoBonosNomVal).toString() + "|" + "|" + "|" + "|" + "|" + "|" + "_");
+						+ DFORMATO.format(eva.getTotalMexicoBonosNomValCur()).toString() + "|"
+						+ DFORMATO.format(eva.getTotalMexicoBonosCer()).toString() + "|"
+						+ DFORMATO.format(eva.getTotalMexicoBonosNomVal()).toString() + "|" + "|" + "|" + "|" + "|"
+						+ "|" + "_");
 				writer.write("\n");
 				writer.write("\n");
 			} // Confirming Mexico
@@ -670,15 +678,15 @@ public class Conexion {
 				writer.write("\n");
 				writer.write("\n");
 			} // Creditos Documentariado Mexio
-			if (!MexicoCredDocu.isEmpty()) {
+			if (!docuexpimp.getCadenaMexicoCredDoc().isEmpty()) {
 				writer.write("MEXICO - CREDITOS DOCUMENTARIADO\n");
 				writer.write(CadenaEncabeza);
-				writer.write(CadenaMexicoCredDoc);
+				writer.write(docuexpimp.getCadenaMexicoCredDoc());
 				writer.write(
 						"TOTAL MEXICO - CREDITOS DOCUMENTARIOS" + "|" + "|" + "|" + "|" + "TOTAL CREDITOS DOCUMENTARIOS"
-								+ "|" + "|" + "|" + "|" + DFORMATO.format(totalMexicoCredDocuNomValCurSum).toString()
-								+ "|" + DFORMATO.format(totalMexicoCredDocuCerSum).toString() + "|"
-								+ DFORMATO.format(totalMexicoCredDocuNomValSum).toString() + "|" + "|" + "|" + "|" + "|"
+								+ "|" + "|" + "|" + "|" + DFORMATO.format(docuexpimp.getTotalMexicoCredDocuNomValCurSum()).toString()
+								+ "|" + DFORMATO.format(docuexpimp.getTotalMexicoCredDocuCerSum()).toString() + "|"
+								+ DFORMATO.format(docuexpimp.getTotalMexicoCredDocuCerSum()).toString() + "|" + "|" + "|" + "|" + "|"
 								+ "|" + "_");
 				writer.write("\n");
 				writer.write("\n");
@@ -744,15 +752,15 @@ public class Conexion {
 				writer.write("\n");
 				writer.write("\n");
 			} // Financiamiento IMP/EXP-Mexico
-			if (!MexicoExportImport.isEmpty()) {
+			if (!docuexpimp.getCadenaMexicoExportImport().isEmpty()) {
 				writer.write("MEXICO - FINANCIAMIENTO IMP/EXP\n");
 				writer.write(CadenaEncabeza);
-				writer.write(CadenaMexicoExportImport);
+				writer.write(docuexpimp.getCadenaMexicoExportImport());
 				writer.write("TOTAL MEXICO - FINANCIAMIENTO IMP/EXP" + "|" + "|" + "|" + "|"
 						+ "TOTAL FINANCIAMIENTO IMP/EXP" + "|" + "|" + "|" + "|"
-						+ DFORMATO.format(totalMexicoExportImportNomValCurSum).toString() + "|"
-						+ DFORMATO.format(totalMexicoExportImportCerSum).toString() + "|"
-						+ DFORMATO.format(totalMexicoExportImportNomValSum).toString() + "|" + "|" + "|" + "|" + "|"
+						+ DFORMATO.format(docuexpimp.getTotalMexicoExportImportNomValCurSum()).toString() + "|"
+						+ DFORMATO.format(docuexpimp.getTotalMexicoExportImportCerSum()).toString() + "|"
+						+ DFORMATO.format(docuexpimp.getTotalMexicoExportImportNomValSum()).toString() + "|" + "|" + "|" + "|" + "|"
 						+ "|" + "_");
 				writer.write("\n");
 				writer.write("\n");
@@ -845,7 +853,8 @@ public class Conexion {
 		return systCode;
 	}
 
-	public String getConsultaOtrosPaises(String grupo, String nombreInterfaz, String fechaConsumo) throws Exception {
+	public String getConsultaOtrosPaises(String grupo, String nombreInterfaz, String fechaConsumo)
+			throws SQLException, ParseException {
 
 		Statement sta = con.createStatement();
 
@@ -964,11 +973,11 @@ public class Conexion {
 		List<Double> SpainLeasingRentingNomValSum = new ArrayList<Double>();
 
 		// Overdrafts Spain
-		List<String> SpainOverdrafts = new ArrayList<String>();
+		List<String> SpainOverdrafts = new ArrayList<String>(); // registro completo 17
 		// Avales sumatoria Mexico
-		List<Double> SpainOverdraftsValCurSum = new ArrayList<Double>();
-		List<Double> SpainOverdraftsCerSum = new ArrayList<Double>();
-		List<Double> SpainOverdraftsNomValSum = new ArrayList<Double>();
+		List<Double> SpainOverdraftsValCurSum = new ArrayList<Double>();// nom
+		List<Double> SpainOverdraftsCerSum = new ArrayList<Double>();// cer
+		List<Double> SpainOverdraftsNomValSum = new ArrayList<Double>();// nomvalcur
 
 		ArrayList<String> contraparte = new ArrayList<String>();
 
@@ -1026,9 +1035,11 @@ public class Conexion {
 								rs.getString(6), rs.getString(7));
 						contraparte.addAll(info);
 						SpainBonos.addAll(info);
+
 						SpainBonosNomValCurSum.add(Double.valueOf(sumatoriaNomValCur));
 						SpainBonosCerSum.add(Double.valueOf(sumatoriaCer));
 						SpainBonosNomValSum.add(Double.valueOf(sumatoriaNomVal));
+
 						SpainTotNomValCurSum.add(sumatoriaNomValCur);
 						SpainTotCerSum.add(sumatoriaCer);
 						SpainTotNomValSum.add(sumatoriaNomVal);
@@ -1421,10 +1432,8 @@ public class Conexion {
 			pstmt.close();
 			rs.close();
 		} catch (SQLException e) {
-
-			System.out.println("error en query " + e);
+			LOGGER.info("error en query " + e);
 		}
-
 		return registrosInterfaz;
 	}
 
@@ -1752,11 +1761,12 @@ public class Conexion {
 				writer.write(pais.toUpperCase() + " - OVERDRAFTS" + "\n");
 				writer.write(CadenaEncabeza);
 				writer.write(CadenaSpainOverdrafts);
-				writer.write("TOTAL " + pais.toUpperCase() + " - OVERDRAFTS" + "|" + "|" + "|" + "|"
-						+ "TOTAL OVERDRAFTS" + "|" + "|" + "|" + "|"
-						+ DFORMATO.format(totalSpainOverdraftsValCurSum).toString() + "|"
-						+ Double.toString(totalSpainTarCerSum).toString() + "|"
-						+ DFORMATO.format(totalSpainTarNomValSum).toString() + "|" + "|" + "|" + "|" + "|" + "|" + "_");
+				writer.write(
+						"TOTAL " + pais.toUpperCase() + " - OVERDRAFTS" + "|" + "|" + "|" + "|" + "TOTAL OVERDRAFTS"
+								+ "|" + "|" + "|" + "|" + DFORMATO.format(totalSpainOverdraftsValCurSum).toString()
+								+ "|" + Double.toString(totalSpainOverdraftsCerSum).toString() + "|"
+								+ DFORMATO.format(totalSpainOverdraftsNomValSum).toString() + "|" + "|" + "|" + "|"
+								+ "|" + "|" + "_");
 				writer.write("\n");
 				writer.write("\n");
 			}
@@ -1773,13 +1783,12 @@ public class Conexion {
 			writer.flush();
 			writer.close();
 		} catch (IOException e) {
-
-			e.printStackTrace();
+			LOGGER.info(e);
 		}
 
 	}
 
-	public String getNombreGrupo(String grupo, String date) throws Exception {
+	public String getNombreGrupo(String grupo, String date) throws SQLException {
 		strbSql = new StringBuilder();
 		String systCode = "";
 		strbSql.append("SELECT lastparentfname  AS nominalvalue\r\n"
@@ -1804,9 +1813,11 @@ public class Conexion {
 
 	/*********************
 	 * validar carga Victoria
+	 * 
+	 * @throws SQLException
 	 ****************************************************************/
 
-	public String getCargaVictoria() throws Exception {
+	public String getCargaVictoria() throws SQLException {
 		strbSql = new StringBuilder();
 		String systCode = "";
 		strbSql.append(
@@ -1821,8 +1832,6 @@ public class Conexion {
 			}
 		} catch (SQLException e) {
 			throw e;
-		} catch (Exception e) {
-			throw e;
 		}
 
 		return systCode;
@@ -1830,9 +1839,11 @@ public class Conexion {
 
 	/*********************
 	 * validar carga Dolphing
+	 * 
+	 * @throws SQLException
 	 ****************************************************************/
 
-	public String getCargaDolphing() throws Exception {
+	public String getCargaDolphing() throws SQLException {
 		strbSql = new StringBuilder();
 		String systCode = "";
 		strbSql.append(
@@ -1847,18 +1858,17 @@ public class Conexion {
 			}
 		} catch (SQLException e) {
 			throw e;
-		} catch (Exception e) {
-			throw e;
 		}
-
 		return systCode;
 	}
 
 	/*********************
 	 * validar carga Victoria
+	 * 
+	 * @throws SQLException
 	 ****************************************************************/
 
-	public String getCargaVictoriaHistorico(String fecha) throws Exception {
+	public String getCargaVictoriaHistorico(String fecha) throws SQLException {
 		strbSql = new StringBuilder();
 		String systCode = "";
 		strbSql.append("SELECT FECHACARGA FROM PGT_MEX.T_PGT_MEX_CONSUMOSC_V  WHERE TRUNC(FECHACARGA)='" + fecha + "'");
@@ -1871,33 +1881,6 @@ public class Conexion {
 				systCode = "No hay ultima carga";
 			}
 		} catch (SQLException e) {
-			throw e;
-		} catch (Exception e) {
-			throw e;
-		}
-
-		return systCode;
-	}
-
-	/*********************
-	 * validar carga Dolphing
-	 ****************************************************************/
-
-	public String getCargaDolphingHistorico(String fecha) throws Exception {
-		strbSql = new StringBuilder();
-		String systCode = "";
-		strbSql.append("SELECT FECHACARGA FROM PGT_MEX.T_PGT_MEX_CONSUMOSC_D  WHERE TRUNC(FECHACARGA)='" + fecha + "'");
-		try {
-			pstmt = con.prepareStatement(strbSql.toString());
-			rs = pstmt.executeQuery();
-			if (rs.next()) {
-				systCode = rs.getString(1);
-			} else {
-				systCode = "No hay ultima carga";
-			}
-		} catch (SQLException e) {
-			throw e;
-		} catch (Exception e) {
 			throw e;
 		}
 
