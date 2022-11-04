@@ -21,7 +21,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 import interfaz.AvalBonos;
-import interfaz.DocumentariadoExpImp;
+import interfaz.csv;
 import oracle.jdbc.pool.OracleDataSource;
 
 /**
@@ -40,7 +40,7 @@ public class Conexion {
 	public static final DecimalFormat DFORMATO = new DecimalFormat("###,###,###.##");
 	private static final Logger LOGGER = LogManager.getLogger(Conexion.class);
 
-	private Properties getPro = cargaProperties();
+	Properties getPro = cargaProperties();
 
 	public Conexion() {
 
@@ -76,6 +76,7 @@ public class Conexion {
 		String connString = getPro.getProperty("bbdd.jdbc") + getPro.getProperty("bbdd.host") + ":"
 				+ getPro.getProperty("bbdd.puerto") + ":" + getPro.getProperty("bbdd.sid");
 
+		System.out.println("connString :" + connString);
 		ods.setURL(connString);
 		ods.setUser(getPro.getProperty("bbdd.usuario"));
 		ods.setPassword(getPro.getProperty("bbdd.contrasena"));
@@ -124,9 +125,10 @@ public class Conexion {
 
 	/*********************
 	 * validar carga Dolphing
-	 * @param fecha validar carga 
-	 * @throws SQLException problemas en el query 
-	 * @return systCode validar si tiene carga para ese dia
+	 * 
+	 * @param fecha
+	 * @throws SQLException
+	 * @return systCode
 	 ****************************************************************/
 
 	public String getCargaDolphingHistorico(String fecha) throws SQLException {
@@ -142,7 +144,7 @@ public class Conexion {
 				systCode = "No hay ultima carga";
 			}
 		} catch (SQLException e) {
-			
+
 			LOGGER.info(e);
 		}
 
@@ -151,70 +153,39 @@ public class Conexion {
 
 	/*********************
 	 * validar getConsultaMexico
-	 * @param fechaConsumo fecha para extraccion 
-	 * @param nombreInterfaz generear csv 
-	 * @param grupo para extraccion
-	 * @return systCode validar si tiene registros la interfaz
-	 * @throws SQLException excepcion en el query 
+	 * 
+	 * @param fechaConsumo   fec
+	 * @param nombreInterfaz
+	 * @param grupo
+	 * @return systCode
+	 * @throws SQLException
+	 * @throws ParseException
+	 * @throws IOException
 	 ****************************************************************/
 	public String getConsultaMexico(String grupo, String nombreInterfaz, String fechaConsumo) throws Exception {
-
-		Statement sta = con.createStatement();
-		AvalBonos eva = new AvalBonos();
-		DocumentariadoExpImp docuexpimp = new DocumentariadoExpImp();
-
+		Statement sta = sta = con.createStatement();
+		csv interfazCsv = new csv();
+		AvalBonos aval = new AvalBonos("aval");
+		AvalBonos bono = new AvalBonos("bono");
+		AvalBonos confirming = new AvalBonos("confirming");
+		AvalBonos documentariado = new AvalBonos("documentariado");
+		AvalBonos sindicado = new AvalBonos("sindicado");
+		AvalBonos derivados = new AvalBonos("derivados");
+		AvalBonos descuentos = new AvalBonos("descuentos");
+		AvalBonos factoring = new AvalBonos("factoring");
+		AvalBonos comex = new AvalBonos("comex");
+		AvalBonos impexp = new AvalBonos("impexp");
+		// AvalBonos garantias = new AvalBonos();
+		AvalBonos leasrent = new AvalBonos("leasrent");
+		AvalBonos comprome = new AvalBonos("comprome");
+		AvalBonos nocompro = new AvalBonos("nocompro");
+		AvalBonos tarjeta = new AvalBonos("tarjeta");
+		AvalBonos over = new AvalBonos("over");
 		double sumatoriaNomValCur;
 		double sumatoriaCer;
 		double sumatoriaNomVal;
 
-		// Comex/Forfaiting Mexico
-		List<String> MexicoComFor = new ArrayList<String>();
-		// Comex/Forfaiting sumatoria Mexico
-		List<Double> MexicoComForNomValCurSum = new ArrayList<Double>();
-		List<Double> MexicoComForCerSum = new ArrayList<Double>();
-		List<Double> MexicoComForNomValSum = new ArrayList<Double>();
-
-		// Sindicado Mexico
-		List<String> MexicoSindicado = new ArrayList<String>();
-		// Sindicado sumatoria Mexico
-		List<Double> MexicoSindicadoNomValCurSum = new ArrayList<Double>();
-		List<Double> MexicoSindicadoCerSum = new ArrayList<Double>();
-		List<Double> MexicoSindicadoNomValSum = new ArrayList<Double>();
-
-		// Confirming Mexico
-		List<String> MexicoConfir = new ArrayList<String>();
-		// Confirming sumatoria Mexico
-		List<Double> MexicoConfirNomValCurSum = new ArrayList<Double>();
-		List<Double> MexicoConfirCerSum = new ArrayList<Double>();
-		List<Double> MexicoConfirNomValSum = new ArrayList<Double>();
-
-		// Descuentos Mexico
-		List<String> MexicoDesc = new ArrayList<String>();
-		// Descuentos sumatoria Mexico
-		List<Double> MexicoDescValCurSum = new ArrayList<Double>();
-		List<Double> MexicoDescCerSum = new ArrayList<Double>();
-		List<Double> MexicoDescNomValSum = new ArrayList<Double>();
-
-		// Factoring Mexico
-		List<String> MexicoFac = new ArrayList<String>();
-		// Factoring sumatoria Mexico
-		List<Double> MexicoFacValCurSum = new ArrayList<Double>();
-		List<Double> MexicoFacCerSum = new ArrayList<Double>();
-		List<Double> MexicoFacNomValSum = new ArrayList<Double>();
-
-		// Tarjetas
-		List<String> MexicoTar = new ArrayList<String>();
-		// Tarjetas sumatoria Mexico
-		List<Double> MexicoTarValCurSum = new ArrayList<Double>();
-		List<Double> MexicoTarCerSum = new ArrayList<Double>();
-		List<Double> MexicoTarNomValSum = new ArrayList<Double>();
-
-		// Lineas Comprometidas Mexico
-		List<String> MexicoLinCom = new ArrayList<String>();
-		// Lineas Comprometidas sumatoria Mexico
-		List<Double> MexicoLinComValCurSum = new ArrayList<Double>();
-		List<Double> MexicoLinComCerSum = new ArrayList<Double>();
-		List<Double> MexicoLinComNomValSum = new ArrayList<Double>();
+		List<AvalBonos> instrumento = new ArrayList<AvalBonos>();
 
 		// Garantias Mexico
 		List<String> MexicoGaran = new ArrayList<String>();
@@ -223,62 +194,15 @@ public class Conexion {
 		List<Double> MexicoGaranCerSum = new ArrayList<Double>();
 		List<Double> MexicoGaranNomValSum = new ArrayList<Double>();
 
-		// Derivados Mexico
-		List<String> MexicoDer = new ArrayList<String>();
-		// Derivados sumatoria Mexico
-		List<Double> MexicoDerValCurSum = new ArrayList<Double>();
-		List<Double> MexicoDerCerSum = new ArrayList<Double>();
-		List<Double> MexicoDerNomValSum = new ArrayList<Double>();
-
-		// Lineas No Comprometidas Mexico
-		List<String> MexicoLinNoCom = new ArrayList<String>();
-		// Derivados sumatoria Mexico
-		List<Double> MexicoLinNoComValCurSum = new ArrayList<Double>();
-		List<Double> MexicoLinNoComCerSum = new ArrayList<Double>();
-		List<Double> MexicoLinNoComNomValSum = new ArrayList<Double>();
-
-		// LeasingRenting Mexico
-		List<String> MexicoLeasingRenting = new ArrayList<String>();
-		// Avales sumatoria Mexico
-		List<Double> MexicoLeasingRentingValCurSum = new ArrayList<Double>();
-		List<Double> MexicoLeasingRentingCerSum = new ArrayList<Double>();
-		List<Double> MexicoLeasingRentingNomValSum = new ArrayList<Double>();
-
-		// Overdrafts OVERDRAFTS Mexico
-		List<String> MexicoOverdrafts = new ArrayList<String>();
-		// Avales sumatoria Mexico
-		List<Double> MexicoOverdraftsValCurSum = new ArrayList<Double>();
-		List<Double> MexicoOverdraftsCerSum = new ArrayList<Double>();
-		List<Double> MexicoOverdraftsNomValSum = new ArrayList<Double>();
-
 		// Total general Mexico
 		List<Double> MexicoTotValCurSum = new ArrayList<Double>();
 		List<Double> MexicoTotCerSum = new ArrayList<Double>();
 		List<Double> MexicoTotNomValSum = new ArrayList<Double>();
 
 		List<String> info = new ArrayList<String>();
-		List<String> encabezado = new ArrayList<>();
-
+		
 		ArrayList<String> contraparte = new ArrayList<String>();
-
-		encabezado.add("CPTYPARENT|");
-		encabezado.add("CPTYPARENTRATING|");
-		encabezado.add("CPTYPARENTNAME|");
-		encabezado.add("DEALSTAMP|");
-		encabezado.add("INSTRUMENTNAME|");
-		encabezado.add("VALUEDATE|");
-		encabezado.add("MATURITYDATE|");
-		encabezado.add("CURRENCY|");
-		encabezado.add("NOMINALVALUECUR|");
-		encabezado.add("CER|");
-		encabezado.add("NOMINALVALUE|");
-		encabezado.add("ONEOFF|");
-		encabezado.add("CPTYNAME|");
-		encabezado.add("FOLDERCOUNTRYNAME|");
-		encabezado.add("CPTYCOUNTRY|");
-		encabezado.add("CPTYPARENTCOUNTRY|");
-		encabezado.add("FOLDERCOUNTRY");
-		encabezado.add("\n");
+		
 
 		String systCode = "SELECT cptyparent, NVL(cptyparentrating, 'SIN RATING'),cptyparentname,dealstamp,instrumentname,TO_CHAR(TO_DATE(valuedate,  'YYYY-MM-DD'), 'DD-mon-YY'),TO_CHAR(TO_DATE(maturitydate,  'YYYY-MM-DD'), 'DD-mon-YY'),currency,to_char(DECODE(nominalvaluecur,null, '0.0',nominalvaluecur), '999,999,999,999.99')  AS nominalvaluecur,to_char(DECODE(CER,null, '0.0',CER), '999,999,999,999.99')  AS CER,to_char(DECODE(nominalvalue,null, '0.0',nominalvalue), '999,999,999,999.99')  AS nominalvalue,oneoff,cptyname,foldercountryname,cptycountry,cptyparentcountry,foldercountry from PGT_MEX.T_PGT_MEX_CONSUMOSC_V WHERE LastParentF ='"
 				+ grupo + "' and FECHACARGA='" + fechaConsumo
@@ -291,9 +215,7 @@ public class Conexion {
 			systCode = "No existen registros para este grupo en la interfaz CONSULTA";
 		} else {
 			String directoryName = System.getProperty("user.dir");
-
 			FileWriter writer = new FileWriter(nombreInterfaz, true);
-
 			do {
 				// cadena
 				systCode = rs.getString(1) + "|" + rs.getString(2) + "|" + "\"" + rs.getString(3) + "\"" + "|"
@@ -308,8 +230,52 @@ public class Conexion {
 				sumatoriaNomVal = DecimalFormat.getNumberInstance().parse(rs.getString(11).trim()).doubleValue();
 
 				if (rs.getString(5).contains("BOND")) {
+					bono.bonos(grupo, fechaConsumo, systCode, rs.getString(4), rs.getString(14), rs.getString(6),
+							rs.getString(7), rs.getString(9), rs.getString(10), rs.getString(11));
+					info = this.getContraparte(grupo, fechaConsumo, rs.getString(4), rs.getString(14), rs.getString(6),
+							rs.getString(7));
+					contraparte.addAll(info);
+					MexicoTotValCurSum.add(sumatoriaNomValCur);
+					MexicoTotCerSum.add(sumatoriaCer);
+					MexicoTotNomValSum.add(sumatoriaNomVal);
+					instrumento.add(bono);
 
-					eva.bonos(grupo, fechaConsumo, systCode, rs.getString(4), rs.getString(14), rs.getString(6),
+				} else if (rs.getString(5).contains(" CREDITO DOCUMENTARIO")) {
+
+					documentariado.bonos(grupo, fechaConsumo, systCode, rs.getString(4), rs.getString(14),
+							rs.getString(6), rs.getString(7), rs.getString(9), rs.getString(10), rs.getString(11));
+					info = this.getContraparte(grupo, fechaConsumo, rs.getString(4), rs.getString(14), rs.getString(6),
+							rs.getString(7));
+					contraparte.addAll(info);
+					MexicoTotValCurSum.add(sumatoriaNomValCur);
+					MexicoTotCerSum.add(sumatoriaCer);
+					MexicoTotNomValSum.add(sumatoriaNomVal);
+					instrumento.add(documentariado);
+				} else if (rs.getString(5).contains("EXPORTACION") || rs.getString(5).contains("IMPORTACION")) {
+
+					impexp.bonos(grupo, fechaConsumo, systCode, rs.getString(4), rs.getString(14), rs.getString(6),
+							rs.getString(7), rs.getString(9), rs.getString(10), rs.getString(11));
+					info = this.getContraparte(grupo, fechaConsumo, rs.getString(4), rs.getString(14), rs.getString(6),
+							rs.getString(7));
+					contraparte.addAll(info);
+					MexicoTotValCurSum.add(sumatoriaNomValCur);
+					MexicoTotCerSum.add(sumatoriaCer);
+					MexicoTotNomValSum.add(sumatoriaNomVal);
+					instrumento.add(impexp);
+				} else if (rs.getString(5).contains("COMEX") || rs.getString(5).contains("FORFAITING")) {
+
+					comex.bonos(grupo, fechaConsumo, systCode, rs.getString(4), rs.getString(14), rs.getString(6),
+							rs.getString(7), rs.getString(9), rs.getString(10), rs.getString(11));
+					info = this.getContraparte(grupo, fechaConsumo, rs.getString(4), rs.getString(14), rs.getString(6),
+							rs.getString(7));
+					contraparte.addAll(info);
+					MexicoTotValCurSum.add(sumatoriaNomValCur);
+					MexicoTotCerSum.add(sumatoriaCer);
+					MexicoTotNomValSum.add(sumatoriaNomVal);
+					instrumento.add(comex);
+				} else if (rs.getString(5).contains("SINDICADO")) {
+
+					sindicado.bonos(grupo, fechaConsumo, systCode, rs.getString(4), rs.getString(14), rs.getString(6),
 							rs.getString(7), rs.getString(9), rs.getString(10), rs.getString(11));
 
 					info = this.getContraparte(grupo, fechaConsumo, rs.getString(4), rs.getString(14), rs.getString(6),
@@ -318,119 +284,69 @@ public class Conexion {
 					MexicoTotValCurSum.add(sumatoriaNomValCur);
 					MexicoTotCerSum.add(sumatoriaCer);
 					MexicoTotNomValSum.add(sumatoriaNomVal);
-
-				} else if (rs.getString(5).contains(" CREDITO DOCUMENTARIO")) {
-
-					docuexpimp.documentariado(grupo, fechaConsumo, systCode, rs.getString(4), rs.getString(14),
-							rs.getString(6), rs.getString(7), rs.getString(9), rs.getString(10), rs.getString(11));
-
-					info = this.getContraparte(grupo, fechaConsumo, rs.getString(4), rs.getString(14), rs.getString(6),
-							rs.getString(7));
-					contraparte.addAll(info);
-
-					MexicoTotValCurSum.add(sumatoriaNomValCur);
-					MexicoTotCerSum.add(sumatoriaCer);
-					MexicoTotNomValSum.add(sumatoriaNomVal);
-				} else if (rs.getString(5).contains("EXPORTACION") || rs.getString(5).contains("IMPORTACION")) {
-
-					docuexpimp.exportImport(grupo, fechaConsumo, systCode, rs.getString(4), rs.getString(14),
-							rs.getString(6), rs.getString(7), rs.getString(9), rs.getString(10), rs.getString(11));
-
-					info = this.getContraparte(grupo, fechaConsumo, rs.getString(4), rs.getString(14), rs.getString(6),
-							rs.getString(7));
-					contraparte.addAll(info);
-
-					MexicoTotValCurSum.add(sumatoriaNomValCur);
-					MexicoTotCerSum.add(sumatoriaCer);
-					MexicoTotNomValSum.add(sumatoriaNomVal);
-				} else if (rs.getString(5).contains("COMEX") || rs.getString(5).contains("FORFAITING")) {
-					MexicoComFor.add(systCode);
-					info = this.getContraparte(grupo, fechaConsumo, rs.getString(4), rs.getString(14), rs.getString(6),
-							rs.getString(7));
-					contraparte.addAll(info);
-					MexicoComFor.addAll(info);
-					MexicoComForNomValCurSum.add(sumatoriaNomValCur);
-					MexicoComForCerSum.add(sumatoriaCer);
-					MexicoComForNomValSum.add(sumatoriaNomVal);
-					MexicoTotValCurSum.add(sumatoriaNomValCur);
-					MexicoTotCerSum.add(sumatoriaCer);
-					MexicoTotNomValSum.add(sumatoriaNomVal);
-				} else if (rs.getString(5).contains("SINDICADO")) {
-					MexicoSindicado.add(systCode);
-					info = this.getContraparte(grupo, fechaConsumo, rs.getString(4), rs.getString(14), rs.getString(6),
-							rs.getString(7));
-					contraparte.addAll(info);
-					MexicoSindicado.addAll(info);
-					MexicoSindicadoNomValCurSum.add(sumatoriaNomValCur);
-					MexicoSindicadoCerSum.add(sumatoriaCer);
-					MexicoSindicadoNomValSum.add(sumatoriaNomVal);
-					MexicoTotValCurSum.add(sumatoriaNomValCur);
-					MexicoTotCerSum.add(sumatoriaCer);
-					MexicoTotNomValSum.add(sumatoriaNomVal);
+					instrumento.add(sindicado);
 				} else if (rs.getString(5).contains("CONFIRMING")) {
-					MexicoConfir.add(systCode);
+
+					confirming.bonos(grupo, fechaConsumo, systCode, rs.getString(4), rs.getString(14), rs.getString(6),
+							rs.getString(7), rs.getString(9), rs.getString(10), rs.getString(11));
+
 					info = this.getContraparte(grupo, fechaConsumo, rs.getString(4), rs.getString(14), rs.getString(6),
 							rs.getString(7));
 					contraparte.addAll(info);
-					MexicoConfir.addAll(info);
-					MexicoConfirNomValCurSum.add(sumatoriaNomValCur);
-					MexicoConfirCerSum.add(sumatoriaCer);
-					MexicoConfirNomValSum.add(sumatoriaNomVal);
 					MexicoTotValCurSum.add(sumatoriaNomValCur);
 					MexicoTotCerSum.add(sumatoriaCer);
 					MexicoTotNomValSum.add(sumatoriaNomVal);
-
+					instrumento.add(confirming);
 				} else if (rs.getString(5).contains("DESCUENTOS")) {
-					MexicoDesc.add(systCode);
-					info = this.getContraparte(grupo, fechaConsumo, rs.getString(4), rs.getString(14), rs.getString(6),
-							rs.getString(7));
-					contraparte.addAll(info);
-					MexicoDesc.addAll(info);
-					MexicoDescValCurSum.add(sumatoriaNomValCur);
-					MexicoDescCerSum.add(sumatoriaCer);
-					MexicoDescNomValSum.add(sumatoriaNomVal);
-					MexicoTotValCurSum.add(sumatoriaNomValCur);
-					MexicoTotCerSum.add(sumatoriaCer);
-					MexicoTotNomValSum.add(sumatoriaNomVal);
-				} else if (rs.getString(5).contains("FACTORING")) {
-					MexicoFac.add(systCode);
-					info = this.getContraparte(grupo, fechaConsumo, rs.getString(4), rs.getString(14), rs.getString(6),
-							rs.getString(7));
-					contraparte.addAll(info);
-					MexicoFac.addAll(info);
-					MexicoFacValCurSum.add(sumatoriaNomValCur);
-					MexicoFacCerSum.add(sumatoriaCer);
-					MexicoFacNomValSum.add(sumatoriaNomVal);
-					MexicoTotValCurSum.add(sumatoriaNomValCur);
-					MexicoTotCerSum.add(sumatoriaCer);
-					MexicoTotNomValSum.add(sumatoriaNomVal);
 
-				} else if (rs.getString(5).contains("TARJETAS")) {
-					MexicoTar.add(systCode);
+					descuentos.bonos(grupo, fechaConsumo, systCode, rs.getString(4), rs.getString(14), rs.getString(6),
+							rs.getString(7), rs.getString(9), rs.getString(10), rs.getString(11));
+
 					info = this.getContraparte(grupo, fechaConsumo, rs.getString(4), rs.getString(14), rs.getString(6),
 							rs.getString(7));
 					contraparte.addAll(info);
-					MexicoTar.addAll(info);
-					MexicoTarValCurSum.add(sumatoriaNomValCur);
-					MexicoTarCerSum.add(sumatoriaCer);
-					MexicoTarNomValSum.add(sumatoriaNomVal);
 					MexicoTotValCurSum.add(sumatoriaNomValCur);
 					MexicoTotCerSum.add(sumatoriaCer);
 					MexicoTotNomValSum.add(sumatoriaNomVal);
+					instrumento.add(descuentos);
+				} else if (rs.getString(5).contains("FACTORING")) {
+
+					factoring.bonos(grupo, fechaConsumo, systCode, rs.getString(4), rs.getString(14), rs.getString(6),
+							rs.getString(7), rs.getString(9), rs.getString(10), rs.getString(11));
+
+					info = this.getContraparte(grupo, fechaConsumo, rs.getString(4), rs.getString(14), rs.getString(6),
+							rs.getString(7));
+					contraparte.addAll(info);
+					MexicoTotValCurSum.add(sumatoriaNomValCur);
+					MexicoTotCerSum.add(sumatoriaCer);
+					MexicoTotNomValSum.add(sumatoriaNomVal);
+					instrumento.add(factoring);
+				} else if (rs.getString(5).contains("TARJETAS")) {
+
+					tarjeta.bonos(grupo, fechaConsumo, systCode, rs.getString(4), rs.getString(14), rs.getString(6),
+							rs.getString(7), rs.getString(9), rs.getString(10), rs.getString(11));
+
+					info = this.getContraparte(grupo, fechaConsumo, rs.getString(4), rs.getString(14), rs.getString(6),
+							rs.getString(7));
+					contraparte.addAll(info);
+					MexicoTotValCurSum.add(sumatoriaNomValCur);
+					MexicoTotCerSum.add(sumatoriaCer);
+					MexicoTotNomValSum.add(sumatoriaNomVal);
+					instrumento.add(tarjeta);
 				} else if (rs.getString(5).contains("LINEA MULTIDEAL RESTO")
 						|| rs.getString(5).contains("CREDITOS - COMPROMETIDO")
 						|| rs.getString(5).contains("CREDITO BACKUP") || rs.getString(5).contains("CREDITO OTROS")) {
-					MexicoLinCom.add(systCode);
+
+					comprome.bonos(grupo, fechaConsumo, systCode, rs.getString(4), rs.getString(14), rs.getString(6),
+							rs.getString(7), rs.getString(9), rs.getString(10), rs.getString(11));
+
 					info = this.getContraparte(grupo, fechaConsumo, rs.getString(4), rs.getString(14), rs.getString(6),
 							rs.getString(7));
 					contraparte.addAll(info);
-					MexicoLinCom.addAll(info);
-					MexicoLinComValCurSum.add(sumatoriaNomValCur);
-					MexicoLinComCerSum.add(sumatoriaCer);
-					MexicoLinComNomValSum.add(sumatoriaNomVal);
 					MexicoTotValCurSum.add(sumatoriaNomValCur);
 					MexicoTotCerSum.add(sumatoriaCer);
 					MexicoTotNomValSum.add(sumatoriaNomVal);
+					instrumento.add(comprome);
 				} else if (rs.getString(5).contains("GARANTIA ACCIONES") || rs.getString(5).contains("GARANTIA AVAL")
 						|| rs.getString(5).contains("GARANTIA DERECHOS")
 						|| rs.getString(5).contains("GARANTIA PERSONAL")
@@ -438,20 +354,20 @@ public class Conexion {
 						|| rs.getString(5).contains("OTRAS GARANTIAS REALES")
 						|| rs.getString(5).contains("OTHER GUARANTY")) {
 					MexicoGaran.add(systCode);
-
 					MexicoGaranValCurSum.add(sumatoriaNomValCur);
 					MexicoGaranCerSum.add(sumatoriaCer);
 					MexicoGaranNomValSum.add(sumatoriaNomVal);
 					MexicoTotValCurSum.add(sumatoriaNomValCur);
 					MexicoTotCerSum.add(sumatoriaCer);
 					MexicoTotNomValSum.add(sumatoriaNomVal);
+
 				} else if (rs.getString(5).contains("AVAL COMERCIAL")
 						|| rs.getString(5).contains("AVAL FINANCIERO - NO COMPROMETIDO")
 						|| rs.getString(5).contains("AVAL NO") || rs.getString(5).contains("AVAL TECNICO")
 						|| rs.getString(5).contains("GARANTIA LINE") || rs.getString(5).contains("STANDBY")
 						|| rs.getString(5).contains("LINEA DE AVALES")) {
 
-					eva.aval(grupo, fechaConsumo, systCode, rs.getString(4), rs.getString(14), rs.getString(6),
+					aval.bonos(grupo, fechaConsumo, systCode, rs.getString(4), rs.getString(14), rs.getString(6),
 							rs.getString(7), rs.getString(9), rs.getString(10), rs.getString(11));
 
 					info = this.getContraparte(grupo, fechaConsumo, rs.getString(4), rs.getString(14), rs.getString(6),
@@ -460,7 +376,7 @@ public class Conexion {
 					MexicoTotValCurSum.add(sumatoriaNomValCur);
 					MexicoTotCerSum.add(sumatoriaCer);
 					MexicoTotNomValSum.add(sumatoriaNomVal);
-
+					instrumento.add(aval);
 				} else if (rs.getString(5).contains("ASSET") || rs.getString(5).contains("CALL")
 						|| rs.getString(5).contains("CERTIFICATES") || rs.getString(5).contains("COLLAR")
 						|| rs.getString(5).contains("EQUITY") || rs.getString(5).contains("COMMODITY")
@@ -478,67 +394,60 @@ public class Conexion {
 						|| rs.getString(5).contains("SWAP FORWARD") || rs.getString(5).contains("TITULIZACION")
 						|| rs.getString(5).contains("DELIVERABLE") || rs.getString(5).contains("GENERIC DEALS")
 						|| rs.getString(5).contains("PAYER REVENUE")) {
-					MexicoDer.add(systCode);
+
+					derivados.bonos(grupo, fechaConsumo, systCode, rs.getString(4), rs.getString(14), rs.getString(6),
+							rs.getString(7), rs.getString(9), rs.getString(10), rs.getString(11));
+
 					info = this.getContraparte(grupo, fechaConsumo, rs.getString(4), rs.getString(14), rs.getString(6),
 							rs.getString(7));
 					contraparte.addAll(info);
-					MexicoDer.addAll(info);
-					MexicoDerValCurSum.add(sumatoriaNomValCur);
-					MexicoDerCerSum.add(sumatoriaCer);
-					MexicoDerNomValSum.add(sumatoriaNomVal);
 					MexicoTotValCurSum.add(sumatoriaNomValCur);
 					MexicoTotCerSum.add(sumatoriaCer);
 					MexicoTotNomValSum.add(sumatoriaNomVal);
+					instrumento.add(derivados);
 				} else if (rs.getString(5).contains("CREDITOS - NO COMPROMETIDO")) {
-					MexicoLinNoCom.add(systCode);
+
+					nocompro.bonos(grupo, fechaConsumo, systCode, rs.getString(4), rs.getString(14), rs.getString(6),
+							rs.getString(7), rs.getString(9), rs.getString(10), rs.getString(11));
+
 					info = this.getContraparte(grupo, fechaConsumo, rs.getString(4), rs.getString(14), rs.getString(6),
 							rs.getString(7));
 					contraparte.addAll(info);
-					MexicoLinNoCom.addAll(info);
-					MexicoLinNoComValCurSum.add(sumatoriaNomValCur);
-					MexicoLinNoComCerSum.add(sumatoriaCer);
-					MexicoLinNoComNomValSum.add(sumatoriaNomVal);
 					MexicoTotValCurSum.add(sumatoriaNomValCur);
 					MexicoTotCerSum.add(sumatoriaCer);
 					MexicoTotNomValSum.add(sumatoriaNomVal);
+					instrumento.add(nocompro);
 				} else if (rs.getString(5).contains("LEASING") || rs.getString(5).contains("RENTING")) {
-					MexicoLeasingRenting.add(systCode);
+
+					leasrent.bonos(grupo, fechaConsumo, systCode, rs.getString(4), rs.getString(14), rs.getString(6),
+							rs.getString(7), rs.getString(9), rs.getString(10), rs.getString(11));
+
 					info = this.getContraparte(grupo, fechaConsumo, rs.getString(4), rs.getString(14), rs.getString(6),
 							rs.getString(7));
 					contraparte.addAll(info);
-
-					MexicoLeasingRenting.addAll(info);
-					MexicoLeasingRentingValCurSum.add(sumatoriaNomValCur);
-					MexicoLeasingRentingCerSum.add(sumatoriaCer);
-					MexicoLeasingRentingNomValSum.add(sumatoriaNomVal);
-
 					MexicoTotValCurSum.add(sumatoriaNomValCur);
 					MexicoTotCerSum.add(sumatoriaCer);
 					MexicoTotNomValSum.add(sumatoriaNomVal);
-
+					instrumento.add(leasrent);
 				} else if (rs.getString(5).contains("OVERDRAFTS")) {
-					MexicoOverdrafts.add(systCode);
+
+					over.bonos(grupo, fechaConsumo, systCode, rs.getString(4), rs.getString(14), rs.getString(6),
+							rs.getString(7), rs.getString(9), rs.getString(10), rs.getString(11));
+
 					info = this.getContraparte(grupo, fechaConsumo, rs.getString(4), rs.getString(14), rs.getString(6),
 							rs.getString(7));
 					contraparte.addAll(info);
-
-					MexicoOverdrafts.addAll(info);
-					MexicoOverdraftsValCurSum.add(sumatoriaNomValCur);
-					MexicoOverdraftsCerSum.add(sumatoriaCer);
-					MexicoOverdraftsNomValSum.add(sumatoriaNomVal);
-
 					MexicoTotValCurSum.add(sumatoriaNomValCur);
 					MexicoTotCerSum.add(sumatoriaCer);
 					MexicoTotNomValSum.add(sumatoriaNomVal);
+					instrumento.add(over);
 				}
 
 			} while (rs.next());
 			if (systCode.isEmpty()) {
 				systCode = "No existen registros para este grupo en la interfaz CONSULTA";
 			}
-			// encabezados
-			String CadenaEncabeza = encabezado.stream().collect(Collectors.joining(""));
-
+			
 			ArrayList<String> newList = new ArrayList<String>();
 			for (String element : MexicoGaran) {
 				if (!contraparte.contains(element)) {
@@ -546,308 +455,19 @@ public class Conexion {
 				}
 			}
 
-			// LineasNoComprometidas
-			String CadenaLinNoComMex = MexicoLinNoCom.stream().collect(Collectors.joining(""));
-			double totalMexicoLinNoComNomValCur = MexicoLinNoComValCurSum.stream().mapToDouble(Double::doubleValue)
-					.sum();
-			double totalMexicoLinNoComCer = MexicoLinNoComCerSum.stream().mapToDouble(Double::doubleValue).sum();
-			double totalMexicoLinNoComNomVal = MexicoLinNoComNomValSum.stream().mapToDouble(Double::doubleValue).sum();
-
-			
-
-			// Comex/Forfaiting
-			String CadenaMexicoComFor = MexicoComFor.stream().collect(Collectors.joining(""));
-			double totalMexicoComForNomValCurSum = MexicoComForNomValCurSum.stream().mapToDouble(Double::doubleValue)
-					.sum();
-			double totalMexicoComForCerSum = MexicoComForCerSum.stream().mapToDouble(Double::doubleValue).sum();
-			double totalMexicoComForNomValSum = MexicoComForNomValSum.stream().mapToDouble(Double::doubleValue).sum();
-
-			// Sindicado
-			String CadenaMexicoSindicado = MexicoSindicado.stream().collect(Collectors.joining(""));
-			double totalMexicoSindicadoNomValCurSum = MexicoSindicadoNomValCurSum.stream()
-					.mapToDouble(Double::doubleValue).sum();
-			double totalMexicoSindicadoCerSum = MexicoSindicadoCerSum.stream().mapToDouble(Double::doubleValue).sum();
-			double totalMexicoSindicadoNomValSum = MexicoSindicadoNomValSum.stream().mapToDouble(Double::doubleValue)
-					.sum();
-
-			// Confirming
-			String CadenaMexicoConfir = MexicoConfir.stream().collect(Collectors.joining(""));
-			double totalMexicoConfirNomValCurSum = MexicoConfirNomValCurSum.stream().mapToDouble(Double::doubleValue)
-					.sum();
-			double totalMexicoConfirCerSum = MexicoConfirCerSum.stream().mapToDouble(Double::doubleValue).sum();
-			double totalMexicoConfirNomValSum = MexicoConfirNomValSum.stream().mapToDouble(Double::doubleValue).sum();
-
-			// Descuentos
-			String CadenaMexicoDesc = MexicoDesc.stream().collect(Collectors.joining(""));
-			double totalMexicoDescValCurSum = MexicoDescValCurSum.stream().mapToDouble(Double::doubleValue).sum();
-			double totalMexicoDescCerSum = MexicoDescCerSum.stream().mapToDouble(Double::doubleValue).sum();
-			double totalMexicoDescNomValSum = MexicoDescNomValSum.stream().mapToDouble(Double::doubleValue).sum();
-
-			// Descuentos
-			String CadenaMexicoFac = MexicoFac.stream().collect(Collectors.joining(""));
-			double totalMexicoFacValCurSum = MexicoFacValCurSum.stream().mapToDouble(Double::doubleValue).sum();
-			double totalMexicoFacCerSum = MexicoFacCerSum.stream().mapToDouble(Double::doubleValue).sum();
-			double totalMexicoFacNomValSum = MexicoFacNomValSum.stream().mapToDouble(Double::doubleValue).sum();
-
-			// Tarjetas
-			String CadenaMexicoTar = MexicoTar.stream().collect(Collectors.joining(""));
-			double totalMexicoTarValCurSum = MexicoTarValCurSum.stream().mapToDouble(Double::doubleValue).sum();
-			double totalMexicoTarCerSum = MexicoTarCerSum.stream().mapToDouble(Double::doubleValue).sum();
-			double totalMexicoTarNomValSum = MexicoTarNomValSum.stream().mapToDouble(Double::doubleValue).sum();
-
-			// Lineas Comprometidas
-			String CadenaMexicoLinCom = MexicoLinCom.stream().collect(Collectors.joining(""));
-			double totalMexicoLinComValCurSum = MexicoLinComValCurSum.stream().mapToDouble(Double::doubleValue).sum();
-			double totalMexicoLinComCerSum = MexicoLinComCerSum.stream().mapToDouble(Double::doubleValue).sum();
-			double totalMexicoLinComNomValSum = MexicoLinComNomValSum.stream().mapToDouble(Double::doubleValue).sum();
-
 			// Garantias
 			String CadenaMexicoGaran = newList.stream().collect(Collectors.joining(""));
 			double totalMexicoGaranValCurSum = MexicoGaranValCurSum.stream().mapToDouble(Double::doubleValue).sum();
 			double totalMexicoGaranCerSum = MexicoGaranCerSum.stream().mapToDouble(Double::doubleValue).sum();
 			double totalMexicoGaranNomValSum = MexicoGaranNomValSum.stream().mapToDouble(Double::doubleValue).sum();
 
-			
-
-			// Derivados
-			String CadenaMexicoDer = MexicoDer.stream().collect(Collectors.joining(""));
-			double totalMexicoDerValCurSum = MexicoDerValCurSum.stream().mapToDouble(Double::doubleValue).sum();
-			double totalMexicoDerCerSum = MexicoDerCerSum.stream().mapToDouble(Double::doubleValue).sum();
-			double totalMexicoDerNomValSum = MexicoDerNomValSum.stream().mapToDouble(Double::doubleValue).sum();
-
-			// LeasingRenting
-			String CadenaMexicoLeasingRenting = MexicoLeasingRenting.stream().collect(Collectors.joining(""));
-			double totalMexicoLeasingRentingValCurSum = MexicoLeasingRentingValCurSum.stream()
-					.mapToDouble(Double::doubleValue).sum();
-			double totalMexicoLeasingRentingCerSum = MexicoLeasingRentingCerSum.stream()
-					.mapToDouble(Double::doubleValue).sum();
-			double totalMexicoLeasingRentingNomValSum = MexicoLeasingRentingNomValSum.stream()
-					.mapToDouble(Double::doubleValue).sum();
-
-			// Overdrafts
-			String CadenaMexicoOverdrafts = MexicoOverdrafts.stream().collect(Collectors.joining(""));
-			double totalMexicoOverdraftsValCurSum = MexicoOverdraftsValCurSum.stream().mapToDouble(Double::doubleValue)
-					.sum();
-			double totalMexicoOverdraftsCerSum = MexicoOverdraftsCerSum.stream().mapToDouble(Double::doubleValue).sum();
-			double totalMexicoOverdraftsNomValSum = MexicoOverdraftsNomValSum.stream().mapToDouble(Double::doubleValue)
-					.sum();
-
 			// totales
 			double totalMexicoTotValCurSum = MexicoTotValCurSum.stream().mapToDouble(Double::doubleValue).sum();
 			double totalMexicoTotCerSum = MexicoTotCerSum.stream().mapToDouble(Double::doubleValue).sum();
 			double totalMexicoTotNomValSum = MexicoTotNomValSum.stream().mapToDouble(Double::doubleValue).sum();
 
-			// Avales Mexico
-			if (!eva.getCadenaAvalMex().isEmpty()) {
-				writer.write("MEXICO - AVAL\n");
-				writer.write(CadenaEncabeza);
-				writer.write(eva.getCadenaAvalMex().toString());
-				writer.write("TOTAL MEXICO - AVALES" + "|" + "|" + "|" + "|" + "TOTAL AVALES" + "|" + "|" + "|" + "|"
-						+ DFORMATO.format(eva.getTotalMexicoAvalNomValCur()).toString() + "|"
-						+ DFORMATO.format(eva.getTotalMexicoAvalCer()).toString() + "|"
-						+ DFORMATO.format(eva.getTotalMexicoAvalNomVal()).toString() + "|" + "|" + "|" + "|" + "|" + "|"
-						+ "_");
-				writer.write("\n");
-				writer.write("\n");
-			} // Bonos Mexico
-			if (!eva.getCadenaBonosMex().isEmpty()) {
-				writer.write("MEXICO - BONOS\n");
-				writer.write(CadenaEncabeza);
-				writer.write(eva.getCadenaBonosMex().toString());
-				
-				System.out.println(eva.getCadenaAvalMex().toString());
-				
-				writer.write("TOTAL MEXICO - BONOS" + "|" + "|" + "|" + "|" + "TOTAL BONOS" + "|" + "|" + "|" + "|"
-						+ DFORMATO.format(eva.getTotalMexicoBonosNomValCur()).toString() + "|"
-						+ DFORMATO.format(eva.getTotalMexicoBonosCer()).toString() + "|"
-						+ DFORMATO.format(eva.getTotalMexicoBonosNomVal()).toString() + "|" + "|" + "|" + "|" + "|"
-						+ "|" + "_");
-				writer.write("\n");
-				writer.write("\n");
-			} // Confirming Mexico
-			if (!MexicoConfir.isEmpty()) {
-				writer.write("-MEXICO - CONFIRMING\n");
-				writer.write(CadenaEncabeza);
-				writer.write(CadenaMexicoConfir);
-				writer.write("TOTAL MEXICO - CONFIRMING" + "|" + "|" + "|" + "|" + "TOTAL CONFIRMING" + "|" + "|" + "|"
-						+ "|" + DFORMATO.format(totalMexicoConfirNomValCurSum).toString() + "|"
-						+ DFORMATO.format(totalMexicoConfirCerSum).toString() + "|"
-						+ DFORMATO.format(totalMexicoConfirNomValSum).toString() + "|" + "|" + "|" + "|" + "|" + "|"
-						+ "_");
-
-				writer.write("\n");
-				writer.write("\n");
-			} // Creditos Documentariado Mexio
-			if (!docuexpimp.getCadenaMexicoCredDoc().isEmpty()) {
-				writer.write("MEXICO - CREDITOS DOCUMENTARIADO\n");
-				writer.write(CadenaEncabeza);
-				writer.write(docuexpimp.getCadenaMexicoCredDoc());
-				writer.write(
-						"TOTAL MEXICO - CREDITOS DOCUMENTARIOS" + "|" + "|" + "|" + "|" + "TOTAL CREDITOS DOCUMENTARIOS"
-								+ "|" + "|" + "|" + "|" + DFORMATO.format(docuexpimp.getTotalMexicoCredDocuNomValCurSum()).toString()
-								+ "|" + DFORMATO.format(docuexpimp.getTotalMexicoCredDocuCerSum()).toString() + "|"
-								+ DFORMATO.format(docuexpimp.getTotalMexicoCredDocuCerSum()).toString() + "|" + "|" + "|" + "|" + "|"
-								+ "|" + "_");
-				writer.write("\n");
-				writer.write("\n");
-			} // Creditos Sindicados-Mexico
-			if (!MexicoSindicado.isEmpty()) {
-				writer.write("MEXICO - CREDITOS SINDICADOS\n");
-				writer.write(CadenaEncabeza);
-				writer.write(CadenaMexicoSindicado);
-				writer.write("TOTAL MEXICO - CREDITOS SINDICADOS" + "|" + "|" + "|" + "|" + "TOTAL CREDITOS SINDICADOS"
-						+ "|" + "|" + "|" + "|" + DFORMATO.format(totalMexicoSindicadoNomValCurSum).toString() + "|"
-						+ DFORMATO.format(totalMexicoSindicadoCerSum).toString() + "|"
-						+ DFORMATO.format(totalMexicoSindicadoNomValSum).toString() + "|" + "|" + "|" + "|" + "|" + "|"
-						+ "_");
-				writer.write("\n");
-				writer.write("\n");
-			} // Derivados-Mexico
-			if (!MexicoDer.isEmpty()) {
-				writer.write("MEXICO - DERIVADOS\n");
-				writer.write(CadenaEncabeza);
-				writer.write(CadenaMexicoDer);
-				writer.write("TOTAL MEXICO - DERIVADOS" + "|" + "|" + "|" + "|" + "TOTAL DERIVADOS" + "|" + "|" + "|"
-						+ "|" + DFORMATO.format(totalMexicoDerValCurSum).toString() + "|"
-						+ DFORMATO.format(totalMexicoDerCerSum).toString() + "|"
-						+ DFORMATO.format(totalMexicoDerNomValSum).toString() + "|" + "|" + "|" + "|" + "|" + "|"
-						+ "_");
-				writer.write("\n");
-				writer.write("\n");
-			} // Descuentos-Mexico
-			if (!MexicoDesc.isEmpty()) {
-				writer.write("MEXICO - DESCUENTOS\n");
-				writer.write(CadenaEncabeza);
-				writer.write(CadenaMexicoDesc);
-				writer.write("TOTAL MEXICO - DESCUENTOS" + "|" + "|" + "|" + "|" + "TOTAL DESCUENTOS" + "|" + "|" + "|"
-						+ "|" + DFORMATO.format(totalMexicoDescValCurSum).toString() + "|"
-						+ DFORMATO.format(totalMexicoDescCerSum).toString() + "|"
-						+ DFORMATO.format(totalMexicoDescNomValSum).toString() + "|" + "|" + "|" + "|" + "|" + "|"
-						+ "_");
-				writer.write("\n");
-				writer.write("\n");
-			} // Factoring Mexico
-			if (!MexicoFac.isEmpty()) {
-				writer.write("MEXICO - FACTORING\n");
-				writer.write(CadenaEncabeza);
-				writer.write(CadenaMexicoFac);
-				writer.write("TOTAL MEXICO - FACTORING" + "|" + "|" + "|" + "|" + "TOTAL FACTORING" + "|" + "|" + "|"
-						+ "|" + DFORMATO.format(totalMexicoFacValCurSum).toString() + "|"
-						+ DFORMATO.format(totalMexicoFacCerSum).toString() + "|"
-						+ DFORMATO.format(totalMexicoFacNomValSum).toString() + "|" + "|" + "|" + "|" + "|" + "|"
-						+ "_");
-				writer.write("\n");
-				writer.write("\n");
-			} // Financiamiento Comex
-			if (!MexicoComFor.isEmpty()) {
-				writer.write("MEXICO - FINANCIAMIENTO COMEX\n");
-				writer.write(CadenaEncabeza);
-				writer.write(CadenaMexicoComFor);
-				writer.write(
-						"TOTAL MEXICO - FINANCIAMIENTO COMEX" + "|" + "|" + "|" + "|" + "TOTAL FINANCIAMIENTO COMEX"
-								+ "|" + "|" + "|" + "|" + DFORMATO.format(totalMexicoComForNomValCurSum).toString()
-								+ "|" + DFORMATO.format(totalMexicoComForCerSum).toString() + "|"
-								+ DFORMATO.format(totalMexicoComForNomValSum).toString() + "|" + "|" + "|" + "|" + "|"
-								+ "|" + "_");
-				writer.write("\n");
-				writer.write("\n");
-			} // Financiamiento IMP/EXP-Mexico
-			if (!docuexpimp.getCadenaMexicoExportImport().isEmpty()) {
-				writer.write("MEXICO - FINANCIAMIENTO IMP/EXP\n");
-				writer.write(CadenaEncabeza);
-				writer.write(docuexpimp.getCadenaMexicoExportImport());
-				writer.write("TOTAL MEXICO - FINANCIAMIENTO IMP/EXP" + "|" + "|" + "|" + "|"
-						+ "TOTAL FINANCIAMIENTO IMP/EXP" + "|" + "|" + "|" + "|"
-						+ DFORMATO.format(docuexpimp.getTotalMexicoExportImportNomValCurSum()).toString() + "|"
-						+ DFORMATO.format(docuexpimp.getTotalMexicoExportImportCerSum()).toString() + "|"
-						+ DFORMATO.format(docuexpimp.getTotalMexicoExportImportNomValSum()).toString() + "|" + "|" + "|" + "|" + "|"
-						+ "|" + "_");
-				writer.write("\n");
-				writer.write("\n");
-			} // Garantias
-			if (!newList.isEmpty()) {
-				writer.write("MEXICO - GARANTIAS\n");
-				writer.write(CadenaEncabeza);
-				writer.write(CadenaMexicoGaran);
-				writer.write("TOTAL MEXICO - GARANTIAS" + "|" + "|" + "|" + "|" + "TOTAL GARANTIAS" + "|" + "|" + "|"
-						+ "|" + DFORMATO.format(totalMexicoGaranValCurSum).toString() + "|"
-						+ DFORMATO.format(totalMexicoGaranCerSum).toString() + "|"
-						+ DFORMATO.format(totalMexicoGaranNomValSum).toString() + "|" + "|" + "|" + "|" + "|" + "|"
-						+ "_");
-				writer.write("\n");
-				writer.write("\n");
-			} // Leasing-Renting
-			if (!MexicoLeasingRenting.isEmpty()) {
-				writer.write("MEXICO - LEASING - RENTING\n");
-				writer.write(CadenaEncabeza);
-				writer.write(CadenaMexicoLeasingRenting);
-				writer.write("TOTAL MEXICO - LEASING - RENTING" + "|" + "|" + "|" + "|" + "TOTAL LEASING - RENTING"
-						+ "|" + "|" + "|" + "|" + DFORMATO.format(totalMexicoLeasingRentingValCurSum).toString() + "|"
-						+ DFORMATO.format(totalMexicoLeasingRentingCerSum).toString() + "|"
-						+ DFORMATO.format(totalMexicoLeasingRentingNomValSum).toString() + "|" + "|" + "|" + "|" + "|"
-						+ "|" + "_");
-				writer.write("\n");
-				writer.write("\n");
-			} // Lineas Comprometidas
-			if (!MexicoLinCom.isEmpty()) {
-				writer.write("MEXICO - LINEAS COMPROMETIDAS\n");
-				writer.write(CadenaEncabeza);
-				writer.write(CadenaMexicoLinCom);
-				writer.write(
-						"TOTAL MEXICO - LINEAS COMPROMETIDAS" + "|" + "|" + "|" + "|" + "TOTAL LINEAS COMPROMETIDAS"
-								+ "|" + "|" + "|" + "|" + DFORMATO.format(totalMexicoLinComValCurSum).toString() + "|"
-								+ DFORMATO.format(totalMexicoLinComCerSum).toString() + "|"
-								+ DFORMATO.format(totalMexicoLinComNomValSum).toString() + "|" + "|" + "|" + "|" + "|"
-								+ "|" + "_");
-				writer.write("\n");
-				writer.write("\n");
-			} // Lineas No Comprometidas
-			if (!MexicoLinNoCom.isEmpty()) {
-				writer.write("MEXICO - LINEAS NO COMPROMETIDAS\n");
-				writer.write(CadenaEncabeza);
-				writer.write(CadenaLinNoComMex);
-				writer.write("TOTAL MEXICO - LINEAS NO COMPROMETIDAS" + "|" + "|" + "|" + "|"
-						+ "TOTAL LINEAS NO COMPROMETIDAS" + "|" + "|" + "|" + "|"
-						+ DFORMATO.format(totalMexicoLinNoComNomValCur).toString() + "|"
-						+ DFORMATO.format(totalMexicoLinNoComCer).toString() + "|"
-						+ DFORMATO.format(totalMexicoLinNoComNomVal).toString() + "|" + "|" + "|" + "|" + "|" + "|"
-						+ "_");
-				writer.write("\n");
-				writer.write("\n");
-			} // Tarjeta de Credito Mexico
-			if (!MexicoTar.isEmpty()) {
-				writer.write("MEXICO - TARJETA DE CREDITO\n");
-				writer.write(CadenaEncabeza);
-				writer.write(CadenaMexicoTar);
-				writer.write("TOTAL MEXICO - TARJETAS DE CREDITO" + "|" + "|" + "|" + "|" + "TOTAL TARJETAS DE CREDITO"
-						+ "|" + "|" + "|" + "|" + DFORMATO.format(totalMexicoTarValCurSum).toString() + "|"
-						+ DFORMATO.format(totalMexicoTarCerSum).toString() + "|"
-						+ DFORMATO.format(totalMexicoTarNomValSum).toString() + "|" + "|" + "|" + "|" + "|" + "|"
-						+ "_");
-				writer.write("\n");
-				writer.write("\n");
-			} // OVERDRAFTS Mexico
-			if (!MexicoOverdrafts.isEmpty()) {
-				writer.write("MEXICO - OVERDRAFTS\n");
-				writer.write(CadenaEncabeza);
-				writer.write(CadenaMexicoOverdrafts);
-				writer.write("TOTAL MEXICO - OVERDRAFTS" + "|" + "|" + "|" + "|" + "TOTAL OVERDRAFTS" + "|" + "|" + "|"
-						+ "|" + DFORMATO.format(totalMexicoOverdraftsValCurSum).toString() + "|"
-						+ DFORMATO.format(totalMexicoOverdraftsCerSum).toString() + "|"
-						+ DFORMATO.format(totalMexicoOverdraftsNomValSum).toString() + "|" + "|" + "|" + "|" + "|" + "|"
-						+ "_");
-				writer.write("\n");
-				writer.write("\n");
-			}
-			writer.write("TOTAL MEXICO" + "|" + "|" + "|" + "|" + "TOTAL GENERAL" + "|" + "|" + "|" + "|"
-					+ DFORMATO.format(totalMexicoTotValCurSum).toString() + "|"
-					+ DFORMATO.format(totalMexicoTotCerSum).toString() + "|"
-					+ DFORMATO.format(totalMexicoTotNomValSum).toString() + "|" + "|" + "|" + "|" + "|" + "|" + "_");
-			writer.write("\n");
-			writer.write("\n");
-			writer.flush();
-			writer.close();
-
+			interfazCsv.interfazCsvPrimeraParte( instrumento, newList, CadenaMexicoGaran,nombreInterfaz,totalMexicoGaranValCurSum,totalMexicoGaranCerSum,totalMexicoGaranNomValSum
+					,totalMexicoTotValCurSum,totalMexicoTotCerSum,totalMexicoTotNomValSum);
 		}
 
 		return systCode;
@@ -1412,7 +1032,7 @@ public class Conexion {
 		strbSql.append(
 				"SELECT cptyparent, NVL(cptyparentrating, 'SIN RATING'),cptyparentname,dealstamp,instrumentname,TO_CHAR(TO_DATE(valuedate,  'YYYY-MM-DD'), 'DD-mon-YY'),TO_CHAR(TO_DATE(maturitydate,  'YYYY-MM-DD'), 'DD-mon-YY'),currency,to_char(DECODE(nominalvaluecur,null, '0.0',nominalvaluecur), '999,999,999,999.99')  AS nominalvaluecur,to_char(DECODE(CER,null, '0.0',CER), '999,999,999,999.99')  AS CER,to_char(DECODE(nominalvalue,null, '0.0',nominalvalue), '999,999,999,999.99')  AS nominalvalue,oneoff,cptyname,foldercountryname,cptycountry,cptyparentcountry,foldercountry from PGT_MEX.T_PGT_MEX_CONSUMOSC_V WHERE FECHACARGA='"
 						+ fechaConsumo + "' AND foldercountryname='" + pais + "' AND DEALSTAMP='" + deal
-						+ "' AND INSTRUMENTNAME IN('GARANTIA ACCIONES COTIZADAS','GARANTIA AVAL FINANCIERO - NO USAR (3Q 2016)','GARANTIA DERECHOS DE COBRO','GARANTIA PERSONAL MANCOMUNADA','GARANTIA PERSONAL SOLIDARIA','GARANTIA PERSONAL SOLIDARIA FINAN','OTRAS GARANTIAS EN EFECTIVO','OTRAS GARANTIAS REALES NO LIQUIDAS','OTHER GUARANTY CASH','GARANTIA BONOS LIQUIDOS AAA/A-') UNION ALL  SELECT cptyparent, NVL(cptyparentrating, 'SIN RATING'),cptyparentname,dealstamp,instrumentname,TO_CHAR(TO_DATE(valuedate,  'YYYY-MM-DD'), 'DD-mon-YY'),TO_CHAR(TO_DATE(maturitydate,  'YYYY-MM-DD'), 'DD-mon-YY'),currency,to_char(DECODE(nominalvaluecur,null, '0.0',nominalvaluecur), '999,999,999,999.99')  AS nominalvaluecur,to_char(DECODE(CER,null, '0.0',CER), '999,999,999,999.99')  AS CER,to_char(DECODE(nominalvalue,null, '0.0',nominalvalue), '999,999,999,999.99')  AS nominalvalue,oneoff,cptyname,foldercountryname,cptycountry,cptyparentcountry,foldercountry from PGT_MEX.T_PGT_MEX_CONSUMOSC_D WHERE                  FECHACARGA='"
+						+ "' AND INSTRUMENTNAME IN('GARANTIA ACCIONES COTIZADAS','GARANTIA AVAL FINANCIERO - NO USAR (3Q 2016)','GARANTIA DERECHOS DE COBRO','GARANTIA PERSONAL MANCOMUNADA','GARANTIA PERSONAL SOLIDARIA','GARANTIA PERSONAL SOLIDARIA FINAN','OTRAS GARANTIAS EN EFECTIVO','OTRAS GARANTIAS REALES NO LIQUIDAS','OTHER GUARANTY CASH','GARANTIA BONOS LIQUIDOS AAA/A-') UNION ALL  SELECT cptyparent, NVL(cptyparentrating, 'SIN RATING'),cptyparentname,dealstamp,instrumentname,TO_CHAR(TO_DATE(valuedate,  'YYYY-MM-DD'), 'DD-mon-YY'),TO_CHAR(TO_DATE(maturitydate,  'YYYY-MM-DD'), 'DD-mon-YY'),currency,to_char(DECODE(nominalvaluecur,null, '0.0',nominalvaluecur), '999,999,999,999.99')  AS nominalvaluecur,to_char(DECODE(CER,null, '0.0',CER), '999,999,999,999.99')  AS CER,to_char(DECODE(nominalvalue,null, '0.0',nominalvalue), '999,999,999,999.99')  AS nominalvalue,oneoff,cptyname,foldercountryname,cptycountry,cptyparentcountry,foldercountry from PGT_MEX.T_PGT_MEX_CONSUMOSC_D WHERE FECHACARGA='"
 						+ fechaConsumo + "' AND foldercountryname='" + pais + "' AND DEALSTAMP='" + deal
 						+ "' AND INSTRUMENTNAME IN('GARANTIA ACCIONES COTIZADAS','GARANTIA AVAL FINANCIERO - NO USAR (3Q 2016)','GARANTIA DERECHOS DE COBRO','GARANTIA PERSONAL MANCOMUNADA','GARANTIA PERSONAL SOLIDARIA','GARANTIA PERSONAL SOLIDARIA FINAN','OTRAS GARANTIAS EN EFECTIVO','OTRAS GARANTIAS REALES NO LIQUIDAS','OTHER GUARANTY CASH','GARANTIA BONOS LIQUIDOS AAA/A-') ORDER BY foldercountryname,instrumentname,cptyparentname");
 
@@ -1434,6 +1054,7 @@ public class Conexion {
 		} catch (SQLException e) {
 			LOGGER.info("error en query " + e);
 		}
+
 		return registrosInterfaz;
 	}
 

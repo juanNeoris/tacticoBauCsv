@@ -281,9 +281,11 @@ public class vista extends JFrame {
 					} catch (InterruptedException e2) {
 						LOGGER.info(e2);
 						System.out.println("error :" + e2);
+						System.out.println("error :" + e2.getStackTrace());
 					}
 					System.out.println("error :" + e1);
 					LOGGER.info(e1);
+					System.out.println("error :" + e1.getLocalizedMessage() + e1.getMessage() );
 				}
 
 			}
@@ -367,8 +369,7 @@ public class vista extends JFrame {
 						if (victoria.equals("No hay ultima carga") || dolphing.equals("No hay ultima carga")) {
 
 							try {
-								String res = Validaficheros
-										.validaFicherosDolphinVictoria(dateChooser.getDate().getTime());
+								String res = Validaficheros.validaFicherosDolphinVictoria(dateChooser.getDate().getTime());
 								textField_1.setText(res);
 								textField_1.update(textField_1.getGraphics());
 								Thread.sleep(5000);
