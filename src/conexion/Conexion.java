@@ -163,7 +163,7 @@ public class Conexion {
 	 * @throws IOException
 	 ****************************************************************/
 	public String getConsultaMexico(String grupo, String nombreInterfaz, String fechaConsumo) throws Exception {
-		Statement sta = sta = con.createStatement();
+		Statement sta = con.createStatement();
 		csv interfazCsv = new csv();
 		AvalBonos aval = new AvalBonos("aval");
 		AvalBonos bono = new AvalBonos("bono");
@@ -175,7 +175,7 @@ public class Conexion {
 		AvalBonos factoring = new AvalBonos("factoring");
 		AvalBonos comex = new AvalBonos("comex");
 		AvalBonos impexp = new AvalBonos("impexp");
-		// AvalBonos garantias = new AvalBonos();
+		AvalBonos sumatoria = new AvalBonos("sumatoria");
 		AvalBonos leasrent = new AvalBonos("leasrent");
 		AvalBonos comprome = new AvalBonos("comprome");
 		AvalBonos nocompro = new AvalBonos("nocompro");
@@ -194,15 +194,9 @@ public class Conexion {
 		List<Double> MexicoGaranCerSum = new ArrayList<Double>();
 		List<Double> MexicoGaranNomValSum = new ArrayList<Double>();
 
-		// Total general Mexico
-		List<Double> MexicoTotValCurSum = new ArrayList<Double>();
-		List<Double> MexicoTotCerSum = new ArrayList<Double>();
-		List<Double> MexicoTotNomValSum = new ArrayList<Double>();
-
 		List<String> info = new ArrayList<String>();
-		
+
 		ArrayList<String> contraparte = new ArrayList<String>();
-		
 
 		String systCode = "SELECT cptyparent, NVL(cptyparentrating, 'SIN RATING'),cptyparentname,dealstamp,instrumentname,TO_CHAR(TO_DATE(valuedate,  'YYYY-MM-DD'), 'DD-mon-YY'),TO_CHAR(TO_DATE(maturitydate,  'YYYY-MM-DD'), 'DD-mon-YY'),currency,to_char(DECODE(nominalvaluecur,null, '0.0',nominalvaluecur), '999,999,999,999.99')  AS nominalvaluecur,to_char(DECODE(CER,null, '0.0',CER), '999,999,999,999.99')  AS CER,to_char(DECODE(nominalvalue,null, '0.0',nominalvalue), '999,999,999,999.99')  AS nominalvalue,oneoff,cptyname,foldercountryname,cptycountry,cptyparentcountry,foldercountry from PGT_MEX.T_PGT_MEX_CONSUMOSC_V WHERE LastParentF ='"
 				+ grupo + "' and FECHACARGA='" + fechaConsumo
@@ -214,8 +208,7 @@ public class Conexion {
 		if (rs.equals(null) || rs.next() == false) {
 			systCode = "No existen registros para este grupo en la interfaz CONSULTA";
 		} else {
-			String directoryName = System.getProperty("user.dir");
-			FileWriter writer = new FileWriter(nombreInterfaz, true);
+
 			do {
 				// cadena
 				systCode = rs.getString(1) + "|" + rs.getString(2) + "|" + "\"" + rs.getString(3) + "\"" + "|"
@@ -232,121 +225,117 @@ public class Conexion {
 				if (rs.getString(5).contains("BOND")) {
 					bono.bonos(grupo, fechaConsumo, systCode, rs.getString(4), rs.getString(14), rs.getString(6),
 							rs.getString(7), rs.getString(9), rs.getString(10), rs.getString(11));
+					sumatoria.bonos(grupo, fechaConsumo, systCode, rs.getString(4), rs.getString(14), rs.getString(6),
+							rs.getString(7), rs.getString(9), rs.getString(10), rs.getString(11));
 					info = this.getContraparte(grupo, fechaConsumo, rs.getString(4), rs.getString(14), rs.getString(6),
 							rs.getString(7));
 					contraparte.addAll(info);
-					MexicoTotValCurSum.add(sumatoriaNomValCur);
-					MexicoTotCerSum.add(sumatoriaCer);
-					MexicoTotNomValSum.add(sumatoriaNomVal);
-					instrumento.add(bono);
 
+					instrumento.add(bono);
+					instrumento.add(sumatoria);
 				} else if (rs.getString(5).contains(" CREDITO DOCUMENTARIO")) {
 
 					documentariado.bonos(grupo, fechaConsumo, systCode, rs.getString(4), rs.getString(14),
 							rs.getString(6), rs.getString(7), rs.getString(9), rs.getString(10), rs.getString(11));
+					sumatoria.bonos(grupo, fechaConsumo, systCode, rs.getString(4), rs.getString(14), rs.getString(6),
+							rs.getString(7), rs.getString(9), rs.getString(10), rs.getString(11));
 					info = this.getContraparte(grupo, fechaConsumo, rs.getString(4), rs.getString(14), rs.getString(6),
 							rs.getString(7));
 					contraparte.addAll(info);
-					MexicoTotValCurSum.add(sumatoriaNomValCur);
-					MexicoTotCerSum.add(sumatoriaCer);
-					MexicoTotNomValSum.add(sumatoriaNomVal);
+
 					instrumento.add(documentariado);
+					instrumento.add(sumatoria);
 				} else if (rs.getString(5).contains("EXPORTACION") || rs.getString(5).contains("IMPORTACION")) {
 
 					impexp.bonos(grupo, fechaConsumo, systCode, rs.getString(4), rs.getString(14), rs.getString(6),
 							rs.getString(7), rs.getString(9), rs.getString(10), rs.getString(11));
+					sumatoria.bonos(grupo, fechaConsumo, systCode, rs.getString(4), rs.getString(14), rs.getString(6),
+							rs.getString(7), rs.getString(9), rs.getString(10), rs.getString(11));
 					info = this.getContraparte(grupo, fechaConsumo, rs.getString(4), rs.getString(14), rs.getString(6),
 							rs.getString(7));
-					contraparte.addAll(info);
-					MexicoTotValCurSum.add(sumatoriaNomValCur);
-					MexicoTotCerSum.add(sumatoriaCer);
-					MexicoTotNomValSum.add(sumatoriaNomVal);
+
 					instrumento.add(impexp);
+					instrumento.add(sumatoria);
 				} else if (rs.getString(5).contains("COMEX") || rs.getString(5).contains("FORFAITING")) {
 
 					comex.bonos(grupo, fechaConsumo, systCode, rs.getString(4), rs.getString(14), rs.getString(6),
 							rs.getString(7), rs.getString(9), rs.getString(10), rs.getString(11));
+					sumatoria.bonos(grupo, fechaConsumo, systCode, rs.getString(4), rs.getString(14), rs.getString(6),
+							rs.getString(7), rs.getString(9), rs.getString(10), rs.getString(11));
 					info = this.getContraparte(grupo, fechaConsumo, rs.getString(4), rs.getString(14), rs.getString(6),
 							rs.getString(7));
 					contraparte.addAll(info);
-					MexicoTotValCurSum.add(sumatoriaNomValCur);
-					MexicoTotCerSum.add(sumatoriaCer);
-					MexicoTotNomValSum.add(sumatoriaNomVal);
 					instrumento.add(comex);
+					instrumento.add(sumatoria);
 				} else if (rs.getString(5).contains("SINDICADO")) {
 
 					sindicado.bonos(grupo, fechaConsumo, systCode, rs.getString(4), rs.getString(14), rs.getString(6),
 							rs.getString(7), rs.getString(9), rs.getString(10), rs.getString(11));
-
+					sumatoria.bonos(grupo, fechaConsumo, systCode, rs.getString(4), rs.getString(14), rs.getString(6),
+							rs.getString(7), rs.getString(9), rs.getString(10), rs.getString(11));
 					info = this.getContraparte(grupo, fechaConsumo, rs.getString(4), rs.getString(14), rs.getString(6),
 							rs.getString(7));
 					contraparte.addAll(info);
-					MexicoTotValCurSum.add(sumatoriaNomValCur);
-					MexicoTotCerSum.add(sumatoriaCer);
-					MexicoTotNomValSum.add(sumatoriaNomVal);
+
 					instrumento.add(sindicado);
+					instrumento.add(sumatoria);
 				} else if (rs.getString(5).contains("CONFIRMING")) {
 
 					confirming.bonos(grupo, fechaConsumo, systCode, rs.getString(4), rs.getString(14), rs.getString(6),
 							rs.getString(7), rs.getString(9), rs.getString(10), rs.getString(11));
-
+					sumatoria.bonos(grupo, fechaConsumo, systCode, rs.getString(4), rs.getString(14), rs.getString(6),
+							rs.getString(7), rs.getString(9), rs.getString(10), rs.getString(11));
 					info = this.getContraparte(grupo, fechaConsumo, rs.getString(4), rs.getString(14), rs.getString(6),
 							rs.getString(7));
 					contraparte.addAll(info);
-					MexicoTotValCurSum.add(sumatoriaNomValCur);
-					MexicoTotCerSum.add(sumatoriaCer);
-					MexicoTotNomValSum.add(sumatoriaNomVal);
 					instrumento.add(confirming);
+					instrumento.add(sumatoria);
 				} else if (rs.getString(5).contains("DESCUENTOS")) {
 
 					descuentos.bonos(grupo, fechaConsumo, systCode, rs.getString(4), rs.getString(14), rs.getString(6),
 							rs.getString(7), rs.getString(9), rs.getString(10), rs.getString(11));
-
+					sumatoria.bonos(grupo, fechaConsumo, systCode, rs.getString(4), rs.getString(14), rs.getString(6),
+							rs.getString(7), rs.getString(9), rs.getString(10), rs.getString(11));
 					info = this.getContraparte(grupo, fechaConsumo, rs.getString(4), rs.getString(14), rs.getString(6),
 							rs.getString(7));
 					contraparte.addAll(info);
-					MexicoTotValCurSum.add(sumatoriaNomValCur);
-					MexicoTotCerSum.add(sumatoriaCer);
-					MexicoTotNomValSum.add(sumatoriaNomVal);
 					instrumento.add(descuentos);
+					instrumento.add(sumatoria);
 				} else if (rs.getString(5).contains("FACTORING")) {
 
 					factoring.bonos(grupo, fechaConsumo, systCode, rs.getString(4), rs.getString(14), rs.getString(6),
 							rs.getString(7), rs.getString(9), rs.getString(10), rs.getString(11));
-
+					sumatoria.bonos(grupo, fechaConsumo, systCode, rs.getString(4), rs.getString(14), rs.getString(6),
+							rs.getString(7), rs.getString(9), rs.getString(10), rs.getString(11));
 					info = this.getContraparte(grupo, fechaConsumo, rs.getString(4), rs.getString(14), rs.getString(6),
 							rs.getString(7));
 					contraparte.addAll(info);
-					MexicoTotValCurSum.add(sumatoriaNomValCur);
-					MexicoTotCerSum.add(sumatoriaCer);
-					MexicoTotNomValSum.add(sumatoriaNomVal);
 					instrumento.add(factoring);
+					instrumento.add(sumatoria);
 				} else if (rs.getString(5).contains("TARJETAS")) {
 
 					tarjeta.bonos(grupo, fechaConsumo, systCode, rs.getString(4), rs.getString(14), rs.getString(6),
 							rs.getString(7), rs.getString(9), rs.getString(10), rs.getString(11));
-
+					sumatoria.bonos(grupo, fechaConsumo, systCode, rs.getString(4), rs.getString(14), rs.getString(6),
+							rs.getString(7), rs.getString(9), rs.getString(10), rs.getString(11));
 					info = this.getContraparte(grupo, fechaConsumo, rs.getString(4), rs.getString(14), rs.getString(6),
 							rs.getString(7));
 					contraparte.addAll(info);
-					MexicoTotValCurSum.add(sumatoriaNomValCur);
-					MexicoTotCerSum.add(sumatoriaCer);
-					MexicoTotNomValSum.add(sumatoriaNomVal);
 					instrumento.add(tarjeta);
+					instrumento.add(sumatoria);
 				} else if (rs.getString(5).contains("LINEA MULTIDEAL RESTO")
 						|| rs.getString(5).contains("CREDITOS - COMPROMETIDO")
 						|| rs.getString(5).contains("CREDITO BACKUP") || rs.getString(5).contains("CREDITO OTROS")) {
 
 					comprome.bonos(grupo, fechaConsumo, systCode, rs.getString(4), rs.getString(14), rs.getString(6),
 							rs.getString(7), rs.getString(9), rs.getString(10), rs.getString(11));
-
+					sumatoria.bonos(grupo, fechaConsumo, systCode, rs.getString(4), rs.getString(14), rs.getString(6),
+							rs.getString(7), rs.getString(9), rs.getString(10), rs.getString(11));
 					info = this.getContraparte(grupo, fechaConsumo, rs.getString(4), rs.getString(14), rs.getString(6),
 							rs.getString(7));
 					contraparte.addAll(info);
-					MexicoTotValCurSum.add(sumatoriaNomValCur);
-					MexicoTotCerSum.add(sumatoriaCer);
-					MexicoTotNomValSum.add(sumatoriaNomVal);
 					instrumento.add(comprome);
+					instrumento.add(sumatoria);
 				} else if (rs.getString(5).contains("GARANTIA ACCIONES") || rs.getString(5).contains("GARANTIA AVAL")
 						|| rs.getString(5).contains("GARANTIA DERECHOS")
 						|| rs.getString(5).contains("GARANTIA PERSONAL")
@@ -354,13 +343,13 @@ public class Conexion {
 						|| rs.getString(5).contains("OTRAS GARANTIAS REALES")
 						|| rs.getString(5).contains("OTHER GUARANTY")) {
 					MexicoGaran.add(systCode);
+
+					sumatoria.bonos(grupo, fechaConsumo, systCode, rs.getString(4), rs.getString(14), rs.getString(6),
+							rs.getString(7), rs.getString(9), rs.getString(10), rs.getString(11));
 					MexicoGaranValCurSum.add(sumatoriaNomValCur);
 					MexicoGaranCerSum.add(sumatoriaCer);
 					MexicoGaranNomValSum.add(sumatoriaNomVal);
-					MexicoTotValCurSum.add(sumatoriaNomValCur);
-					MexicoTotCerSum.add(sumatoriaCer);
-					MexicoTotNomValSum.add(sumatoriaNomVal);
-
+					instrumento.add(sumatoria);
 				} else if (rs.getString(5).contains("AVAL COMERCIAL")
 						|| rs.getString(5).contains("AVAL FINANCIERO - NO COMPROMETIDO")
 						|| rs.getString(5).contains("AVAL NO") || rs.getString(5).contains("AVAL TECNICO")
@@ -369,14 +358,13 @@ public class Conexion {
 
 					aval.bonos(grupo, fechaConsumo, systCode, rs.getString(4), rs.getString(14), rs.getString(6),
 							rs.getString(7), rs.getString(9), rs.getString(10), rs.getString(11));
-
+					sumatoria.bonos(grupo, fechaConsumo, systCode, rs.getString(4), rs.getString(14), rs.getString(6),
+							rs.getString(7), rs.getString(9), rs.getString(10), rs.getString(11));
 					info = this.getContraparte(grupo, fechaConsumo, rs.getString(4), rs.getString(14), rs.getString(6),
 							rs.getString(7));
 					contraparte.addAll(info);
-					MexicoTotValCurSum.add(sumatoriaNomValCur);
-					MexicoTotCerSum.add(sumatoriaCer);
-					MexicoTotNomValSum.add(sumatoriaNomVal);
 					instrumento.add(aval);
+					instrumento.add(sumatoria);
 				} else if (rs.getString(5).contains("ASSET") || rs.getString(5).contains("CALL")
 						|| rs.getString(5).contains("CERTIFICATES") || rs.getString(5).contains("COLLAR")
 						|| rs.getString(5).contains("EQUITY") || rs.getString(5).contains("COMMODITY")
@@ -397,57 +385,53 @@ public class Conexion {
 
 					derivados.bonos(grupo, fechaConsumo, systCode, rs.getString(4), rs.getString(14), rs.getString(6),
 							rs.getString(7), rs.getString(9), rs.getString(10), rs.getString(11));
-
+					sumatoria.bonos(grupo, fechaConsumo, systCode, rs.getString(4), rs.getString(14), rs.getString(6),
+							rs.getString(7), rs.getString(9), rs.getString(10), rs.getString(11));
 					info = this.getContraparte(grupo, fechaConsumo, rs.getString(4), rs.getString(14), rs.getString(6),
 							rs.getString(7));
 					contraparte.addAll(info);
-					MexicoTotValCurSum.add(sumatoriaNomValCur);
-					MexicoTotCerSum.add(sumatoriaCer);
-					MexicoTotNomValSum.add(sumatoriaNomVal);
 					instrumento.add(derivados);
+					instrumento.add(sumatoria);
 				} else if (rs.getString(5).contains("CREDITOS - NO COMPROMETIDO")) {
 
 					nocompro.bonos(grupo, fechaConsumo, systCode, rs.getString(4), rs.getString(14), rs.getString(6),
 							rs.getString(7), rs.getString(9), rs.getString(10), rs.getString(11));
-
+					sumatoria.bonos(grupo, fechaConsumo, systCode, rs.getString(4), rs.getString(14), rs.getString(6),
+							rs.getString(7), rs.getString(9), rs.getString(10), rs.getString(11));
 					info = this.getContraparte(grupo, fechaConsumo, rs.getString(4), rs.getString(14), rs.getString(6),
 							rs.getString(7));
 					contraparte.addAll(info);
-					MexicoTotValCurSum.add(sumatoriaNomValCur);
-					MexicoTotCerSum.add(sumatoriaCer);
-					MexicoTotNomValSum.add(sumatoriaNomVal);
 					instrumento.add(nocompro);
+					instrumento.add(sumatoria);
 				} else if (rs.getString(5).contains("LEASING") || rs.getString(5).contains("RENTING")) {
 
 					leasrent.bonos(grupo, fechaConsumo, systCode, rs.getString(4), rs.getString(14), rs.getString(6),
 							rs.getString(7), rs.getString(9), rs.getString(10), rs.getString(11));
-
+					sumatoria.bonos(grupo, fechaConsumo, systCode, rs.getString(4), rs.getString(14), rs.getString(6),
+							rs.getString(7), rs.getString(9), rs.getString(10), rs.getString(11));
 					info = this.getContraparte(grupo, fechaConsumo, rs.getString(4), rs.getString(14), rs.getString(6),
 							rs.getString(7));
 					contraparte.addAll(info);
-					MexicoTotValCurSum.add(sumatoriaNomValCur);
-					MexicoTotCerSum.add(sumatoriaCer);
-					MexicoTotNomValSum.add(sumatoriaNomVal);
 					instrumento.add(leasrent);
+					instrumento.add(sumatoria);
 				} else if (rs.getString(5).contains("OVERDRAFTS")) {
 
 					over.bonos(grupo, fechaConsumo, systCode, rs.getString(4), rs.getString(14), rs.getString(6),
 							rs.getString(7), rs.getString(9), rs.getString(10), rs.getString(11));
-
+					sumatoria.bonos(grupo, fechaConsumo, systCode, rs.getString(4), rs.getString(14), rs.getString(6),
+							rs.getString(7), rs.getString(9), rs.getString(10), rs.getString(11));
 					info = this.getContraparte(grupo, fechaConsumo, rs.getString(4), rs.getString(14), rs.getString(6),
 							rs.getString(7));
 					contraparte.addAll(info);
-					MexicoTotValCurSum.add(sumatoriaNomValCur);
-					MexicoTotCerSum.add(sumatoriaCer);
-					MexicoTotNomValSum.add(sumatoriaNomVal);
 					instrumento.add(over);
+					instrumento.add(sumatoria);
 				}
 
 			} while (rs.next());
 			if (systCode.isEmpty()) {
 				systCode = "No existen registros para este grupo en la interfaz CONSULTA";
 			}
-			
+
 			ArrayList<String> newList = new ArrayList<String>();
 			for (String element : MexicoGaran) {
 				if (!contraparte.contains(element)) {
@@ -461,13 +445,8 @@ public class Conexion {
 			double totalMexicoGaranCerSum = MexicoGaranCerSum.stream().mapToDouble(Double::doubleValue).sum();
 			double totalMexicoGaranNomValSum = MexicoGaranNomValSum.stream().mapToDouble(Double::doubleValue).sum();
 
-			// totales
-			double totalMexicoTotValCurSum = MexicoTotValCurSum.stream().mapToDouble(Double::doubleValue).sum();
-			double totalMexicoTotCerSum = MexicoTotCerSum.stream().mapToDouble(Double::doubleValue).sum();
-			double totalMexicoTotNomValSum = MexicoTotNomValSum.stream().mapToDouble(Double::doubleValue).sum();
-
-			interfazCsv.interfazCsvPrimeraParte( instrumento, newList, CadenaMexicoGaran,nombreInterfaz,totalMexicoGaranValCurSum,totalMexicoGaranCerSum,totalMexicoGaranNomValSum
-					,totalMexicoTotValCurSum,totalMexicoTotCerSum,totalMexicoTotNomValSum);
+			interfazCsv.interfazCsvPrimeraParte(instrumento, newList, CadenaMexicoGaran, nombreInterfaz,
+					totalMexicoGaranValCurSum, totalMexicoGaranCerSum, totalMexicoGaranNomValSum);
 		}
 
 		return systCode;
