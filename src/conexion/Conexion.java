@@ -36,11 +36,11 @@ public class Conexion {
 	private Statement stmt;
 	private ResultSet rs;
 	private StringBuilder strbSql;
-
-	public static final DecimalFormat DFORMATO = new DecimalFormat("###,###,###.##");
+	
 	private static final Logger LOGGER = LogManager.getLogger(Conexion.class);
-
-	Properties getPro = cargaProperties();
+	public static final DecimalFormat DFORMATO = new DecimalFormat("###,###,###.##");
+	
+	public Properties getPro = cargaProperties();
 
 	public Conexion() {
 
@@ -76,7 +76,7 @@ public class Conexion {
 		String connString = getPro.getProperty("bbdd.jdbc") + getPro.getProperty("bbdd.host") + ":"
 				+ getPro.getProperty("bbdd.puerto") + ":" + getPro.getProperty("bbdd.sid");
 
-		System.out.println("connString :" + connString);
+		
 		ods.setURL(connString);
 		ods.setUser(getPro.getProperty("bbdd.usuario"));
 		ods.setPassword(getPro.getProperty("bbdd.contrasena"));
@@ -123,13 +123,14 @@ public class Conexion {
 		}
 	}
 
-	/*********************
-	 * validar carga Dolphing
-	 * 
-	 * @param fecha
-	 * @throws SQLException
-	 * @return systCode
-	 ****************************************************************/
+	
+	
+	/**
+	  * Metodo que valida la carga Dolphing
+	  * @param fecha recive como parametro para la consulta que valida la carga 
+	  * @throws SQLException atrapa la excepcion generada por el query 
+	  * @return systCode regresa lo que obtiene de ejecutar el query 
+	  */
 
 	public String getCargaDolphingHistorico(String fecha) throws SQLException {
 		strbSql = new StringBuilder();
@@ -150,18 +151,15 @@ public class Conexion {
 
 		return systCode;
 	}
-
-	/*********************
-	 * validar getConsultaMexico
-	 * 
-	 * @param fechaConsumo   fec
-	 * @param nombreInterfaz
-	 * @param grupo
-	 * @return systCode
-	 * @throws SQLException
-	 * @throws ParseException
-	 * @throws IOException
-	 ****************************************************************/
+	
+	/**
+	  * Metodo que consulta los instrumentos para los paises Mexico
+	  * @param grupo usado para la consulta de instrumentos 
+	  * @param nombreInterfaz donde se escribiran los instrumentos 
+	  * @param fechaConsumo quenera la consulta del dia deseado 
+	  * @throws Exception atrapa la excepcion generada durante la ejecucion
+	  * @return systCode regresa lo que obtiene de ejecutar el query
+	  */
 	public String getConsultaMexico(String grupo, String nombreInterfaz, String fechaConsumo) throws Exception {
 		Statement sta = con.createStatement();
 		csv interfazCsv = new csv();
@@ -245,6 +243,7 @@ public class Conexion {
 
 					instrumento.add(documentariado);
 					instrumento.add(sumatoria);
+					System.out.println("derivado");
 				} else if (rs.getString(5).contains("EXPORTACION") || rs.getString(5).contains("IMPORTACION")) {
 
 					impexp.bonos(grupo, fechaConsumo, systCode, rs.getString(4), rs.getString(14), rs.getString(6),
@@ -256,6 +255,7 @@ public class Conexion {
 
 					instrumento.add(impexp);
 					instrumento.add(sumatoria);
+					System.out.println("expor-impor");
 				} else if (rs.getString(5).contains("COMEX") || rs.getString(5).contains("FORFAITING")) {
 
 					comex.bonos(grupo, fechaConsumo, systCode, rs.getString(4), rs.getString(14), rs.getString(6),
@@ -267,6 +267,7 @@ public class Conexion {
 					contraparte.addAll(info);
 					instrumento.add(comex);
 					instrumento.add(sumatoria);
+					System.out.println("comex");
 				} else if (rs.getString(5).contains("SINDICADO")) {
 
 					sindicado.bonos(grupo, fechaConsumo, systCode, rs.getString(4), rs.getString(14), rs.getString(6),
@@ -279,6 +280,7 @@ public class Conexion {
 
 					instrumento.add(sindicado);
 					instrumento.add(sumatoria);
+					System.out.println("sindicado");
 				} else if (rs.getString(5).contains("CONFIRMING")) {
 
 					confirming.bonos(grupo, fechaConsumo, systCode, rs.getString(4), rs.getString(14), rs.getString(6),
@@ -290,6 +292,7 @@ public class Conexion {
 					contraparte.addAll(info);
 					instrumento.add(confirming);
 					instrumento.add(sumatoria);
+					System.out.println("confirming");
 				} else if (rs.getString(5).contains("DESCUENTOS")) {
 
 					descuentos.bonos(grupo, fechaConsumo, systCode, rs.getString(4), rs.getString(14), rs.getString(6),
@@ -301,6 +304,7 @@ public class Conexion {
 					contraparte.addAll(info);
 					instrumento.add(descuentos);
 					instrumento.add(sumatoria);
+					System.out.println("descuentos");
 				} else if (rs.getString(5).contains("FACTORING")) {
 
 					factoring.bonos(grupo, fechaConsumo, systCode, rs.getString(4), rs.getString(14), rs.getString(6),
@@ -312,6 +316,7 @@ public class Conexion {
 					contraparte.addAll(info);
 					instrumento.add(factoring);
 					instrumento.add(sumatoria);
+					System.out.println("factoring");
 				} else if (rs.getString(5).contains("TARJETAS")) {
 
 					tarjeta.bonos(grupo, fechaConsumo, systCode, rs.getString(4), rs.getString(14), rs.getString(6),
@@ -323,6 +328,7 @@ public class Conexion {
 					contraparte.addAll(info);
 					instrumento.add(tarjeta);
 					instrumento.add(sumatoria);
+					System.out.println("teajeta");
 				} else if (rs.getString(5).contains("LINEA MULTIDEAL RESTO")
 						|| rs.getString(5).contains("CREDITOS - COMPROMETIDO")
 						|| rs.getString(5).contains("CREDITO BACKUP") || rs.getString(5).contains("CREDITO OTROS")) {
@@ -336,6 +342,7 @@ public class Conexion {
 					contraparte.addAll(info);
 					instrumento.add(comprome);
 					instrumento.add(sumatoria);
+					System.out.println("comprometido");
 				} else if (rs.getString(5).contains("GARANTIA ACCIONES") || rs.getString(5).contains("GARANTIA AVAL")
 						|| rs.getString(5).contains("GARANTIA DERECHOS")
 						|| rs.getString(5).contains("GARANTIA PERSONAL")
@@ -350,6 +357,7 @@ public class Conexion {
 					MexicoGaranCerSum.add(sumatoriaCer);
 					MexicoGaranNomValSum.add(sumatoriaNomVal);
 					instrumento.add(sumatoria);
+					System.out.println("garantia");
 				} else if (rs.getString(5).contains("AVAL COMERCIAL")
 						|| rs.getString(5).contains("AVAL FINANCIERO - NO COMPROMETIDO")
 						|| rs.getString(5).contains("AVAL NO") || rs.getString(5).contains("AVAL TECNICO")
@@ -365,6 +373,7 @@ public class Conexion {
 					contraparte.addAll(info);
 					instrumento.add(aval);
 					instrumento.add(sumatoria);
+					System.out.println("aval");
 				} else if (rs.getString(5).contains("ASSET") || rs.getString(5).contains("CALL")
 						|| rs.getString(5).contains("CERTIFICATES") || rs.getString(5).contains("COLLAR")
 						|| rs.getString(5).contains("EQUITY") || rs.getString(5).contains("COMMODITY")
@@ -392,6 +401,7 @@ public class Conexion {
 					contraparte.addAll(info);
 					instrumento.add(derivados);
 					instrumento.add(sumatoria);
+					System.out.println("derivado");
 				} else if (rs.getString(5).contains("CREDITOS - NO COMPROMETIDO")) {
 
 					nocompro.bonos(grupo, fechaConsumo, systCode, rs.getString(4), rs.getString(14), rs.getString(6),
@@ -403,6 +413,7 @@ public class Conexion {
 					contraparte.addAll(info);
 					instrumento.add(nocompro);
 					instrumento.add(sumatoria);
+					System.out.println("NO COMPROMETIDO");
 				} else if (rs.getString(5).contains("LEASING") || rs.getString(5).contains("RENTING")) {
 
 					leasrent.bonos(grupo, fechaConsumo, systCode, rs.getString(4), rs.getString(14), rs.getString(6),
@@ -414,6 +425,7 @@ public class Conexion {
 					contraparte.addAll(info);
 					instrumento.add(leasrent);
 					instrumento.add(sumatoria);
+					System.out.println("LEASING");
 				} else if (rs.getString(5).contains("OVERDRAFTS")) {
 
 					over.bonos(grupo, fechaConsumo, systCode, rs.getString(4), rs.getString(14), rs.getString(6),
@@ -425,6 +437,7 @@ public class Conexion {
 					contraparte.addAll(info);
 					instrumento.add(over);
 					instrumento.add(sumatoria);
+					System.out.println("OVERDRAFTS");
 				}
 
 			} while (rs.next());
@@ -452,10 +465,20 @@ public class Conexion {
 		return systCode;
 	}
 
+	/**
+	  * Metodo getConsultaOtrosPaises que consulta los instrumentos para los paises restantes
+	  * @param grupo usado para la consulta de instrumentos 
+	  * @param nombreInterfaz donde se escribiran los instrumentos 
+	  * @param fechaConsumo quenera la consulta del dia deseado 
+	  * @throws SQLException atrapa la excepcion generada durante la ejecucion del query
+	  * @throws ParseException atrapa la excepcion generada por al parsear de string a double
+	  * @return systCode regresa lo que obtiene de ejecutar el query
+	  */
 	public String getConsultaOtrosPaises(String grupo, String nombreInterfaz, String fechaConsumo)
-			throws SQLException, ParseException {
+			throws Exception {
 
 		Statement sta = con.createStatement();
+		
 
 		double sumatoriaNomValCur;
 		double sumatoriaCer;
