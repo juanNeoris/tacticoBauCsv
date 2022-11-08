@@ -83,7 +83,7 @@ public class ConfigProperties {
 			// Carga propiedades de archivo properties
 			prop.load(input);
 		} catch (IOException ex) {
-			conexionFtp conFtp = new conexionFtp();
+			ConexionFtp conFtp = new ConexionFtp();
 			// Excepción para generar un fichero con un log de información de error de
 			// conexión
 			try {

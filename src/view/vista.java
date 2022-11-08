@@ -11,7 +11,7 @@ import conexion.Conexion;
 
 import validacion.Validaficheros;
 import interfaz.CsvToExcel;
-import sftp.conexionFtp;
+import sftp.ConexionFtp;
 import util.ConstantsUtil;
 
 import javax.swing.JButton;
@@ -76,7 +76,7 @@ public class vista extends JFrame {
 	public final static JProgressBar progressBar = new JProgressBar();
 	public static final DecimalFormat DFORMATO = new DecimalFormat("###,###,###.##");
 
-	conexionFtp cone = new conexionFtp();
+	ConexionFtp cone = new ConexionFtp();
 
 	/**
 	 * Launch the application.
@@ -198,7 +198,7 @@ public class vista extends JFrame {
 						String grupo = textField.getText();
 						conection.conecGBO();
 						String res = conection.getConsultaMexico(grupo, nombreInterfaz, date);
-						String res2 = conection.getConsultaOtrosPaises(grupo, nombreInterfaz, date);
+						conection.getConsultaOtrosPaises(grupo, nombreInterfaz, date);
 
 						if (res.equals("No existen registros para este grupo en la interfaz CONSULTA")) {
 							textField_1.setText("No se encontro el grupo");
@@ -387,7 +387,7 @@ public class vista extends JFrame {
 								esperar(5);
 								textField_1.setText("Insumos reprocesados, indique grupo.");
 								textField_1.update(textField_1.getGraphics());
-							} catch (ParseException  e1) {
+							} catch (ParseException e1) {
 
 								LOGGER.info(e1);
 							}
@@ -420,11 +420,13 @@ public class vista extends JFrame {
 	 * Pausa la ejecución durante X segundos.
 	 * 
 	 * @param segundos El número de segundos que se quiere esperar.
-	 * @throws InterruptedException excepcion generada durante la ejecucion del metodo 
+	 * @throws InterruptedException excepcion generada durante la ejecucion del
+	 *                              metodo
 	 */
-	public static void esperar(int segundos)  {
+	public static void esperar(int segundos) {
 		try {
-			Thread.sleep(segundos * 1000);
+
+			Thread.sleep(5000);
 		} catch (InterruptedException e) {
 			LOGGER.info(e);
 		}
