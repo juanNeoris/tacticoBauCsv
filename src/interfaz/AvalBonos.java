@@ -85,8 +85,7 @@ public class AvalBonos {
 	 * @throws Exception error en execucion
 	 */
 
-	public void bonos(String grupo, String fechaConsumo, String systCode, String rsGetString4, String rsGetString14,
-			String rsGetString6, String rsGetString7, String rsGetString9, String rsGetString10, String rsGetString11)
+	public void bonos(String fechaConsumo, String systCode, String rsGetString4, String rsGetString14, String rsGetString9, String rsGetString10, String rsGetString11)
 			throws Exception {
 		Conexion conexion = new Conexion();
 
@@ -97,7 +96,7 @@ public class AvalBonos {
 		mexicoBonos.add(systCode);
 		// se consulta la contraparte y se coloca debajo de su operacion
 		conexion.conecGBO();
-		info = conexion.getContraparte(grupo, fechaConsumo, rsGetString4, rsGetString14, rsGetString6, rsGetString7);
+		info = conexion.getContraparte(fechaConsumo, rsGetString4, rsGetString14);
 		mexicoBonos.addAll(info);
 
 		info.clear();

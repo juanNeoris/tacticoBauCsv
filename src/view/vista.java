@@ -9,7 +9,7 @@ import com.jcraft.jsch.SftpException;
 
 import conexion.Conexion;
 
-import ficheros.Validaficheros;
+import validacion.Validaficheros;
 import interfaz.CsvToExcel;
 import sftp.conexionFtp;
 import util.ConstantsUtil;
@@ -112,20 +112,15 @@ public class vista extends JFrame {
 					conection.conecGBO();
 					textField_1.setText("Validando su conexón espere...");
 					textField_1.update(textField_1.getGraphics());
-					Thread.sleep(5000);
+					esperar(5);
 
 					victoria = conection.getCargaVictoria();
 					dolphing = conection.getCargaDolphing();
 
 				} catch (Exception e2) {
-					try {
-						textField_1.setText(ERROR_VPN);
-						textField_1.update(textField_1.getGraphics());
-						Thread.sleep(5000);
-						System.exit(ABORT);
-					} catch (Exception e3) {
-						e3.getMessage();
-					}
+					textField_1.setText(ERROR_VPN);
+					textField_1.update(textField_1.getGraphics());
+					esperar(5);
 				}
 
 				if (victoria.equals("No hay ultima carga") || dolphing.equals("No hay ultima carga")) {
@@ -134,7 +129,7 @@ public class vista extends JFrame {
 						String res = Validaficheros.validaFicherosDolphinVictoria(dateChooser.getDate().getTime());
 						textField_1.setText(res);
 						textField_1.update(textField_1.getGraphics());
-						Thread.sleep(5000);
+						esperar(5);
 						cone.tranferirArchivos(dateChooser.getDate().getTime());
 
 					} catch (InterruptedException | SftpException | IllegalAccessException | RuntimeException
@@ -148,7 +143,7 @@ public class vista extends JFrame {
 						String res = Validaficheros.validaFicherosDolphinVictoria(dateChooser.getDate().getTime());
 						textField_1.setText(res);
 						textField_1.update(textField_1.getGraphics());
-						Thread.sleep(5000);
+						esperar(5);
 						cone.tranferirArchivos(dateChooser.getDate().getTime());
 					} catch (InterruptedException | SftpException | IllegalAccessException | RuntimeException
 							| JSchException | IOException e1) {
@@ -164,17 +159,13 @@ public class vista extends JFrame {
 						Date dolphingCr = sdf.parse(dolphing);
 						String dolphingfrt = ConstantsUtil.sdf2.format(dolphingCr);
 
-						try {
-							textField_1.setText(
-									"Ultima carga victoria: " + victoriafrt + " dolphing: " + dolphingfrt + "");
-							textField_1.update(textField_1.getGraphics());
-							Thread.sleep(5000);
+						textField_1.setText("Ultima carga victoria: " + victoriafrt + " dolphing: " + dolphingfrt + "");
+						textField_1.update(textField_1.getGraphics());
 
-							textField_1.setText("Insumos cargados, indique grupo.");
-							textField_1.update(textField_1.getGraphics());
-						} catch (InterruptedException e1) {
-							LOGGER.info(e1);
-						}
+						esperar(5);
+						textField_1.setText("Insumos cargados, indique grupo.");
+						textField_1.update(textField_1.getGraphics());
+
 					} catch (ParseException e3) {
 						e3.printStackTrace();
 					}
@@ -212,10 +203,10 @@ public class vista extends JFrame {
 						if (res.equals("No existen registros para este grupo en la interfaz CONSULTA")) {
 							textField_1.setText("No se encontro el grupo");
 							textField_1.update(textField_1.getGraphics());
-							Thread.sleep(3000);
+							esperar(5);
 							textField_1.setText("No se puede crear interfaz vacia");
 							textField_1.update(textField_1.getGraphics());
-							Thread.sleep(3000);
+							esperar(5);
 							textField_1.setText("Proceso finalizado, indique grupo");
 							textField_1.update(textField_1.getGraphics());
 						} else {
@@ -247,8 +238,6 @@ public class vista extends JFrame {
 							File directorio = new File(directoryName + "\\" + grupo + "-" + Empresa + "\\" + anio + "\\"
 									+ mesnum + " ) " + last3 + "\\" + part1 + ".xls");
 
-							System.out.println("file:" + directorio);
-
 							if (!directorio.exists()) {
 								progressBar.setValue(0);
 								CsvToExcel.csvToExcel(nombreInterfaz, grupo, date);
@@ -273,19 +262,10 @@ public class vista extends JFrame {
 						textField_1.update(textField_1.getGraphics());
 					}
 				} catch (Exception e1) {
-
-					try {
-						Thread.sleep(2000);
-						textField_1.setText("No se pudo generar la interfaz CONSULTA");
-						textField_1.update(textField_1.getGraphics());
-					} catch (InterruptedException e2) {
-						LOGGER.info(e2);
-						System.out.println("error :" + e2);
-						System.out.println("error :" + e2.getStackTrace());
-					}
-					System.out.println("error :" + e1);
+					esperar(5);
+					textField_1.setText("No se pudo generar la interfaz CONSULTA");
+					textField_1.update(textField_1.getGraphics());
 					LOGGER.info(e1);
-					System.out.println("error :" + e1.getLocalizedMessage() + e1.getMessage() );
 				}
 
 			}
@@ -356,20 +336,18 @@ public class vista extends JFrame {
 							victoria = conection.getCargaVictoriaHistorico(date);
 							dolphing = conection.getCargaDolphingHistorico(date);
 						} catch (Exception e2) {
-							try {
-								textField_1.setText(ERROR_VPN);
-								textField_1.update(textField_1.getGraphics());
-								Thread.sleep(5000);
-								System.exit(ABORT);
-							} catch (Exception e3) {
-								e3.getMessage();
-							}
+
+							textField_1.setText(ERROR_VPN);
+							textField_1.update(textField_1.getGraphics());
+							esperar(5);
+
 						}
 
 						if (victoria.equals("No hay ultima carga") || dolphing.equals("No hay ultima carga")) {
 
 							try {
-								String res = Validaficheros.validaFicherosDolphinVictoria(dateChooser.getDate().getTime());
+								String res = Validaficheros
+										.validaFicherosDolphinVictoria(dateChooser.getDate().getTime());
 								textField_1.setText(res);
 								textField_1.update(textField_1.getGraphics());
 								Thread.sleep(5000);
@@ -385,7 +363,7 @@ public class vista extends JFrame {
 										.validaFicherosDolphinVictoria(dateChooser.getDate().getTime());
 								textField_1.setText(res);
 								textField_1.update(textField_1.getGraphics());
-								Thread.sleep(5000);
+								esperar(5);
 								cone.tranferirArchivos(dateChooser.getDate().getTime());
 							} catch (InterruptedException | SftpException | IllegalAccessException | RuntimeException
 									| JSchException | IOException e1) {
@@ -405,11 +383,11 @@ public class vista extends JFrame {
 								textField_1.setText(
 										"Ultima carga Victoria: " + victoriafrt + " Dolphing: " + dolphingfrt + "");
 								textField_1.update(textField_1.getGraphics());
-								Thread.sleep(5000);
 
+								esperar(5);
 								textField_1.setText("Insumos reprocesados, indique grupo.");
 								textField_1.update(textField_1.getGraphics());
-							} catch (InterruptedException | ParseException e1) {
+							} catch (ParseException  e1) {
 
 								LOGGER.info(e1);
 							}
@@ -436,6 +414,20 @@ public class vista extends JFrame {
 		progressBar.setBounds(10, 143, 321, 14);
 		f.getContentPane().add(progressBar);
 		f.setVisible(true);
+	}
+
+	/**
+	 * Pausa la ejecución durante X segundos.
+	 * 
+	 * @param segundos El número de segundos que se quiere esperar.
+	 * @throws InterruptedException excepcion generada durante la ejecucion del metodo 
+	 */
+	public static void esperar(int segundos)  {
+		try {
+			Thread.sleep(segundos * 1000);
+		} catch (InterruptedException e) {
+			LOGGER.info(e);
+		}
 	}
 
 }

@@ -11,8 +11,6 @@ import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpException;
 
 import conexion.SSHConnector;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -26,7 +24,8 @@ import java.util.Properties;
 import sftp.conexionFtp;
 import view.vista;
 
-/*
+import org.apache.log4j.Logger;
+/**
  * Clase que establece la conexion SFTP 
  * con el servidor de GBO y tranfiere
  * los archivos RTRA 
@@ -34,15 +33,18 @@ import view.vista;
 
 public class conexionFtp {
 
-	private static final Logger logger = LogManager.getLogger(conexionFtp.class);
+	
+	private static final Logger LOGGER = Logger.getLogger(conexionFtp.class.getName());
 
 	// Inicia una variable de tipo sftp.session para poder realizar operaciones de
 	// tipo sftp
 	private static Session session;
-	static ConfigProperties confPro = new ConfigProperties();
+	public ConfigProperties confPro = new ConfigProperties();
 
-	/*
+	/**
 	 * Metodo que valida la conexion SFTP
+	 * @throws JSchException excepcion genera al conectarce por SSH
+	 * @throws IllegalAccessException generada si la conexion ya fue establecida
 	 */
 	public void conn() throws JSchException, IllegalAccessException {
 
@@ -65,40 +67,55 @@ public class conexionFtp {
 				java.util.Properties config = new java.util.Properties();
 				config.put("StrictHostKeyChecking", "no");
 				session.setConfig(config);
-				logger.info("conexion con key activa");
+				LOGGER.info("conexion con key activa");
 			}
+			/**
+			 * conexion exitosa 
+			 */
 			this.session.connect();
-			logger.info("Sftp connected");
+			LOGGER.info("Sftp connected");
 		} else {
 			throw new IllegalAccessException("Sesión sftp ya establecida.");
 		}
 	}
 
-	/*
+	/**
 	 * Metodo que cierra la conexion SFTP
 	 */
 	public final void closeConn() {
 		this.session.disconnect();
-		logger.info("Sftp disconnected");
+		LOGGER.info("Sftp disconnected");
 	}
 
-	/*
+	/**
 	 * Metodo que realiza la Tranferencia de los archivos SFTP
 	 * 
-	 * @param fecha
+	 * @param time se aplicaran distrintos formatos para realizar validaciones ejecucion y tranferencias
+	 * @throws SftpException generada al realizar conexion sftp 
+	 * @throws JSchException excepcion genera al conectarce por SSH
+	 * @throws IOException generada durante la ejecucion del metodo
+	 * @throws InterruptedException generada durante la tranferencia o ejecucion 
+	 * @throws IllegalAccessException genera por errores en las credenciales de conexion
+	 * 
 	 */
 	public void tranferirArchivos(long time)
 			throws SftpException, IllegalAccessException, JSchException, IOException, InterruptedException {
 
+		/**
+		 * se aplican los formatos 
+		 * a la fecha obtenida desde la interfaz 
+		 * para transferir los arhivos al servidor 
+		 * de GBO
+		 * para realizar la ejecucion del shell 
+		 * que carga los RTRA
+		 * validar si la carga ha sido exitosa 
+		 * 
+		 */
 		SimpleDateFormat sdf = new SimpleDateFormat("ddMMyyyy");
 		String date = sdf.format(time);
 		SimpleDateFormat sdfRtra = new SimpleDateFormat("yyyyMMdd");
 		String dateShelRTRA = sdfRtra.format(time);
 		String dateShelRTRALog = DateTimeFormatter.ofPattern("MMMdd", Locale.ENGLISH).format(LocalDateTime.now());
-
-		System.out.println("date :" + date);
-		System.out.println("dateShelRTRA :" + dateShelRTRA);
-		System.out.println("dateShelRTRALog :" + dateShelRTRALog);
 
 		confPro.createVar();
 		JSch jsch = new JSch();
@@ -106,7 +123,7 @@ public class conexionFtp {
 		 * Carga rtra victoria dolphing
 		 *********************************************************************/
 
-		/*
+		/**
 		 * conexion por SSH para la ejecucion del shell que realizara la carga de los
 		 * archivos rtra victoria y dolphing.
 		 */
@@ -127,7 +144,11 @@ public class conexionFtp {
 			session.setConfig(config);
 
 			session.connect(10000);
-
+			/**
+			 * se establece la conexion al servidor de GBO 
+			 * se realiza el put desde un fileshare a la ruta
+			 * /planPGTMEX/procesos/RISK/interfaces
+			 */
 			Channel channel = session.openChannel("sftp");
 			channel.connect(50000);
 			ChannelSftp sftpChannel = (ChannelSftp) channel;
@@ -142,7 +163,7 @@ public class conexionFtp {
 			sftpChannel.exit();
 			sftpChannel.disconnect();
 
-			/*
+			/**
 			 * establecemos las variables de conexion se valida que existan las interfaces
 			 * en la ruta: /planPGTMEX/procesos/RISK/interfaces
 			 */
@@ -162,22 +183,26 @@ public class conexionFtp {
 				Thread.sleep(3000);
 
 			} else {
-
+				/**
+				 * se realiza la ejecucion del shell
+				 * que carga los RTRA a la BBDD de GBO
+				 */
 				String result = sshConnector
 						.executeCommand("cd /planPGTMEX/procesos/RISK/;./cargartrabau.sh " + date + "");
 			}
 
-			/*
+			/**
 			 * Se validan los logs si el proceso termino de manera exitosa
+			 * , se cargo de manera incompleta o no se cargo 
 			 */
 			String resultLogs = sshConnector.executeCommand("cd /planPGTMEX/procesos/RISK/salidas/" + dateShelRTRALog
 					+ "/cargartrabau.sh; ls -ltr cargartrabau.sh.out");
 			String resultLogsVictoria = sshConnector.executeCommand("cd /planPGTMEX/procesos/RISK/salidas/"
 					+ dateShelRTRALog + "/cargartrabau.sh; ls -ltr interfazVictoria.bad");
 
-			/*
+			/**
 			 * Se borran las interfaces de la ruta: /planPGTMEX/procesos/RISK/salidas/ una
-			 * vez que han sido cargadas de manea exitosa
+			 * vez que han sido cargadas de manera exitosa
 			 */
 
 			sshConnector
@@ -188,7 +213,10 @@ public class conexionFtp {
 							+ dateShelRTRA + ".txt ");
 
 			sshConnector.disconnect();
-
+			/**
+			 * se imprimen los mensajes de las 
+			 * validaciones anteriormente echas
+			 */
 			if (!resultLogsVictoria.isEmpty()) {
 				vista.textField_1.setText("Carga parcial archivo con registros erroneos ");
 				vista.textField_1.update(vista.textField_1.getGraphics());
@@ -208,24 +236,23 @@ public class conexionFtp {
 				vista.textField_1.setText("No se pudo realizar la carga de archivos RTRA's");
 				vista.textField_1.update(vista.textField_1.getGraphics());
 				Thread.sleep(4000);
-
+				LOGGER.info("Problemas en SFTP" + e1);
 			} catch (RuntimeException e) {
-				logger.info("Problemas en SFTP" + e);
+				LOGGER.info("Problemas en SFTP" + e);
 			}
 
 		}
 
 	}
 
-	/*
+	/**
 	 * Genera el archivo log que mostrara si se genero o no un problmea en la
 	 * conexion SFTP
 	 * 
-	 * @param nombreFichero
-	 * 
-	 * @param datosAEscribir
-	 * 
-	 * @return fichero
+	 * @param nombreFichero que servira como log del la transferencia 
+	 * @param datosAEscribir el mensaje en si generado 
+	 * @return fichero archivo final generado 
+	 * @throws IOException generada durante la ejecucion del metodo
 	 */
 	public boolean makeFichero(String nombreFichero, String datosAEscribir) throws IOException {
 		String formatoFecha = "yyyy_MM_dd-hh_mm_ss";
@@ -238,13 +265,12 @@ public class conexionFtp {
 		return fichero.createNewFile();
 	}
 
-	/*
+	/**
 	 * Genera el archivo log que mostrara si se genero o no un problmea en la
 	 * conexion SFTP
-	 * 
-	 * @param nombreFichero
-	 * 
-	 * @param datosAEscribir
+	 * @param nombreFichero que servira como log del la transferencia
+	 * @param datosAEscribir el mensaje en si generado 
+	 * @throws IOException generada durante la ejecucion del metodo
 	 */
 
 	private void escribeArchivo(String rutaCompletaFichero, String datosAEscribir) throws IOException {
@@ -255,13 +281,10 @@ public class conexionFtp {
 
 	}
 
-	/*
+	/**
 	 * Genera el archivo log que mostrara si se genero o no un problmea en la
 	 * conexion SFTP
-	 * 
-	 * @param nombreFichero
-	 * 
-	 * @param datosAEscribir
+	 * @return ruta con los datos del servidor
 	 */
 	public String datosServidor() {
 		ConfigProperties confPro = new ConfigProperties();

@@ -1,4 +1,4 @@
-package ficheros;
+package validacion;
 
 import java.io.File;
 import java.text.SimpleDateFormat;

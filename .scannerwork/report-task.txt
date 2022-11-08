@@ -2,5 +2,5 @@ projectKey=TacticoBAU:TacticoBAU
 serverUrl=http://localhost:9000
 serverVersion=8.9.6.50800
 dashboardUrl=http://localhost:9000/dashboard?id=TacticoBAU%3ATacticoBAU
-ceTaskId=AYRKk8kl_RNQV-0_JtM5
-ceTaskUrl=http://localhost:9000/api/ce/task?id=AYRKk8kl_RNQV-0_JtM5
+ceTaskId=AYRTI4nC_RNQV-0_JtNT
+ceTaskUrl=http://localhost:9000/api/ce/task?id=AYRTI4nC_RNQV-0_JtNT
