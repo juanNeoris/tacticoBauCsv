@@ -21,7 +21,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Properties;
-import sftp.ConexionFtp;
 import view.vista;
 
 import org.apache.log4j.Logger;
@@ -41,7 +40,7 @@ public class ConexionFtp {
 	/**
 	 * Se crea la instancia que carga los archivos Properties
 	 */
-	public ConfigProperties confPro = new ConfigProperties();
+	private ConfigProperties confPro = new ConfigProperties();
 
 	/**
 	 * Metodo que valida la conexion SFTP
@@ -103,9 +102,7 @@ public class ConexionFtp {
 	 *                                conexion
 	 * 
 	 */
-	public void tranferirArchivos(long time)
-			throws SftpException, IllegalAccessException, JSchException, IOException, InterruptedException {
-
+	public void tranferirArchivos(long time) {
 		/**
 		 * se aplican los formatos a la fecha obtenida desde la interfaz para transferir
 		 * los arhivos al servidor de GBO para realizar la ejecucion del shell que carga
@@ -128,8 +125,8 @@ public class ConexionFtp {
 		 * conexion por SSH para la ejecucion del shell que realizara la carga de los
 		 * archivos rtra victoria y dolphing.
 		 */
-		vista.textField_1.setText("Sin carga, cargando victoria y dolphing, espere...");
-		vista.textField_1.update(vista.textField_1.getGraphics());
+		vista.textField1.setText("Sin carga, cargando victoria y dolphing, espere...");
+		vista.textField1.update(vista.textField1.getGraphics());
 
 		try {
 			/**
@@ -137,19 +134,19 @@ public class ConexionFtp {
 			 * validemos que existen en la ruta
 			 */
 
-			Session session = jsch.getSession(confPro.getUsuario(), confPro.getHost(), confPro.getPuerto());
-			session.setPassword(confPro.getPassword());
+			Session sesion = jsch.getSession(confPro.getUsuario(), confPro.getHost(), confPro.getPuerto());
+			sesion.setPassword(confPro.getPassword());
 
 			Properties config = new Properties();
 			config.put("StrictHostKeyChecking", "no");
-			session.setConfig(config);
+			sesion.setConfig(config);
 
-			session.connect(10000);
+			sesion.connect(10000);
 			/**
 			 * se establece la conexion al servidor de GBO se realiza el put desde un
 			 * fileshare a la ruta /planPGTMEX/procesos/RISK/interfaces
 			 */
-			Channel channel = session.openChannel("sftp");
+			Channel channel = sesion.openChannel("sftp");
 			channel.connect(50000);
 			ChannelSftp sftpChannel = (ChannelSftp) channel;
 			sftpChannel.put(
@@ -178,16 +175,15 @@ public class ConexionFtp {
 							+ dateShelRTRA + ".txt ");
 
 			if (resultVic.isEmpty() && resultDolp.isEmpty()) {
-				vista.textField_1.setText("No existen tus ficheros RTRA's en el FileShare");
-				vista.textField_1.update(vista.textField_1.getGraphics());
+				vista.textField1.setText("No existen tus ficheros RTRA's en el FileShare");
+				vista.textField1.update(vista.textField1.getGraphics());
 				Thread.sleep(3000);
 
 			} else {
 				/**
 				 * se realiza la ejecucion del shell que carga los RTRA a la BBDD de GBO
 				 */
-				String result = sshConnector
-						.executeCommand("cd /planPGTMEX/procesos/RISK/;./cargartrabau.sh " + date + "");
+				sshConnector.executeCommand("cd /planPGTMEX/procesos/RISK/;./cargartrabau.sh " + date + "");
 			}
 
 			/**
@@ -216,26 +212,27 @@ public class ConexionFtp {
 			 * se imprimen los mensajes de las validaciones anteriormente echas
 			 */
 			if (!resultLogsVictoria.isEmpty()) {
-				vista.textField_1.setText("Carga parcial archivo con registros erroneos ");
-				vista.textField_1.update(vista.textField_1.getGraphics());
+				vista.textField1.setText("Carga parcial archivo con registros erroneos ");
+				vista.textField1.update(vista.textField1.getGraphics());
 
 			} else if (resultLogs.isEmpty()) {
-				vista.textField_1.setText("Ocurrio un problema al cargar los RTRA's");
-				vista.textField_1.update(vista.textField_1.getGraphics());
+				vista.textField1.setText("Ocurrio un problema al cargar los RTRA's");
+				vista.textField1.update(vista.textField1.getGraphics());
 				Thread.sleep(4000);
 
 			} else {
-				vista.textField_1.setText("Proceso finalizado, indique grupo");
-				vista.textField_1.update(vista.textField_1.getGraphics());
+				vista.textField1.setText("Proceso finalizado, indique grupo");
+				vista.textField1.update(vista.textField1.getGraphics());
 			}
 
-		} catch (RuntimeException e1) {
+		} catch (RuntimeException | JSchException | IllegalAccessException | IOException | SftpException
+				| InterruptedException e1) {
 			try {
-				vista.textField_1.setText("No se pudo realizar la carga de archivos RTRA's");
-				vista.textField_1.update(vista.textField_1.getGraphics());
+				vista.textField1.setText("No se pudo realizar la carga de archivos RTRA's");
+				vista.textField1.update(vista.textField1.getGraphics());
 				Thread.sleep(4000);
 				LOGGER.info("Problemas en SFTP" + e1);
-			} catch (RuntimeException e) {
+			} catch (RuntimeException | InterruptedException e) {
 				LOGGER.info("Problemas en SFTP" + e);
 			}
 
@@ -273,15 +270,12 @@ public class ConexionFtp {
 	 */
 
 	private void escribeArchivo(String rutaCompletaFichero, String datosAEscribir) throws IOException {
-		FileWriter fichero = new FileWriter(rutaCompletaFichero);
-		try {
-			
-			fichero.write(datosAEscribir);
 
+		try (FileWriter fichero = new FileWriter(rutaCompletaFichero)) {
+			fichero.write(datosAEscribir);
+			
 		} catch (IOException e) {
 			LOGGER.info("Problemas escribir archivo" + e);
-		} finally {
-			fichero.close();
 		}
 
 	}
@@ -293,7 +287,7 @@ public class ConexionFtp {
 	 * @return ruta con los datos del servidor
 	 */
 	public String datosServidor() {
-		ConfigProperties confPro = new ConfigProperties();
+
 		confPro.createVar();
 		String tipoConexion = "Password";
 

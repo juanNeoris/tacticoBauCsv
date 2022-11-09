@@ -2,33 +2,22 @@ package view;
 
 import java.awt.EventQueue;
 import javax.swing.JFrame;
-
-import com.jcraft.jsch.JSchException;
-
-import com.jcraft.jsch.SftpException;
-
 import conexion.Conexion;
-
 import validacion.Validaficheros;
 import interfaz.CsvToExcel;
 import sftp.ConexionFtp;
 import util.ConstantsUtil;
-
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JProgressBar;
 import javax.swing.JTextField;
-
 import org.apache.log4j.Logger;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -37,9 +26,7 @@ import java.awt.Toolkit;
 import java.awt.SystemColor;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-
 import java.io.File;
-import java.io.IOException;
 import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -51,35 +38,28 @@ public class vista extends JFrame {
 	 * 
 	 */
 
+	public final static JProgressBar progressBar = new JProgressBar();
+	public static final JTextField textField1 = new JTextField();
 	private static final Logger LOGGER = Logger.getLogger(vista.class.getName());
-
 	private static final long serialVersionUID = 1L;
-
+	private static final String ERROR_VPN = "No se pudo establecer la conexion, valide su VPN";
 	private JTextField textField;
-
 	private JDateChooser dateChooser = new JDateChooser();
 	Date date = new Date();
-	String username = "deupgbom";
-	String host = "180.181.37.37";
-	Conexion conection = new Conexion();
-	String cartera = null;
-	String contrapartida = null;
-	String msj = "";
-	public static JTextField textField_1;
+	private Conexion conection = new Conexion();
 	String dolphing = null;
 	String victoria = null;
-
-	String dt2 = ConstantsUtil.sdf3.format(new Date());
-	String dn2 = System.getProperty("user.dir");
-
-	private static final String ERROR_VPN = "No se pudo establecer la conexion, valide su VPN";
-	public final static JProgressBar progressBar = new JProgressBar();
-	public static final DecimalFormat DFORMATO = new DecimalFormat("###,###,###.##");
-
-	ConexionFtp cone = new ConexionFtp();
+	
 
 	/**
-	 * Launch the application.
+	 * se instancia la conexion SFTP que realizara la tranferencia y carga de los
+	 * archivos RTRA
+	 */
+	private ConexionFtp cone = new ConexionFtp();
+
+	/**
+	 * realiza la ejecucion del java
+	 * 
 	 */
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -96,7 +76,9 @@ public class vista extends JFrame {
 	}
 
 	/**
-	 * Create the frame.
+	 * Create la interfaz grafica con 
+	 * la que va a interactuar el usuario.
+	 * 
 	 */
 	public vista() {
 		JFrame f = new JFrame("Táctico BAU ");
@@ -107,64 +89,56 @@ public class vista extends JFrame {
 
 				SimpleDateFormat sdf = new SimpleDateFormat("ddMMyyyy");
 				String date = sdf.format(dateChooser.getDate().getTime());
-
+				/**
+				 * Se valida la 
+				 * conexion a la BBDD
+				 * se puede generar errores
+				 * por no estar coenectado a la VPN  
+				 */
 				try {
-					conection.conecGBO();
-					textField_1.setText("Validando su conexón espere...");
-					textField_1.update(textField_1.getGraphics());
-					esperar(5);
-
+					textField1.setText("Validando su conexón espere...");
+					textField1.update(textField1.getGraphics());
+					esperar();
+					conection.conecGBO();			
 					victoria = conection.getCargaVictoria();
 					dolphing = conection.getCargaDolphing();
 
 				} catch (Exception e2) {
-					textField_1.setText(ERROR_VPN);
-					textField_1.update(textField_1.getGraphics());
-					esperar(5);
+					textField1.setText(ERROR_VPN);
+					textField1.update(textField1.getGraphics());
+					esperar();
 				}
-
-				if (victoria.equals("No hay ultima carga") || dolphing.equals("No hay ultima carga")) {
-
-					try {
-						String res = Validaficheros.validaFicherosDolphinVictoria(dateChooser.getDate().getTime());
-						textField_1.setText(res);
-						textField_1.update(textField_1.getGraphics());
-						esperar(5);
-						cone.tranferirArchivos(dateChooser.getDate().getTime());
-
-					} catch (InterruptedException | SftpException | IllegalAccessException | RuntimeException
-							| JSchException | IOException e1) {
-						LOGGER.info(e1);
-					}
-
-				} else if (!date.trim().equals(victoria.trim()) || !date.trim().equals(dolphing.trim())) {
-
-					try {
-						String res = Validaficheros.validaFicherosDolphinVictoria(dateChooser.getDate().getTime());
-						textField_1.setText(res);
-						textField_1.update(textField_1.getGraphics());
-						esperar(5);
-						cone.tranferirArchivos(dateChooser.getDate().getTime());
-					} catch (InterruptedException | SftpException | IllegalAccessException | RuntimeException
-							| JSchException | IOException e1) {
-						LOGGER.info(e1);
-					}
-
+				/**
+				 * valida las cargas en cuanto
+				 * se ejecuta el jar de no tener informacion 
+				 * realizara las validacion de los fichero y despues su carga
+				 */
+				if (victoria.equals(ConstantsUtil.NOCARGA) || dolphing.equals(ConstantsUtil.NOCARGA)
+						|| !date.trim().equals(victoria.trim()) || !date.trim().equals(dolphing.trim())) {
+					String res = Validaficheros.validaFicherosDolphinVictoria(dateChooser.getDate().getTime());
+					textField1.setText(res);
+					textField1.update(textField1.getGraphics());
+					esperar();
+					cone.tranferirArchivos(dateChooser.getDate().getTime());
 				} else {
 					try {
-						// Parsea la fecha que viene de la consulta sql y la muestra en el textField_1
+						/**
+						 * valida la carga de los RTRA
+						 * en cuanto se ejecuta el 
+						 * jar y lo mostrara en el textfiel
+						 */
 						Date victoriaCr = sdf.parse(victoria);
 						String victoriafrt = ConstantsUtil.sdf2.format(victoriaCr);
 
 						Date dolphingCr = sdf.parse(dolphing);
 						String dolphingfrt = ConstantsUtil.sdf2.format(dolphingCr);
 
-						textField_1.setText("Ultima carga victoria: " + victoriafrt + " dolphing: " + dolphingfrt + "");
-						textField_1.update(textField_1.getGraphics());
+						textField1.setText("Ultima carga victoria: " + victoriafrt + " dolphing: " + dolphingfrt + "");
+						textField1.update(textField1.getGraphics());
 
-						esperar(5);
-						textField_1.setText("Insumos cargados, indique grupo.");
-						textField_1.update(textField_1.getGraphics());
+						esperar();
+						textField1.setText("Insumos cargados, indique grupo.");
+						textField1.update(textField1.getGraphics());
 
 					} catch (ParseException e3) {
 						e3.printStackTrace();
@@ -176,7 +150,9 @@ public class vista extends JFrame {
 				.getImage("C:\\Users\\z363772\\Downloads\\bau\\tacticoBAU\\sources\\santecLogo.png"));
 		f.setSize(357, 338);
 		f.getContentPane().setLayout(null);
-
+        /**
+         * Boton GENERAR RTRA detona el proceso 
+         */
 		JButton btnNewButton_1 = new JButton("GENERAR RTRA");
 		btnNewButton_1.setBackground(Color.LIGHT_GRAY);
 		btnNewButton_1.addActionListener(new ActionListener() {
@@ -185,42 +161,60 @@ public class vista extends JFrame {
 				String date = sdf.format(dateChooser.getDate().getTime());
 				progressBar.setValue(0);
 				progressBar.update(progressBar.getGraphics());
-				/*********************************************************
-				 * Genera interfaces REC, CER y CONSULTA
-				 *************************************************************/
+				/**
+				 * proceso que genera la interfaz 
+				 * mediante la ejecucion del query 
+				 * y validacion  de los intrumentos 
+				 * 
+				 */
 
 				try {
-					// Valida si el grupo esta vacio.
+					/**
+					 * 
+					 * Valida si el grupo esta vacio.
+					 * de lo contrario no generar la interfaz
+					 */
 					if (!textField.getText().isEmpty()) {
-						textField_1.setText("Generando RTRA");
-						textField_1.update(textField_1.getGraphics());
+						textField1.setText("Generando RTRA");
+						textField1.update(textField1.getGraphics());
 						String nombreInterfaz = date + "_" + "rtra" + "_" + textField.getText() + "-" + "TEMP" + ".csv";
 						String grupo = textField.getText();
 						conection.conecGBO();
 						String res = conection.getConsultaMexico(grupo, nombreInterfaz, date);
 						conection.getConsultaOtrosPaises(grupo, nombreInterfaz, date);
-
+						/**
+						 * se valida si el grupo
+						 * que se esta consultando 
+						 * tiene informacion en la BBDD
+						 * de no ser asi la interfaz no
+						 * se puede generar vacia 
+						 */
 						if (res.equals("No existen registros para este grupo en la interfaz CONSULTA")) {
-							textField_1.setText("No se encontro el grupo");
-							textField_1.update(textField_1.getGraphics());
-							esperar(5);
-							textField_1.setText("No se puede crear interfaz vacia");
-							textField_1.update(textField_1.getGraphics());
-							esperar(5);
-							textField_1.setText("Proceso finalizado, indique grupo");
-							textField_1.update(textField_1.getGraphics());
+							textField1.setText("No se encontro el grupo");
+							textField1.update(textField1.getGraphics());
+							esperar();
+							textField1.setText("No se puede crear interfaz vacia");
+							textField1.update(textField1.getGraphics());
+							esperar();
+							textField1.setText("Proceso finalizado, indique grupo");
+							textField1.update(textField1.getGraphics());
 						} else {
 
+							/**
+							 * parte que implementara los Estilos 
+							 * a la primera interfaz generada 
+							 * csv se enviara el archivo csv 
+							 * y la fecha 
+							 */
 							Date miFecha = new SimpleDateFormat("ddMMyyyy").parse(date);
 
-							// creo un calendario
+							/**
+							 * se aplican formatos a la fecha 
+							 * para generar el nombre de nuestra interfaz
+							 */
 							Calendar calendario = Calendar.getInstance();
-							// establezco mi fecha
 							calendario.setTime(miFecha);
-
-							// obtener el año
 							int anio = calendario.get(Calendar.YEAR);
-							// obtener el mes (0-11 ::: enero es 0 y diciembre es 11)
 							int mes = calendario.get(Calendar.MONTH);
 							Calendar cal = Calendar.getInstance();
 							cal.setTime(new Date());
@@ -234,7 +228,11 @@ public class vista extends JFrame {
 
 							String[] interfazExle = nombreInterfaz.split("\\-");
 							String part1 = interfazExle[0];
-
+							/**
+							 * se genera el nombre de la interfaz final 
+							 * que contendra la informacion ya con 
+							 * los estilos requeridos por el Usuario
+							 */
 							File directorio = new File(directoryName + "\\" + grupo + "-" + Empresa + "\\" + anio + "\\"
 									+ mesnum + " ) " + last3 + "\\" + part1 + ".xls");
 
@@ -244,12 +242,16 @@ public class vista extends JFrame {
 								String directoryNames = System.getProperty("user.dir");
 								File fichero = new File(directoryNames + "\\" + nombreInterfaz);
 								fichero.delete();
-								textField_1.setText("RTRA Generado con éxito.");
-								textField_1.update(textField_1.getGraphics());
-
+								textField1.setText("RTRA Generado con éxito.");
+								textField1.update(textField1.getGraphics());
+								/**
+								 * se valida si el rtra 
+								 * ya existe y se vuelva a dar clic en generar RTRA 
+								 * por algun error
+								 */
 							} else if (directorio.exists()) {
-								textField_1.setText("RTRA ya existe.");
-								textField_1.update(textField_1.getGraphics());
+								textField1.setText("RTRA ya existe.");
+								textField1.update(textField1.getGraphics());
 								String directoryNames = System.getProperty("user.dir");
 								File fichero = new File(directoryNames + "\\" + nombreInterfaz);
 								fichero.delete();
@@ -257,14 +259,23 @@ public class vista extends JFrame {
 							}
 
 						}
+						/**
+						 * validacion cuando se quiere generar 
+						 * un reporte y el text area de la interfaz 
+						 * esta vacio
+						 */
 					} else {
-						textField_1.setText("No puedes dejar el campo de grupo vacio");
-						textField_1.update(textField_1.getGraphics());
+						textField1.setText("No puedes dejar el campo de grupo vacio");
+						textField1.update(textField1.getGraphics());
 					}
+					/**
+					 * Excepcion generada cuando ocurrio un problema 
+					 * al generar la interfaz 
+					 */
 				} catch (Exception e1) {
-					esperar(5);
-					textField_1.setText("No se pudo generar la interfaz CONSULTA");
-					textField_1.update(textField_1.getGraphics());
+					esperar();
+					textField1.setText("No se pudo generar la interfaz CONSULTA");
+					textField1.update(textField1.getGraphics());
 					LOGGER.info(e1);
 				}
 
@@ -285,7 +296,10 @@ public class vista extends JFrame {
 		JLabel lblNewLabel_1 = new JLabel("Fecha proceso");
 		lblNewLabel_1.setBounds(34, 44, 96, 34);
 		f.getContentPane().add(lblNewLabel_1);
-
+		/**
+		 * boton Salir termina con el proceso 
+		 * inmediatamente en cuanto lo presionan
+		 */
 		JButton btnSalir = new JButton("Salir");
 		btnSalir.setBackground(Color.LIGHT_GRAY);
 		btnSalir.addActionListener(new ActionListener() {
@@ -293,8 +307,8 @@ public class vista extends JFrame {
 				try {
 					System.exit(ABORT);
 				} catch (Exception err) {
-					textField_1.setText("Ocurrio un problema con la aplicación");
-					textField_1.update(textField_1.getGraphics());
+					textField1.setText("Ocurrio un problema con la aplicación");
+					textField1.update(textField1.getGraphics());
 				} finally {
 					System.exit(ABORT);
 				}
@@ -303,10 +317,20 @@ public class vista extends JFrame {
 		btnSalir.setBounds(214, 234, 89, 23);
 		f.getContentPane().add(btnSalir);
 		dateChooser = new JDateChooser();
+		/**
+		 * boton en el calendario 
+		 * que se encargara de 
+		 * realizar un reporceso realizando 
+		 * todas las validaciones como cuando se ejecuta por primera vez
+		 */
 		dateChooser.getCalendarButton().addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				// Al dar doble click sobre el datechooser se dispara el siguiente evento
+				/**
+				 * Evento de doble click 
+				 * que validara cargas en la BBDD en dado 
+				 * caso de ser un reproceso 
+				 */
 				if (e.getClickCount() == 2 && !e.isConsumed()) {
 					SimpleDateFormat sdf = new SimpleDateFormat("ddMMyyyy");
 					String date = sdf.format(dateChooser.getDate().getTime());
@@ -322,71 +346,67 @@ public class vista extends JFrame {
 						e3.printStackTrace();
 					}
 
+					/**
+					 * se valida que el usuario 
+					 * no haga un proceso de un dia siguiente 
+					 * al actual
+					 */
 					if (fechaVal.compareTo(fechaAct) > 0) {
-						// Se valida que no se procese una fecha mayor a la actual
-						textField_1.setText("No puedes procesar fechas mayores a la actual");
-						textField_1.update(textField_1.getGraphics());
+						
+						textField1.setText("No puedes procesar fechas mayores a la actual");
+						textField1.update(textField1.getGraphics());
 					} else {
-
-						/******************************************************
-						 * Realiza reproceso de Dolphing y victoria
-						 ******************************************************/
+						
+						/**
+						 * se instancia la conexion que va a obtener 
+						 * la ultimas cargar
+						 */
 						try {
 							conection.conecGBO();
 							victoria = conection.getCargaVictoriaHistorico(date);
 							dolphing = conection.getCargaDolphingHistorico(date);
 						} catch (Exception e2) {
 
-							textField_1.setText(ERROR_VPN);
-							textField_1.update(textField_1.getGraphics());
-							esperar(5);
+							textField1.setText(ERROR_VPN);
+							textField1.update(textField1.getGraphics());
+							esperar();
 
 						}
 
-						if (victoria.equals("No hay ultima carga") || dolphing.equals("No hay ultima carga")) {
-
-							try {
-								String res = Validaficheros
-										.validaFicherosDolphinVictoria(dateChooser.getDate().getTime());
-								textField_1.setText(res);
-								textField_1.update(textField_1.getGraphics());
-								Thread.sleep(5000);
-								cone.tranferirArchivos(dateChooser.getDate().getTime());
-							} catch (InterruptedException | SftpException | IllegalAccessException | RuntimeException
-									| JSchException | IOException e1) {
-								LOGGER.info(e1);
-							}
-
-						} else if (!date.trim().equals(victoria.trim()) || !date.trim().equals(dolphing.trim())) {
-							try {
-								String res = Validaficheros
-										.validaFicherosDolphinVictoria(dateChooser.getDate().getTime());
-								textField_1.setText(res);
-								textField_1.update(textField_1.getGraphics());
-								esperar(5);
-								cone.tranferirArchivos(dateChooser.getDate().getTime());
-							} catch (InterruptedException | SftpException | IllegalAccessException | RuntimeException
-									| JSchException | IOException e1) {
-								LOGGER.info(e1);
-							}
-
+						/**
+						 * se valida si tiene la ultima carga 
+						 * de no ser asi realiza la ejecucion 
+						 * de la clase SFTP que tranfiere y ejecuta las cargas
+						 * de los RTRA
+						 */
+						if (victoria.equals(ConstantsUtil.NOCARGA) || dolphing.equals(ConstantsUtil.NOCARGA)
+								|| !date.trim().equals(victoria.trim()) || !date.trim().equals(dolphing.trim())) {
+							String res = Validaficheros.validaFicherosDolphinVictoria(dateChooser.getDate().getTime());
+							textField1.setText(res);
+							textField1.update(textField1.getGraphics());
+							esperar();
+							cone.tranferirArchivos(dateChooser.getDate().getTime());
 						} else {
 
-							// Parsea la fecha que viene de la consulta sql y la muestra en el textField_1
-
+							/**
+							 * se relaiza el parseo de la fecha 
+							 * obtenida del data chose calendar 
+							 * para validar su carga en la BBDD
+							 * y lo muestra en el texfield
+							 */
 							try {
 								Date victoriaCr = sdf.parse(victoria);
 								String victoriafrt = ConstantsUtil.sdf2.format(victoriaCr);
 
 								Date dolphingCr = sdf.parse(dolphing);
 								String dolphingfrt = ConstantsUtil.sdf2.format(dolphingCr);
-								textField_1.setText(
+								textField1.setText(
 										"Ultima carga Victoria: " + victoriafrt + " Dolphing: " + dolphingfrt + "");
-								textField_1.update(textField_1.getGraphics());
+								textField1.update(textField1.getGraphics());
 
-								esperar(5);
-								textField_1.setText("Insumos reprocesados, indique grupo.");
-								textField_1.update(textField_1.getGraphics());
+								esperar();
+								textField1.setText("Insumos reprocesados, indique grupo.");
+								textField1.update(textField1.getGraphics());
 							} catch (ParseException e1) {
 
 								LOGGER.info(e1);
@@ -401,15 +421,20 @@ public class vista extends JFrame {
 		dateChooser.setDateFormatString("dd/MM/yyyy");
 		dateChooser.setBounds(132, 44, 96, 34);
 		f.getContentPane().add(dateChooser);
-
-		textField_1 = new JTextField();
-		textField_1.setForeground(SystemColor.desktop);
-		textField_1.setFont(new Font("Tahoma", Font.PLAIN, 11));
-		textField_1.setEditable(false);
-		textField_1.setBackground(SystemColor.menu);
-		textField_1.setBounds(10, 165, 321, 34);
-		f.getContentPane().add(textField_1);
-		textField_1.setColumns(10);
+		/**
+		 * componentes de la interaz 
+		 * grafica 
+		 * teexfiel
+		 * progressbar
+		 * Estilos
+		 */
+		textField1.setForeground(SystemColor.desktop);
+		textField1.setFont(new Font("Tahoma", Font.PLAIN, 11));
+		textField1.setEditable(false);
+		textField1.setBackground(SystemColor.menu);
+		textField1.setBounds(10, 165, 321, 34);
+		f.getContentPane().add(textField1);
+		textField1.setColumns(10);
 		progressBar.setForeground(new Color(204, 0, 0));
 		progressBar.setBounds(10, 143, 321, 14);
 		f.getContentPane().add(progressBar);
@@ -423,7 +448,7 @@ public class vista extends JFrame {
 	 * @throws InterruptedException excepcion generada durante la ejecucion del
 	 *                              metodo
 	 */
-	public static void esperar(int segundos) {
+	public static void esperar() {
 		try {
 
 			Thread.sleep(5000);

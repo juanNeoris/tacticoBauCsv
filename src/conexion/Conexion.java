@@ -20,9 +20,8 @@ import java.util.stream.Collectors;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
-import interfaz.AvalBonos;
-import interfaz.Csv;
 import oracle.jdbc.pool.OracleDataSource;
+import validacion.ValidaIntrumentos;
 
 /**
  * Clase conexión para BD vía Wallet
@@ -30,7 +29,7 @@ import oracle.jdbc.pool.OracleDataSource;
  * @author hmh
  */
 public class Conexion {
-	
+
 	private static final Logger LOGGER = LogManager.getLogger(Conexion.class);
 	private Connection con;
 	private PreparedStatement pstmt;
@@ -38,18 +37,17 @@ public class Conexion {
 	private ResultSet rs;
 	private StringBuilder strbSql;
 	private static final DecimalFormat DFORMATO = new DecimalFormat("###,###,###.##");
-	
+
 	private Properties getPro = cargaProperties();
-	
 
-	public Conexion() {
+		public Conexion() {
 
-		super();
-		this.con = null;
-		this.pstmt = null;
-		this.stmt = null;
-		this.rs = null;
-	}
+			super();
+			this.con = null;
+			this.pstmt = null;
+			this.stmt = null;
+			this.rs = null;
+		}
 
 	private Properties cargaProperties() {
 		Properties properties = new Properties();
@@ -158,232 +156,59 @@ public class Conexion {
 	 * @param fechaConsumo   quenera la consulta del dia deseado
 	 * @throws Exception atrapa la excepcion generada durante la ejecucion
 	 * @return systCode regresa lo que obtiene de ejecutar el query
+	 * @throws SQLException generada durante la ejecucion del query
 	 */
-	public String getConsultaMexico(String grupo, String nombreInterfaz, String fechaConsumo) throws Exception {
+	public String getConsultaMexico(String grupo, String nombreInterfaz, String fechaConsumo) throws SQLException {
 		Statement sta = con.createStatement();
-		Csv interfazCsv = new Csv();
-		AvalBonos aval = new AvalBonos("AVALES");
-		AvalBonos bono = new AvalBonos("BONOSS");
-		AvalBonos confirming = new AvalBonos("CONFIRMING");
-		AvalBonos documentariado = new AvalBonos("CREDITOS DOCUMENTARIOS");
-		AvalBonos sindicado = new AvalBonos("CREDITOS SINDICADOS");
-		AvalBonos derivados = new AvalBonos("DERIVADOS");
-		AvalBonos descuentos = new AvalBonos("DESCUENTOS");
-		AvalBonos factoring = new AvalBonos("FACTORING");
-		AvalBonos comex = new AvalBonos("FINANCIAMIENTO COMEX");
-		AvalBonos impexp = new AvalBonos("FINANCIAMIENTO IMPEXP");
-		AvalBonos sumatoria = new AvalBonos("sumatoria");
-		AvalBonos leasrent = new AvalBonos("LEASING - RENTING");
-		AvalBonos comprome = new AvalBonos("LINEAS COMPROMETIDAS");
-		AvalBonos nocompro = new AvalBonos("LINEAS NO COMPROMETIDAS");
-		AvalBonos tarjeta = new AvalBonos("TARJETAS DE CREDITO");
-		AvalBonos over = new AvalBonos("OVERDRAFTS");
-		double sumatoriaNomValCur;
-		double sumatoriaCer;
-		double sumatoriaNomVal;
+		ValidaIntrumentos valida = new ValidaIntrumentos();
 
-		List<AvalBonos> instrumento = new ArrayList<AvalBonos>();
-		String pais = "";
-		// Garantias Mexico
-		List<String> MexicoGaran = new ArrayList<String>();
-		// Garantias sumatoria Mexico
-		List<Double> MexicoGaranValCurSum = new ArrayList<Double>();
-		List<Double> MexicoGaranCerSum = new ArrayList<Double>();
-		List<Double> MexicoGaranNomValSum = new ArrayList<Double>();
-		List<String> info = new ArrayList<String>();
-		ArrayList<String> contraparte = new ArrayList<String>();
-
-		String systCode = "SELECT cptyparent, NVL(cptyparentrating, 'SIN RATING'),cptyparentname,dealstamp,instrumentname,TO_CHAR(TO_DATE(valuedate,  'YYYY-MM-DD'), 'DD-mon-YY'),TO_CHAR(TO_DATE(maturitydate,  'YYYY-MM-DD'), 'DD-mon-YY'),currency,to_char(DECODE(nominalvaluecur,null, '0.0',nominalvaluecur), '999,999,999,999.99')  AS nominalvaluecur,to_char(DECODE(CER,null, '0.0',CER), '999,999,999,999.99')  AS CER,to_char(DECODE(nominalvalue,null, '0.0',nominalvalue), '999,999,999,999.99')  AS nominalvalue,oneoff,cptyname,foldercountryname,cptycountry,cptyparentcountry,foldercountry from PGT_MEX.T_PGT_MEX_CONSUMOSC_V WHERE LastParentF ='"+ grupo + "' and FECHACARGA='" + fechaConsumo+ "' AND foldercountryname='Mexico' UNION ALL SELECT cptyparent, NVL(cptyparentrating, 'SIN RATING'),cptyparentname,dealstamp,instrumentname,TO_CHAR(TO_DATE(valuedate,  'YYYY-MM-DD'), 'DD-mon-YY'),TO_CHAR(TO_DATE(maturitydate,  'YYYY-MM-DD'), 'DD-mon-YY'),currency,to_char(DECODE(nominalvaluecur,null, '0.0',nominalvaluecur), '999,999,999,999.99')  AS nominalvaluecur,to_char(DECODE(CER,null, '0.0',CER), '999,999,999,999.99')  AS CER,to_char(DECODE(nominalvalue,null, '0.0',nominalvalue), '999,999,999,999.99')  AS nominalvalue,oneoff,cptyname,foldercountryname,cptycountry,cptyparentcountry,foldercountry from PGT_MEX.T_PGT_MEX_CONSUMOSC_D WHERE LastParentF ='"+ grupo + "' and FECHACARGA='" + fechaConsumo+ "' AND foldercountryname='Mexico' ORDER BY foldercountryname,instrumentname ";
+		String systCode = "SELECT cptyparent, NVL(cptyparentrating, 'SIN RATING'),cptyparentname,dealstamp,instrumentname,TO_CHAR(TO_DATE(valuedate,  'YYYY-MM-DD'), 'DD-mon-YY'),TO_CHAR(TO_DATE(maturitydate,  'YYYY-MM-DD'), 'DD-mon-YY'),currency,to_char(DECODE(nominalvaluecur,null, '0.0',nominalvaluecur), '999,999,999,999.99')  AS nominalvaluecur,to_char(DECODE(CER,null, '0.0',CER), '999,999,999,999.99')  AS CER,to_char(DECODE(nominalvalue,null, '0.0',nominalvalue), '999,999,999,999.99')  AS nominalvalue,oneoff,cptyname,foldercountryname,cptycountry,cptyparentcountry,foldercountry from PGT_MEX.T_PGT_MEX_CONSUMOSC_V WHERE LastParentF ='"
+				+ grupo + "' and FECHACARGA='" + fechaConsumo
+				+ "' AND foldercountryname='Mexico' UNION ALL SELECT cptyparent, NVL(cptyparentrating, 'SIN RATING'),cptyparentname,dealstamp,instrumentname,TO_CHAR(TO_DATE(valuedate,  'YYYY-MM-DD'), 'DD-mon-YY'),TO_CHAR(TO_DATE(maturitydate,  'YYYY-MM-DD'), 'DD-mon-YY'),currency,to_char(DECODE(nominalvaluecur,null, '0.0',nominalvaluecur), '999,999,999,999.99')  AS nominalvaluecur,to_char(DECODE(CER,null, '0.0',CER), '999,999,999,999.99')  AS CER,to_char(DECODE(nominalvalue,null, '0.0',nominalvalue), '999,999,999,999.99')  AS nominalvalue,oneoff,cptyname,foldercountryname,cptycountry,cptyparentcountry,foldercountry from PGT_MEX.T_PGT_MEX_CONSUMOSC_D WHERE LastParentF ='"
+				+ grupo + "' and FECHACARGA='" + fechaConsumo
+				+ "' AND foldercountryname='Mexico' ORDER BY foldercountryname,instrumentname ";
 		ResultSet rs = sta.executeQuery(systCode);
-		 int total = getQueryRowCount(systCode);
-		
+		int total = getQueryRowCount(systCode);
+
 		if (rs.equals(null) || rs.next() == false) {
 			systCode = "No existen registros para este grupo en la interfaz CONSULTA";
 		} else {
 			do {
 				// cadena
-				systCode = rs.getString(1) + "|" + rs.getString(2) + "|" + "\"" + rs.getString(3) + "\"" + "|"+ rs.getString(4) + "|" + rs.getString(5) + 							"|" + rs.getString(6) + "|" + rs.getString(7) + "|"+ rs.getString(8) + "|" + rs.getString(9) + "|" + rs.getString(10) + "|" + 							rs.getString(11)+ "|" + rs.getString(12) + "|" + "\"" + rs.getString(13) + "\"" + "|" + rs.getString(14) + "|"+ "\"" + 							rs.getString(15) + "\"" + "|" + rs.getString(16) + "|" + rs.getString(17) + "\n";
+				systCode = rs.getString(1) + "|" + rs.getString(2) + "|" + "\"" + rs.getString(3) + "\"" + "|"
+						+ rs.getString(4) + "|" + rs.getString(5) + "|" + rs.getString(6) + "|" + rs.getString(7) + "|"
+						+ rs.getString(8) + "|" + rs.getString(9) + "|" + rs.getString(10) + "|" + rs.getString(11)
+						+ "|" + rs.getString(12) + "|" + "\"" + rs.getString(13) + "\"" + "|" + rs.getString(14) + "|"
+						+ "\"" + rs.getString(15) + "\"" + "|" + rs.getString(16) + "|" + rs.getString(17) + "\n";
 
 				// cadena obtener la sumatoria
-				sumatoriaNomValCur = DecimalFormat.getNumberInstance().parse(rs.getString(9).trim()).doubleValue();
-				sumatoriaCer = DecimalFormat.getNumberInstance().parse(rs.getString(10).trim()).doubleValue();
-				sumatoriaNomVal = DecimalFormat.getNumberInstance().parse(rs.getString(11).trim()).doubleValue();
-				if (rs.getString(5).contains("BOND")) {
-					bono.bonos(fechaConsumo, systCode, rs.getString(4), rs.getString(14), rs.getString(9),rs.getString(10), rs.getString(11));
-					sumatoria.bonos(fechaConsumo, systCode, rs.getString(4), rs.getString(14), rs.getString(9),rs.getString(10), rs.getString(11));
-					info = this.getContraparte( fechaConsumo, rs.getString(4), rs.getString(14));
-					contraparte.addAll(info);
-					instrumento.add(bono);
-					instrumento.add(sumatoria);
-				} else if (rs.getString(5).contains(" CREDITO DOCUMENTARIO")) {
-					documentariado.bonos(fechaConsumo,systCode, rs.getString(4), rs.getString(14),rs.getString(9),rs.getString(10),rs.getString(11));
-					sumatoria.bonos(fechaConsumo, systCode, rs.getString(4), rs.getString(14), rs.getString(9),rs.getString(10), rs.getString(11));
-					info = this.getContraparte( fechaConsumo, rs.getString(4), rs.getString(14));
-					contraparte.addAll(info);
-					instrumento.add(documentariado);
-					instrumento.add(sumatoria);
-				} else if (rs.getString(5).contains("EXPORTACION") || rs.getString(5).contains("IMPORTACION")) {
-					impexp.bonos(fechaConsumo, systCode, rs.getString(4), rs.getString(14),  rs.getString(9), rs.getString(10), rs.getString(11));
-					sumatoria.bonos(fechaConsumo, systCode, rs.getString(4), rs.getString(14), rs.getString(9), rs.getString(10), rs.getString(11));
-					info = this.getContraparte( fechaConsumo, rs.getString(4), rs.getString(14));
-					contraparte.addAll(info);
-					instrumento.add(impexp);
-					instrumento.add(sumatoria);
-				} else if (rs.getString(5).contains("COMEX") || rs.getString(5).contains("FORFAITING")) {
-					comex.bonos(fechaConsumo, systCode, rs.getString(4), rs.getString(14),  rs.getString(9), rs.getString(10), rs.getString(11));
-					sumatoria.bonos(fechaConsumo, systCode, rs.getString(4), rs.getString(14), rs.getString(9), rs.getString(10), rs.getString(11));
-					info = this.getContraparte( fechaConsumo, rs.getString(4), rs.getString(14));
-					contraparte.addAll(info);
-					instrumento.add(comex);
-					instrumento.add(sumatoria);
-				} else if (rs.getString(5).contains("SINDICADO")) {
-					sindicado.bonos(fechaConsumo, systCode, rs.getString(4), rs.getString(14),rs.getString(9), rs.getString(10), rs.getString(11));
-					sumatoria.bonos(fechaConsumo, systCode, rs.getString(4), rs.getString(14),rs.getString(9), rs.getString(10), rs.getString(11));
-					info = this.getContraparte( fechaConsumo, rs.getString(4), rs.getString(14));
-					contraparte.addAll(info);
-					instrumento.add(sindicado);
-					instrumento.add(sumatoria);
-				} else if (rs.getString(5).contains("CONFIRMING")) {
-					confirming.bonos(fechaConsumo, systCode, rs.getString(4), rs.getString(14),rs.getString(9), rs.getString(10), rs.getString(11));
-					sumatoria.bonos(fechaConsumo, systCode, rs.getString(4), rs.getString(14), rs.getString(9), rs.getString(10), rs.getString(11));
-					info = this.getContraparte( fechaConsumo, rs.getString(4), rs.getString(14));
-					contraparte.addAll(info);
-					instrumento.add(confirming);
-					instrumento.add(sumatoria);
-				} else if (rs.getString(5).contains("DESCUENTOS")) {
-					descuentos.bonos(fechaConsumo, systCode, rs.getString(4), rs.getString(14),rs.getString(9), rs.getString(10), rs.getString(11));
-					sumatoria.bonos(fechaConsumo, systCode, rs.getString(4), rs.getString(14),rs.getString(9), rs.getString(10), rs.getString(11));
-					info = this.getContraparte( fechaConsumo, rs.getString(4), rs.getString(14));
-					contraparte.addAll(info);
-					instrumento.add(descuentos);
-					instrumento.add(sumatoria);
-				} else if (rs.getString(5).contains("FACTORING")) {
-					factoring.bonos(fechaConsumo, systCode, rs.getString(4), rs.getString(14),rs.getString(9), rs.getString(10), rs.getString(11));
-					sumatoria.bonos(fechaConsumo, systCode, rs.getString(4), rs.getString(14),rs.getString(9), rs.getString(10), rs.getString(11));
-					info = this.getContraparte( fechaConsumo, rs.getString(4), rs.getString(14));
-					contraparte.addAll(info);
-					instrumento.add(factoring);
-					instrumento.add(sumatoria);
-				} else if (rs.getString(5).contains("TARJETAS")) {
-					tarjeta.bonos(fechaConsumo, systCode, rs.getString(4), rs.getString(14),rs.getString(9), rs.getString(10), rs.getString(11));
-					sumatoria.bonos(fechaConsumo, systCode, rs.getString(4), rs.getString(14),rs.getString(9), rs.getString(10), rs.getString(11));
-					info = this.getContraparte( fechaConsumo, rs.getString(4), rs.getString(14));
-					contraparte.addAll(info);
-					instrumento.add(tarjeta);
-					instrumento.add(sumatoria);
-				} else if (rs.getString(5).contains("LINEA MULTIDEAL RESTO")
-						|| rs.getString(5).contains("CREDITOS - COMPROMETIDO")
-						|| rs.getString(5).contains("CREDITO BACKUP") || rs.getString(5).contains("CREDITO OTROS")) {
-					comprome.bonos(fechaConsumo, systCode, rs.getString(4), rs.getString(14),rs.getString(9), rs.getString(10), rs.getString(11));
-					sumatoria.bonos(fechaConsumo, systCode, rs.getString(4), rs.getString(14),rs.getString(9), rs.getString(10), rs.getString(11));
-					info = this.getContraparte( fechaConsumo, rs.getString(4), rs.getString(14));
-					contraparte.addAll(info);
-					instrumento.add(comprome);
-					instrumento.add(sumatoria);
-				} else if (rs.getString(5).contains("GARANTIA ACCIONES") || rs.getString(5).contains("GARANTIA AVAL")
-						|| rs.getString(5).contains("GARANTIA DERECHOS")
-						|| rs.getString(5).contains("GARANTIA PERSONAL")
-						|| rs.getString(5).contains("OTRAS GARANTIAS EN")
-						|| rs.getString(5).contains("OTRAS GARANTIAS REALES")
-						|| rs.getString(5).contains("OTHER GUARANTY")) {
-					MexicoGaran.add(systCode);
-					sumatoria.bonos(fechaConsumo, systCode, rs.getString(4), rs.getString(14),rs.getString(9), rs.getString(10), rs.getString(11));
-					MexicoGaranValCurSum.add(sumatoriaNomValCur);
-					MexicoGaranCerSum.add(sumatoriaCer);
-					MexicoGaranNomValSum.add(sumatoriaNomVal);
-					instrumento.add(sumatoria);
-				} else if (rs.getString(5).contains("AVAL COMERCIAL")
-						|| rs.getString(5).contains("AVAL FINANCIERO - NO COMPROMETIDO")
-						|| rs.getString(5).contains("AVAL NO") || rs.getString(5).contains("AVAL TECNICO")
-						|| rs.getString(5).contains("GARANTIA LINE") || rs.getString(5).contains("STANDBY")
-						|| rs.getString(5).contains("LINEA DE AVALES")) {
-					aval.bonos(fechaConsumo, systCode, rs.getString(4), rs.getString(14),rs.getString(9), rs.getString(10), rs.getString(11));
-					sumatoria.bonos(fechaConsumo, systCode, rs.getString(4), rs.getString(14),rs.getString(9), rs.getString(10), rs.getString(11));
-					info = this.getContraparte( fechaConsumo, rs.getString(4), rs.getString(14));
-					contraparte.addAll(info);
-					instrumento.add(aval);
-					instrumento.add(sumatoria);
-				} else if (rs.getString(5).contains("ASSET") || rs.getString(5).contains("CALL")
-						|| rs.getString(5).contains("CERTIFICATES") || rs.getString(5).contains("COLLAR")
-						|| rs.getString(5).contains("EQUITY") || rs.getString(5).contains("COMMODITY")
-						|| rs.getString(5).contains("CREDIT DEFAULT") || rs.getString(5).contains("CURRENCY")
-						|| rs.getString(5).contains("FIXED") || rs.getString(5).contains("FLOATING")
-						|| rs.getString(5).contains("FX") || rs.getString(5).contains("INDEXED")
-						|| rs.getString(5).contains("INTEREST") || rs.getString(5).contains("ZERO")
-						|| rs.getString(5).contains("INITIAL MARGIN CASH") || rs.getString(5).contains("VARIATION")
-						|| rs.getString(5).contains("NOSTRO") || rs.getString(5).contains("VOSTRO")
-						|| rs.getString(5).contains("ACOTADO") || rs.getString(5).contains("SECURITIES")
-						|| rs.getString(5).contains("MONEY MARKET") || rs.getString(5).contains("SECURED")
-						|| rs.getString(5).contains("RECEIVER REVENUE") || rs.getString(5).contains("YEAR ON YEAR")
-						|| rs.getString(5).contains("GENERIC DEALS") || rs.getString(5).contains("OPTIONSPAYER")
-						|| rs.getString(5).contains("OPTIONS RECEIVER") || rs.getString(5).contains("BONIFICADO")
-						|| rs.getString(5).contains("SWAP FORWARD") || rs.getString(5).contains("TITULIZACION")
-						|| rs.getString(5).contains("DELIVERABLE") || rs.getString(5).contains("GENERIC DEALS")
-						|| rs.getString(5).contains("PAYER REVENUE")) {
-					derivados.bonos(fechaConsumo, systCode, rs.getString(4), rs.getString(14),rs.getString(9), rs.getString(10), rs.getString(11));
-					sumatoria.bonos(fechaConsumo, systCode, rs.getString(4), rs.getString(14),rs.getString(9), rs.getString(10), rs.getString(11));
-					info = this.getContraparte( fechaConsumo, rs.getString(4), rs.getString(14));
-					contraparte.addAll(info);
-					instrumento.add(derivados);
-					instrumento.add(sumatoria);
-				} else if (rs.getString(5).contains("CREDITOS - NO COMPROMETIDO")) {
-					nocompro.bonos(fechaConsumo, systCode, rs.getString(4), rs.getString(14),rs.getString(9), rs.getString(10), rs.getString(11));
-					sumatoria.bonos(fechaConsumo, systCode, rs.getString(4), rs.getString(14),rs.getString(9), rs.getString(10), rs.getString(11));
-					info = this.getContraparte( fechaConsumo, rs.getString(4), rs.getString(14));
-					contraparte.addAll(info);
-					instrumento.add(nocompro);
-					instrumento.add(sumatoria);
-				} else if (rs.getString(5).contains("LEASING") || rs.getString(5).contains("RENTING")) {
-					leasrent.bonos(fechaConsumo, systCode, rs.getString(4), rs.getString(14),rs.getString(9), rs.getString(10), rs.getString(11));
-					sumatoria.bonos(fechaConsumo, systCode, rs.getString(4), rs.getString(14),rs.getString(9), rs.getString(10), rs.getString(11));
-					info = this.getContraparte( fechaConsumo, rs.getString(4), rs.getString(14));
-					contraparte.addAll(info);
-					instrumento.add(leasrent);
-					instrumento.add(sumatoria);
-				} else if (rs.getString(5).contains("OVERDRAFTS")) {
-					over.bonos(fechaConsumo, systCode, rs.getString(4), rs.getString(14),rs.getString(9), rs.getString(10), rs.getString(11));
-					sumatoria.bonos(fechaConsumo, systCode, rs.getString(4), rs.getString(14),rs.getString(9), rs.getString(10), rs.getString(11));
-					info = this.getContraparte( fechaConsumo, rs.getString(4), rs.getString(14));
-					contraparte.addAll(info);
-					instrumento.add(over);
-					instrumento.add(sumatoria);
+				try {
+					valida.intrumentosParteUno(systCode, rs.getString(5), fechaConsumo, rs.getString(4),
+							rs.getString(14), rs.getString(9), rs.getString(10), rs.getString(11), nombreInterfaz,
+							total);
+				} catch (Exception e) {
+					LOGGER.info(e);
 				}
-				pais = rs.getString(14);
-				
+
 			} while (rs.next());
 			if (systCode.isEmpty()) {
 				systCode = "No existen registros para este grupo en la interfaz CONSULTA";
 			}
-			ArrayList<String> newList = new ArrayList<String>();
-			for (String element : MexicoGaran) {
-				if (!contraparte.contains(element)) {
-					newList.add(element);
-				}
-			}
-			
-			// Garantias
-			String CadenaMexicoGaran = newList.stream().collect(Collectors.joining(""));
-			double totalMexicoGaranValCurSum = MexicoGaranValCurSum.stream().mapToDouble(Double::doubleValue).sum();
-			double totalMexicoGaranCerSum = MexicoGaranCerSum.stream().mapToDouble(Double::doubleValue).sum();
-			double totalMexicoGaranNomValSum = MexicoGaranNomValSum.stream().mapToDouble(Double::doubleValue).sum();
-			interfazCsv.interfazCsvPrimeraParte(instrumento, newList, CadenaMexicoGaran, nombreInterfaz,
-					totalMexicoGaranValCurSum, totalMexicoGaranCerSum, totalMexicoGaranNomValSum, pais);
+
 		}
 
 		return systCode;
 	}
-	
-	
+
 	int getQueryRowCount(String query) throws SQLException {
-		
-	    try (Statement sta = con.createStatement();
-	        ResultSet standardRS = sta.executeQuery(query)) {
-	        int size = 0;
-	        while (standardRS.next()) {
-	            size++;
-	        }
-	        return size;
-	    }
+
+		try (Statement sta = con.createStatement(); ResultSet standardRS = sta.executeQuery(query)) {
+			int size = 0;
+			while (standardRS.next()) {
+				size++;
+			}
+			return size;
+		}
 	}
 
 	/**
@@ -572,7 +397,7 @@ public class Conexion {
 					pais = rs.getNString(14);
 					if (rs.getString(5).contains("BOND")) {
 						SpainBonos.add(systCode);
-						info = this.getContraparte( fechaConsumo, rs.getString(4), rs.getString(14));
+						info = this.getContraparte(fechaConsumo, rs.getString(4), rs.getString(14));
 						contraparte.addAll(info);
 						SpainBonos.addAll(info);
 						SpainBonosNomValCurSum.add(Double.valueOf(sumatoriaNomValCur));
@@ -583,7 +408,7 @@ public class Conexion {
 						SpainTotNomValSum.add(sumatoriaNomVal);
 					} else if (rs.getString(5).contains(" CREDITO DOCUMENTARIO")) {
 						SpainCredDocu.add(systCode);
-						info = this.getContraparte( fechaConsumo, rs.getString(4), rs.getString(14));
+						info = this.getContraparte(fechaConsumo, rs.getString(4), rs.getString(14));
 						contraparte.addAll(info);
 						SpainCredDocu.addAll(info);
 						SpainCredDocuNomValCurSum.add(sumatoriaNomValCur);
@@ -594,7 +419,7 @@ public class Conexion {
 						SpainTotNomValSum.add(sumatoriaNomVal);
 					} else if (rs.getString(5).contains("EXPORTACION") || rs.getString(5).contains("IMPORTACION")) {
 						SpainExportImport.add(systCode);
-						info = this.getContraparte( fechaConsumo, rs.getString(4), rs.getString(14));
+						info = this.getContraparte(fechaConsumo, rs.getString(4), rs.getString(14));
 						contraparte.addAll(info);
 						SpainExportImport.addAll(info);
 						SpainExportImportNomValCurSum.add(sumatoriaNomValCur);
@@ -605,7 +430,7 @@ public class Conexion {
 						SpainTotNomValSum.add(sumatoriaNomVal);
 					} else if (rs.getString(5).contains("COMEX") || rs.getString(5).contains("FORFAITING")) {
 						SpainComFor.add(systCode);
-						info = this.getContraparte( fechaConsumo, rs.getString(4), rs.getString(14));
+						info = this.getContraparte(fechaConsumo, rs.getString(4), rs.getString(14));
 						contraparte.addAll(info);
 						SpainComFor.addAll(info);
 						SpainComForNomValCurSum.add(sumatoriaNomValCur);
@@ -616,7 +441,7 @@ public class Conexion {
 						SpainTotNomValSum.add(sumatoriaNomVal);
 					} else if (rs.getString(5).contains("SINDICADO")) {
 						SpainSindicado.add(systCode);
-						info = this.getContraparte( fechaConsumo, rs.getString(4), rs.getString(14));
+						info = this.getContraparte(fechaConsumo, rs.getString(4), rs.getString(14));
 						contraparte.addAll(info);
 						SpainSindicado.addAll(info);
 						SpainSindicadoNomValCurSum.add(sumatoriaNomValCur);
@@ -627,7 +452,7 @@ public class Conexion {
 						SpainTotNomValSum.add(sumatoriaNomVal);
 					} else if (rs.getString(5).contains("CONFIRMING")) {
 						SpainConfir.add(systCode);
-						info = this.getContraparte( fechaConsumo, rs.getString(4), rs.getString(14));
+						info = this.getContraparte(fechaConsumo, rs.getString(4), rs.getString(14));
 						contraparte.addAll(info);
 						SpainConfir.addAll(info);
 						SpainConfirNomValCurSum.add(sumatoriaNomValCur);
@@ -638,7 +463,7 @@ public class Conexion {
 						SpainTotNomValSum.add(sumatoriaNomVal);
 					} else if (rs.getString(5).contains("DESCUENTOS")) {
 						SpainDesc.add(systCode);
-						info = this.getContraparte( fechaConsumo, rs.getString(4), rs.getString(14));
+						info = this.getContraparte(fechaConsumo, rs.getString(4), rs.getString(14));
 						contraparte.addAll(info);
 						SpainDesc.addAll(info);
 						SpainDescNomValCurSum.add(sumatoriaNomValCur);
@@ -649,7 +474,7 @@ public class Conexion {
 						SpainTotNomValSum.add(sumatoriaNomVal);
 					} else if (rs.getString(5).contains("FACTORING")) {
 						SpainFac.add(systCode);
-						info = this.getContraparte( fechaConsumo, rs.getString(4), rs.getString(14));
+						info = this.getContraparte(fechaConsumo, rs.getString(4), rs.getString(14));
 						contraparte.addAll(info);
 						SpainFac.addAll(info);
 						SpainFacNomValCurSum.add(sumatoriaNomValCur);
@@ -660,7 +485,7 @@ public class Conexion {
 						SpainTotNomValSum.add(sumatoriaNomVal);
 					} else if (rs.getString(5).contains("TARJETAS")) {
 						SpainTar.add(systCode);
-						info = this.getContraparte( fechaConsumo, rs.getString(4), rs.getString(14));
+						info = this.getContraparte(fechaConsumo, rs.getString(4), rs.getString(14));
 						contraparte.addAll(info);
 						SpainTar.addAll(info);
 						SpainTarNomValCurSum.add(sumatoriaNomValCur);
@@ -674,7 +499,7 @@ public class Conexion {
 							|| rs.getString(5).contains("CREDITO BACKUP")
 							|| rs.getString(5).contains("CREDITO OTROS")) {
 						SpainLinCom.add(systCode);
-						info = this.getContraparte( fechaConsumo, rs.getString(4), rs.getString(14));
+						info = this.getContraparte(fechaConsumo, rs.getString(4), rs.getString(14));
 						contraparte.addAll(info);
 						SpainLinCom.addAll(info);
 						SpainLinComNomValCurSum.add(sumatoriaNomValCur);
@@ -703,7 +528,7 @@ public class Conexion {
 							|| rs.getString(5).contains("GARANTIA LINE") || rs.getString(5).contains("STANDBY")
 							|| rs.getString(5).contains("LINEA DE AVALES")) {
 						SpainAval.add(systCode);
-						info = this.getContraparte( fechaConsumo, rs.getString(4), rs.getString(14));
+						info = this.getContraparte(fechaConsumo, rs.getString(4), rs.getString(14));
 						contraparte.addAll(info);
 						SpainAval.addAll(info);
 						SpainAvalNomValCurSum.add(sumatoriaNomValCur);
@@ -730,7 +555,7 @@ public class Conexion {
 							|| rs.getString(5).contains("DELIVERABLE") || rs.getString(5).contains("GENERIC DEALS")
 							|| rs.getString(5).contains("PAYER REVENUE")) {
 						SpainDer.add(systCode);
-						info = this.getContraparte( fechaConsumo, rs.getString(4), rs.getString(14));
+						info = this.getContraparte(fechaConsumo, rs.getString(4), rs.getString(14));
 						contraparte.addAll(info);
 						SpainDer.addAll(info);
 						SpainDerNomValCurSum.add(sumatoriaNomValCur);
@@ -741,7 +566,7 @@ public class Conexion {
 						SpainTotNomValSum.add(sumatoriaNomVal);
 					} else if (rs.getString(5).contains("CREDITOS - NO COMPROMETIDO")) {
 						SpainLinNoCom.add(systCode);
-						info = this.getContraparte( fechaConsumo, rs.getString(4), rs.getString(14));
+						info = this.getContraparte(fechaConsumo, rs.getString(4), rs.getString(14));
 						contraparte.addAll(info);
 						SpainLinNoCom.addAll(info);
 						SpainLinNoComNomValCurSum.add(sumatoriaNomValCur);
@@ -894,13 +719,14 @@ public class Conexion {
 	}
 
 	/**
-	  * Metodo getContraparte validar si tiene una garantia 
-	  * la operacion que se esta evaluando 
-	  * @param fechaConsumo se valida con la fecha que se esta evaluando 
-	  * @param deal usa para validar la garantia 
-	  * @param pais otra condicion es que sea del pais 
-	  * @return registrosInterfaz regresa el array con las contrapartes
-	  */
+	 * Metodo getContraparte validar si tiene una garantia la operacion que se esta
+	 * evaluando
+	 * 
+	 * @param fechaConsumo se valida con la fecha que se esta evaluando
+	 * @param deal         usa para validar la garantia
+	 * @param pais         otra condicion es que sea del pais
+	 * @return registrosInterfaz regresa el array con las contrapartes
+	 */
 	public List<String> getContraparte(String fechaConsumo, String deal, String pais) {
 		strbSql = new StringBuilder();
 
@@ -1048,9 +874,12 @@ public class Conexion {
 		double totalSpainDerNomValSum = spainDerNomValSum.stream().mapToDouble(Double::doubleValue).sum();
 
 		String CadenaSpainLeasingRenting = SpainLeasingRenting.stream().collect(Collectors.joining(""));
-		double totalSpainLeasingRentingValCurSum = SpainLeasingRentingValCurSum.stream().mapToDouble(Double::doubleValue).sum();
-		double totalSpainLeasingRentingCerSum = SpainLeasingRentingCerSum.stream().mapToDouble(Double::doubleValue).sum();
-		double totalSpainLeasingRentingNomValSum = SpainLeasingRentingNomValSum.stream().mapToDouble(Double::doubleValue).sum();
+		double totalSpainLeasingRentingValCurSum = SpainLeasingRentingValCurSum.stream()
+				.mapToDouble(Double::doubleValue).sum();
+		double totalSpainLeasingRentingCerSum = SpainLeasingRentingCerSum.stream().mapToDouble(Double::doubleValue)
+				.sum();
+		double totalSpainLeasingRentingNomValSum = SpainLeasingRentingNomValSum.stream()
+				.mapToDouble(Double::doubleValue).sum();
 
 		String CadenaSpainOverdrafts = SpainOverdrafts.stream().collect(Collectors.joining(""));
 		double totalSpainOverdraftsValCurSum = SpainOverdraftsValCurSum.stream().mapToDouble(Double::doubleValue).sum();
@@ -1307,7 +1136,7 @@ public class Conexion {
 			}
 		} catch (SQLException e) {
 			LOGGER.info(e);
-			
+
 		} catch (Exception e) {
 			LOGGER.info(e);
 		}
