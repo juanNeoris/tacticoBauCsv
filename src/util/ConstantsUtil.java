@@ -63,6 +63,7 @@ public final class ConstantsUtil {
 	@Getter
 	private ArrayList<String> impExp = new ArrayList<>(Arrays.asList("FINANCIACION DE EXPORTACIONES - NO COMPROMETIDO",
 			"FINANCIACION DE IMPORTACIONES - NO COMPROMETIDO"));
+
 	/**
 	 * array que almacena instrumentos Comex
 	 */

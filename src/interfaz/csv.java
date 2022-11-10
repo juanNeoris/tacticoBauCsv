@@ -48,6 +48,7 @@ public class Csv {
 			String nombreInterfaz, Double totalMexicoGaranValCurSum, Double totalMexicoGaranCerSum,
 			Double totalMexicoGaranNomValSum, String pais) throws IOException {
 
+		System.out.println("pais escrito"+pais);
 		/**
 		 * se genera la instancia del archivo temporal
 		 */
@@ -61,7 +62,7 @@ public class Csv {
 		ArrayList<String> grades = new ArrayList<>(
 				Arrays.asList("AVALES", "BONOS", "CONFIRMING", "CREDITOS DOCUMENTARIOS", "CREDITOS SINDICADOS",
 						"DERIVADOS", "DESCUENTOS", "FACTORING", "FINANCIAMIENTO COMEX", "FINANCIAMIENTO IMP/EXP",
-						"GARANTIAS", "LEASING - RENTING", "LINEAS COMPROMETIDAS", "TARJETAS DE CREDITO", "OVERDRAFTS"));
+						"GARANTIAS", "LEASING - RENTING", "LINEAS COMPROMETIDAS", "LINEAS NO COMPROMETIDAS","TARJETAS DE CREDITO", "OVERDRAFTS"));
 		/*
 		 * Declaramos el Iterador que obtendra los elementos de la lista que y llamara
 		 * la metodo getInstrumento que regresara el objeto con los instrumentos y
@@ -75,7 +76,7 @@ public class Csv {
 				writer.write("MEXICO - GARANTIAS\n");
 				writer.write(cadenaEncabeza);
 				writer.write(cadenaMexicoGaran);
-				writer.write("TOTAL MEXICO - GARANTIAS" + "|" + "|" + "|" + "|" + "TOTAL GARANTIAS" + "|" + "|" + "|"
+				writer.write("TOTAL "+pais.toUpperCase() +"- GARANTIAS" + "|" + "|" + "|" + "|" + "TOTAL GARANTIAS" + "|" + "|" + "|"
 						+ "|" + DFORMATO.format(totalMexicoGaranValCurSum).toString() + "|"
 						+ DFORMATO.format(totalMexicoGaranCerSum).toString() + "|"
 						+ DFORMATO.format(totalMexicoGaranNomValSum).toString() + "|" + "|" + "|" + "|" + "|" + "|"
@@ -106,7 +107,7 @@ public class Csv {
 		/* el total general de todos los intrumentos para un pais */
 		intrumentoProcesado = getInstrumento("sumatoria", instrumento);
 		if (intrumentoProcesado != null && intrumentoProcesado.getCadenaBonosMex() != null) {
-			writer.write("TOTAL MEXICO" + "|" + "|" + "|" + "|" + "TOTAL GENERAL" + "|" + "|" + "|" + "|"
+			writer.write("TOTAL "+pais.toUpperCase() + "|" + "|" + "|" + "|" + "TOTAL GENERAL" + "|" + "|" + "|" + "|"
 					+ DFORMATO.format(intrumentoProcesado.getTotalMexicoBonosNomValCur()).toString() + "|"
 					+ DFORMATO.format(intrumentoProcesado.getTotalMexicoBonosCer()).toString() + "|"
 					+ DFORMATO.format(intrumentoProcesado.getTotalMexicoBonosNomVal()).toString() + "|" + "|" + "|"
@@ -116,6 +117,7 @@ public class Csv {
 		}
 		writer.flush();
 		writer.close();
+		instrumento.clear();
 	}
 
 	/**

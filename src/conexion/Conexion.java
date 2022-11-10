@@ -40,14 +40,14 @@ public class Conexion {
 
 	private Properties getPro = cargaProperties();
 
-		public Conexion() {
+	public Conexion() {
 
-			super();
-			this.con = null;
-			this.pstmt = null;
-			this.stmt = null;
-			this.rs = null;
-		}
+		super();
+		this.con = null;
+		this.pstmt = null;
+		this.stmt = null;
+		this.rs = null;
+	}
 
 	private Properties cargaProperties() {
 		Properties properties = new Properties();
@@ -228,161 +228,18 @@ public class Conexion {
 
 		Statement sta = con.createStatement();
 
-		double sumatoriaNomValCur;
-		double sumatoriaCer;
-		double sumatoriaNomVal;
-		List<String> info = new ArrayList<String>();
-		// bonos Spain
-		List<String> SpainBonos = new ArrayList<String>();
-		// bonos sumatoria Spain
-		List<Double> SpainBonosNomValCurSum = new ArrayList<Double>();
-		List<Double> SpainBonosCerSum = new ArrayList<Double>();
-		List<Double> SpainBonosNomValSum = new ArrayList<Double>();
-
-		// creditos documentariado Spain
-		List<String> SpainCredDocu = new ArrayList<String>();
-		// creditos documentariado sumatoria Spain
-		List<Double> SpainCredDocuNomValCurSum = new ArrayList<Double>();
-		List<Double> SpainCredDocuCerSum = new ArrayList<Double>();
-		List<Double> SpainCredDocuNomValSum = new ArrayList<Double>();
-
-		// Exportacion/Importacion Spain
-		List<String> SpainExportImport = new ArrayList<String>();
-		// Exportacion/Importacion sumatoria Spain
-		List<Double> SpainExportImportNomValCurSum = new ArrayList<Double>();
-		List<Double> SpainExportImportCerSum = new ArrayList<Double>();
-		List<Double> SpainExportImportNomValSum = new ArrayList<Double>();
-
-		// Comex/Forfaiting Spain
-		List<String> SpainComFor = new ArrayList<String>();
-		// Comex/Forfaiting sumatoria Spain
-		List<Double> SpainComForNomValCurSum = new ArrayList<Double>();
-		List<Double> SpainComForCerSum = new ArrayList<Double>();
-		List<Double> SpainComForNomValSum = new ArrayList<Double>();
-
-		// Sindicado Spain
-		List<String> SpainSindicado = new ArrayList<String>();
-		// Sindicado sumatoria Spain
-		List<Double> SpainSindicadoNomValCurSum = new ArrayList<Double>();
-		List<Double> SpainSindicadoCerSum = new ArrayList<Double>();
-		List<Double> SpainSindicadoNomValSum = new ArrayList<Double>();
-
-		// Confirming Spain
-		List<String> SpainConfir = new ArrayList<String>();
-		// Confirming sumatoria Spain
-		List<Double> SpainConfirNomValCurSum = new ArrayList<Double>();
-		List<Double> SpainConfirCerSum = new ArrayList<Double>();
-		List<Double> SpainConfirNomValSum = new ArrayList<Double>();
-
-		// Descuentos Spain
-		List<String> SpainDesc = new ArrayList<String>();
-		// Descuentos sumatoria Spain
-		List<Double> SpainDescNomValCurSum = new ArrayList<Double>();
-		List<Double> SpainDescCerSum = new ArrayList<Double>();
-		List<Double> SpainDescNomValSum = new ArrayList<Double>();
-
-		// Factoring Spain
-		List<String> SpainFac = new ArrayList<String>();
-		// Factoring sumatoria Spain
-		List<Double> SpainFacNomValCurSum = new ArrayList<Double>();
-		List<Double> SpainFacCerSum = new ArrayList<Double>();
-		List<Double> SpainFacNomValSum = new ArrayList<Double>();
-
-		// Tarjetas Spain
-		List<String> SpainTar = new ArrayList<String>();
-		// Tarjetas sumatoria Spain
-		List<Double> SpainTarNomValCurSum = new ArrayList<Double>();
-		List<Double> SpainTarCerSum = new ArrayList<Double>();
-		List<Double> SpainTarNomValSum = new ArrayList<Double>();
-
-		// Lineas Comprometidas Spain
-		List<String> SpainLinCom = new ArrayList<String>();
-		// Lineas Comprometidas sumatorias Spain
-		List<Double> SpainLinComNomValCurSum = new ArrayList<Double>();
-		List<Double> SpainLinComCerSum = new ArrayList<Double>();
-		List<Double> SpainLinComNomValSum = new ArrayList<Double>();
-
-		// Lineas Comprometidas Spain
-		List<String> SpainLinNoCom = new ArrayList<String>();
-		// Lineas Comprometidas sumatorias Spain
-		List<Double> SpainLinNoComNomValCurSum = new ArrayList<Double>();
-		List<Double> SpainLinNoComCerSum = new ArrayList<Double>();
-		List<Double> SpainLinNoComNomValSum = new ArrayList<Double>();
-
-		// Garantias Spain
-		List<String> SpainGaran = new ArrayList<String>();
-		// Garantias sumatoria Mexico
-		List<Double> SpainGaranNomValCurSum = new ArrayList<Double>();
-		List<Double> SpainGaranCerSum = new ArrayList<Double>();
-		List<Double> SpainGaranNomValSum = new ArrayList<Double>();
-
-		// Avales Spain
-		List<String> SpainAval = new ArrayList<String>();
-		// Avales sumatoria Spain
-		List<Double> SpainAvalNomValCurSum = new ArrayList<Double>();
-		List<Double> SpainAvalCerSum = new ArrayList<Double>();
-		List<Double> SpainAvalNomValSum = new ArrayList<Double>();
-
-		// Derivados Spain
-		List<String> SpainDer = new ArrayList<String>();
-		// Derivados sumatoria Spain
-		List<Double> SpainDerNomValCurSum = new ArrayList<Double>();
-		List<Double> SpainDerCerSum = new ArrayList<Double>();
-		List<Double> SpainDerNomValSum = new ArrayList<Double>();
-
-		// Total General Spain
-		List<Double> SpainTotNomValCurSum = new ArrayList<Double>();
-		List<Double> SpainTotCerSum = new ArrayList<Double>();
-		List<Double> SpainTotNomValSum = new ArrayList<Double>();
-
-		// LeasingRenting Spain
-		List<String> SpainLeasingRenting = new ArrayList<String>();
-		// Avales sumatoria Mexico
-		List<Double> SpainLeasingRentingValCurSum = new ArrayList<Double>();
-		List<Double> SpainLeasingRentingCerSum = new ArrayList<Double>();
-		List<Double> SpainLeasingRentingNomValSum = new ArrayList<Double>();
-
-		// Overdrafts Spain
-		List<String> SpainOverdrafts = new ArrayList<String>(); // registro completo 17
-		// Avales sumatoria Mexico
-		List<Double> SpainOverdraftsValCurSum = new ArrayList<Double>();// nom
-		List<Double> SpainOverdraftsCerSum = new ArrayList<Double>();// cer
-		List<Double> SpainOverdraftsNomValSum = new ArrayList<Double>();// nomvalcur
-
-		ArrayList<String> contraparte = new ArrayList<String>();
-
-		List<String> encabezado = new ArrayList<>();
-		encabezado.add("CPTYPARENT|");
-		encabezado.add("CPTYPARENTRATING|");
-		encabezado.add("CPTYPARENTNAME|");
-		encabezado.add("DEALSTAMP|");
-		encabezado.add("INSTRUMENTNAME|");
-		encabezado.add("VALUEDATE|");
-		encabezado.add("MATURITYDATE|");
-		encabezado.add("CURRENCY|");
-		encabezado.add("NOMINALVALUECUR|");
-		encabezado.add("CER|");
-		encabezado.add("NOMINALVALUE|");
-		encabezado.add("ONEOFF|");
-		encabezado.add("CPTYNAME|");
-		encabezado.add("FOLDERCOUNTRYNAME|");
-		encabezado.add("CPTYCOUNTRY|");
-		encabezado.add("CPTYPARENTCOUNTRY|");
-		encabezado.add("FOLDERCOUNTRY");
-		encabezado.add("\n");
-
 		String systCode = "SELECT cptyparent, NVL(cptyparentrating, 'SIN RATING'),cptyparentname,dealstamp,instrumentname,TO_CHAR(TO_DATE(valuedate,  'YYYY-MM-DD'), 'DD-mon-YY'),TO_CHAR(TO_DATE(maturitydate,  'YYYY-MM-DD'), 'DD-mon-YY'),currency,to_char(DECODE(nominalvaluecur,null, '0.0',nominalvaluecur), '999,999,999,999.99')  AS nominalvaluecur,to_char(DECODE(CER,null, '0.0',CER), '999,999,999,999.99')  AS CER,to_char(DECODE(nominalvalue,null, '0.0',nominalvalue), '999,999,999,999.99')  AS nominalvalue,oneoff,cptyname,foldercountryname,cptycountry,cptyparentcountry,foldercountry from PGT_MEX.T_PGT_MEX_CONSUMOSC_V WHERE LastParentF ='"
 				+ grupo + "' and FECHACARGA='" + fechaConsumo
 				+ "' AND foldercountryname<>'Mexico' UNION ALL SELECT cptyparent, NVL(cptyparentrating, 'SIN RATING'),cptyparentname,dealstamp,instrumentname,TO_CHAR(TO_DATE(valuedate,  'YYYY-MM-DD'), 'DD-mon-YY'),TO_CHAR(TO_DATE(maturitydate,  'YYYY-MM-DD'), 'DD-mon-YY'),currency,to_char(DECODE(nominalvaluecur,null, '0.0',nominalvaluecur), '999,999,999,999.99')  AS nominalvaluecur,to_char(DECODE(CER,null, '0.0',CER), '999,999,999,999.99')  AS CER,to_char(DECODE(nominalvalue,null, '0.0',nominalvalue), '999,999,999,999.99')  AS nominalvalue,oneoff,cptyname,foldercountryname,cptycountry,cptyparentcountry,foldercountry from PGT_MEX.T_PGT_MEX_CONSUMOSC_D WHERE LastParentF ='"
 				+ grupo + "' and FECHACARGA='" + fechaConsumo
 				+ "' AND foldercountryname<>'Mexico' ORDER BY foldercountryname ,instrumentname ";
 		ResultSet rs = sta.executeQuery(systCode);
-
+		ValidaIntrumentos valida = new ValidaIntrumentos();
+		int total = getQueryRowCount(systCode);
 		if (rs.equals(null) || rs.next() == false) {
 			systCode = "No existen registros para este grupo en la interfaz CONSULTA";
 		} else {
 
-			String pais = null;
 			do {
 				// cadena
 				systCode = rs.getString(1) + "|" + rs.getString(2) + "|" + "\"" + rs.getString(3) + "\"" + "|"
@@ -390,328 +247,18 @@ public class Conexion {
 						+ rs.getString(8) + "|" + rs.getString(9) + "|" + rs.getString(10) + "|" + rs.getString(11)
 						+ "|" + rs.getString(12) + "|" + "\"" + rs.getString(13) + "\"" + "|" + rs.getString(14) + "|"
 						+ "\"" + rs.getString(15) + "\"" + "|" + rs.getString(16) + "|" + rs.getString(17) + "\n";
-				sumatoriaNomValCur = DecimalFormat.getNumberInstance().parse(rs.getString(9).trim()).doubleValue();
-				sumatoriaCer = DecimalFormat.getNumberInstance().parse(rs.getString(10).trim()).doubleValue();
-				sumatoriaNomVal = DecimalFormat.getNumberInstance().parse(rs.getString(11).trim()).doubleValue();
-				if (pais == null || pais.equals(rs.getNString(14))) {
-					pais = rs.getNString(14);
-					if (rs.getString(5).contains("BOND")) {
-						SpainBonos.add(systCode);
-						info = this.getContraparte(fechaConsumo, rs.getString(4), rs.getString(14));
-						contraparte.addAll(info);
-						SpainBonos.addAll(info);
-						SpainBonosNomValCurSum.add(Double.valueOf(sumatoriaNomValCur));
-						SpainBonosCerSum.add(Double.valueOf(sumatoriaCer));
-						SpainBonosNomValSum.add(Double.valueOf(sumatoriaNomVal));
-						SpainTotNomValCurSum.add(sumatoriaNomValCur);
-						SpainTotCerSum.add(sumatoriaCer);
-						SpainTotNomValSum.add(sumatoriaNomVal);
-					} else if (rs.getString(5).contains(" CREDITO DOCUMENTARIO")) {
-						SpainCredDocu.add(systCode);
-						info = this.getContraparte(fechaConsumo, rs.getString(4), rs.getString(14));
-						contraparte.addAll(info);
-						SpainCredDocu.addAll(info);
-						SpainCredDocuNomValCurSum.add(sumatoriaNomValCur);
-						SpainCredDocuCerSum.add(sumatoriaCer);
-						SpainCredDocuNomValSum.add(sumatoriaNomVal);
-						SpainTotNomValCurSum.add(sumatoriaNomValCur);
-						SpainTotCerSum.add(sumatoriaCer);
-						SpainTotNomValSum.add(sumatoriaNomVal);
-					} else if (rs.getString(5).contains("EXPORTACION") || rs.getString(5).contains("IMPORTACION")) {
-						SpainExportImport.add(systCode);
-						info = this.getContraparte(fechaConsumo, rs.getString(4), rs.getString(14));
-						contraparte.addAll(info);
-						SpainExportImport.addAll(info);
-						SpainExportImportNomValCurSum.add(sumatoriaNomValCur);
-						SpainExportImportCerSum.add(sumatoriaCer);
-						SpainExportImportNomValSum.add(sumatoriaNomVal);
-						SpainTotNomValCurSum.add(sumatoriaNomValCur);
-						SpainTotCerSum.add(sumatoriaCer);
-						SpainTotNomValSum.add(sumatoriaNomVal);
-					} else if (rs.getString(5).contains("COMEX") || rs.getString(5).contains("FORFAITING")) {
-						SpainComFor.add(systCode);
-						info = this.getContraparte(fechaConsumo, rs.getString(4), rs.getString(14));
-						contraparte.addAll(info);
-						SpainComFor.addAll(info);
-						SpainComForNomValCurSum.add(sumatoriaNomValCur);
-						SpainComForCerSum.add(sumatoriaCer);
-						SpainComForNomValSum.add(sumatoriaNomVal);
-						SpainTotNomValCurSum.add(sumatoriaNomValCur);
-						SpainTotCerSum.add(sumatoriaCer);
-						SpainTotNomValSum.add(sumatoriaNomVal);
-					} else if (rs.getString(5).contains("SINDICADO")) {
-						SpainSindicado.add(systCode);
-						info = this.getContraparte(fechaConsumo, rs.getString(4), rs.getString(14));
-						contraparte.addAll(info);
-						SpainSindicado.addAll(info);
-						SpainSindicadoNomValCurSum.add(sumatoriaNomValCur);
-						SpainSindicadoCerSum.add(sumatoriaCer);
-						SpainSindicadoNomValSum.add(sumatoriaNomVal);
-						SpainTotNomValCurSum.add(sumatoriaNomValCur);
-						SpainTotCerSum.add(sumatoriaCer);
-						SpainTotNomValSum.add(sumatoriaNomVal);
-					} else if (rs.getString(5).contains("CONFIRMING")) {
-						SpainConfir.add(systCode);
-						info = this.getContraparte(fechaConsumo, rs.getString(4), rs.getString(14));
-						contraparte.addAll(info);
-						SpainConfir.addAll(info);
-						SpainConfirNomValCurSum.add(sumatoriaNomValCur);
-						SpainConfirCerSum.add(sumatoriaCer);
-						SpainConfirNomValSum.add(sumatoriaNomVal);
-						SpainTotNomValCurSum.add(sumatoriaNomValCur);
-						SpainTotCerSum.add(sumatoriaCer);
-						SpainTotNomValSum.add(sumatoriaNomVal);
-					} else if (rs.getString(5).contains("DESCUENTOS")) {
-						SpainDesc.add(systCode);
-						info = this.getContraparte(fechaConsumo, rs.getString(4), rs.getString(14));
-						contraparte.addAll(info);
-						SpainDesc.addAll(info);
-						SpainDescNomValCurSum.add(sumatoriaNomValCur);
-						SpainDescCerSum.add(sumatoriaCer);
-						SpainDescNomValSum.add(sumatoriaNomVal);
-						SpainTotNomValCurSum.add(sumatoriaNomValCur);
-						SpainTotCerSum.add(sumatoriaCer);
-						SpainTotNomValSum.add(sumatoriaNomVal);
-					} else if (rs.getString(5).contains("FACTORING")) {
-						SpainFac.add(systCode);
-						info = this.getContraparte(fechaConsumo, rs.getString(4), rs.getString(14));
-						contraparte.addAll(info);
-						SpainFac.addAll(info);
-						SpainFacNomValCurSum.add(sumatoriaNomValCur);
-						SpainFacCerSum.add(sumatoriaCer);
-						SpainFacNomValSum.add(sumatoriaNomVal);
-						SpainTotNomValCurSum.add(sumatoriaNomValCur);
-						SpainTotCerSum.add(sumatoriaCer);
-						SpainTotNomValSum.add(sumatoriaNomVal);
-					} else if (rs.getString(5).contains("TARJETAS")) {
-						SpainTar.add(systCode);
-						info = this.getContraparte(fechaConsumo, rs.getString(4), rs.getString(14));
-						contraparte.addAll(info);
-						SpainTar.addAll(info);
-						SpainTarNomValCurSum.add(sumatoriaNomValCur);
-						SpainTarCerSum.add(sumatoriaCer);
-						SpainTarNomValSum.add(sumatoriaNomVal);
-						SpainTotNomValCurSum.add(sumatoriaNomValCur);
-						SpainTotCerSum.add(sumatoriaCer);
-						SpainTotNomValSum.add(sumatoriaNomVal);
-					} else if (rs.getString(5).contains("LINEA MULTIDEAL RESTO")
-							|| rs.getString(5).contains("CREDITOS - COMPROMETIDO")
-							|| rs.getString(5).contains("CREDITO BACKUP")
-							|| rs.getString(5).contains("CREDITO OTROS")) {
-						SpainLinCom.add(systCode);
-						info = this.getContraparte(fechaConsumo, rs.getString(4), rs.getString(14));
-						contraparte.addAll(info);
-						SpainLinCom.addAll(info);
-						SpainLinComNomValCurSum.add(sumatoriaNomValCur);
-						SpainLinComCerSum.add(sumatoriaCer);
-						SpainLinComNomValSum.add(sumatoriaNomVal);
-						SpainTotNomValCurSum.add(sumatoriaNomValCur);
-						SpainTotCerSum.add(sumatoriaCer);
-						SpainTotNomValSum.add(sumatoriaNomVal);
-					} else if (rs.getString(5).contains("GARANTIA ACCIONES")
-							|| rs.getString(5).contains("GARANTIA AVAL")
-							|| rs.getString(5).contains("GARANTIA DERECHOS")
-							|| rs.getString(5).contains("GARANTIA PERSONAL")
-							|| rs.getString(5).contains("OTRAS GARANTIAS EN")
-							|| rs.getString(5).contains("OTRAS GARANTIAS REALES")
-							|| rs.getString(5).contains("OTHER GUARANTY")) {
-						SpainGaran.add(systCode);
-						SpainGaranNomValCurSum.add(sumatoriaNomValCur);
-						SpainGaranCerSum.add(sumatoriaCer);
-						SpainGaranNomValSum.add(sumatoriaNomVal);
-						SpainTotNomValCurSum.add(sumatoriaNomValCur);
-						SpainTotCerSum.add(sumatoriaCer);
-						SpainTotNomValSum.add(sumatoriaNomVal);
-					} else if (rs.getString(5).contains("AVAL COMERCIAL")
-							|| rs.getString(5).contains("AVAL FINANCIERO - NO COMPROMETIDO")
-							|| rs.getString(5).contains("AVAL NO") || rs.getString(5).contains("AVAL TECNICO")
-							|| rs.getString(5).contains("GARANTIA LINE") || rs.getString(5).contains("STANDBY")
-							|| rs.getString(5).contains("LINEA DE AVALES")) {
-						SpainAval.add(systCode);
-						info = this.getContraparte(fechaConsumo, rs.getString(4), rs.getString(14));
-						contraparte.addAll(info);
-						SpainAval.addAll(info);
-						SpainAvalNomValCurSum.add(sumatoriaNomValCur);
-						SpainAvalCerSum.add(sumatoriaCer);
-						SpainAvalNomValSum.add(sumatoriaNomVal);
-						SpainTotNomValCurSum.add(sumatoriaNomValCur);
-						SpainTotCerSum.add(sumatoriaCer);
-						SpainTotNomValSum.add(sumatoriaNomVal);
-					} else if (rs.getString(5).contains("ASSET") || rs.getString(5).contains("CALL")
-							|| rs.getString(5).contains("CERTIFICATES") || rs.getString(5).contains("COLLAR")
-							|| rs.getString(5).contains("EQUITY") || rs.getString(5).contains("COMMODITY")
-							|| rs.getString(5).contains("CREDIT DEFAULT") || rs.getString(5).contains("CURRENCY")
-							|| rs.getString(5).contains("FIXED") || rs.getString(5).contains("FLOATING")
-							|| rs.getString(5).contains("FX") || rs.getString(5).contains("INDEXED")
-							|| rs.getString(5).contains("INTEREST") || rs.getString(5).contains("ZERO")
-							|| rs.getString(5).contains("INITIAL MARGIN CASH") || rs.getString(5).contains("VARIATION")
-							|| rs.getString(5).contains("NOSTRO") || rs.getString(5).contains("VOSTRO")
-							|| rs.getString(5).contains("ACOTADO") || rs.getString(5).contains("SECURITIES")
-							|| rs.getString(5).contains("MONEY MARKET") || rs.getString(5).contains("SECURED")
-							|| rs.getString(5).contains("RECEIVER REVENUE") || rs.getString(5).contains("YEAR ON YEAR")
-							|| rs.getString(5).contains("GENERIC DEALS") || rs.getString(5).contains("OPTIONSPAYER")
-							|| rs.getString(5).contains("OPTIONS RECEIVER") || rs.getString(5).contains("BONIFICADO")
-							|| rs.getString(5).contains("SWAP FORWARD") || rs.getString(5).contains("TITULIZACION")
-							|| rs.getString(5).contains("DELIVERABLE") || rs.getString(5).contains("GENERIC DEALS")
-							|| rs.getString(5).contains("PAYER REVENUE")) {
-						SpainDer.add(systCode);
-						info = this.getContraparte(fechaConsumo, rs.getString(4), rs.getString(14));
-						contraparte.addAll(info);
-						SpainDer.addAll(info);
-						SpainDerNomValCurSum.add(sumatoriaNomValCur);
-						SpainDerCerSum.add(sumatoriaCer);
-						SpainDerNomValSum.add(sumatoriaNomVal);
-						SpainTotNomValCurSum.add(sumatoriaNomValCur);
-						SpainTotCerSum.add(sumatoriaCer);
-						SpainTotNomValSum.add(sumatoriaNomVal);
-					} else if (rs.getString(5).contains("CREDITOS - NO COMPROMETIDO")) {
-						SpainLinNoCom.add(systCode);
-						info = this.getContraparte(fechaConsumo, rs.getString(4), rs.getString(14));
-						contraparte.addAll(info);
-						SpainLinNoCom.addAll(info);
-						SpainLinNoComNomValCurSum.add(sumatoriaNomValCur);
-						SpainLinNoComCerSum.add(sumatoriaCer);
-						SpainLinNoComNomValSum.add(sumatoriaNomVal);
-						SpainTotNomValCurSum.add(sumatoriaNomValCur);
-						SpainTotCerSum.add(sumatoriaCer);
-						SpainTotNomValSum.add(sumatoriaNomVal);
-					} else if (rs.getString(5).contains("LEASING") || rs.getString(5).contains("RENTING")) {
-						SpainLeasingRenting.add(systCode);
-						info = this.getContraparte(fechaConsumo, rs.getString(4), rs.getString(14));
-						contraparte.addAll(info);
-						SpainLeasingRenting.addAll(info);
-						SpainLeasingRentingValCurSum.add(sumatoriaNomValCur);
-						SpainLeasingRentingCerSum.add(sumatoriaCer);
-						SpainLeasingRentingNomValSum.add(sumatoriaNomVal);
-						SpainTotNomValCurSum.add(sumatoriaNomValCur);
-						SpainTotCerSum.add(sumatoriaCer);
-						SpainTotNomValSum.add(sumatoriaNomVal);
-					} else if (rs.getString(5).contains("OVERDRAFTS")) {
-						SpainOverdrafts.add(systCode);
-						info = this.getContraparte(fechaConsumo, rs.getString(4), rs.getString(14));
-						contraparte.addAll(info);
-						SpainOverdrafts.addAll(info);
-						SpainOverdraftsValCurSum.add(sumatoriaNomValCur);
-						SpainOverdraftsCerSum.add(sumatoriaCer);
-						SpainOverdraftsNomValSum.add(sumatoriaNomVal);
-						SpainTotNomValCurSum.add(sumatoriaNomValCur);
-						SpainTotCerSum.add(sumatoriaCer);
-						SpainTotNomValSum.add(sumatoriaNomVal);
-					}
 
-				} else {
-
-					this.creaInterfaz(encabezado, SpainBonos, SpainBonosNomValCurSum, SpainBonosCerSum,
-							SpainBonosNomValSum, SpainCredDocu, SpainCredDocuNomValCurSum, SpainCredDocuCerSum,
-							SpainCredDocuNomValSum, SpainExportImport, SpainExportImportNomValCurSum,
-							SpainExportImportCerSum, SpainExportImportNomValSum, SpainComFor, SpainComForNomValCurSum,
-							SpainComForCerSum, SpainComForNomValSum, SpainSindicado, SpainSindicadoNomValCurSum,
-							SpainSindicadoCerSum, SpainSindicadoNomValSum, SpainConfir, SpainConfirNomValCurSum,
-							SpainConfirCerSum, SpainConfirNomValSum, SpainDesc, SpainDescNomValCurSum, SpainDescCerSum,
-							SpainDescNomValSum, SpainFac, SpainFacNomValCurSum, SpainFacCerSum, SpainFacNomValSum,
-							SpainTar, SpainTarNomValCurSum, SpainTarCerSum, SpainTarNomValSum, SpainLinCom,
-							SpainLinComNomValCurSum, SpainLinComCerSum, SpainLinComNomValSum, SpainGaran,
-							SpainGaranNomValCurSum, SpainGaranCerSum, SpainGaranNomValSum, SpainAval,
-							SpainAvalNomValCurSum, SpainAvalCerSum, SpainAvalNomValSum, SpainDer, SpainDerNomValCurSum,
-							SpainDerCerSum, SpainDerNomValSum, SpainTotNomValCurSum, SpainTotCerSum, SpainTotNomValSum,
-							nombreInterfaz, pais, contraparte, SpainLinNoCom, SpainLinNoComNomValCurSum,
-							SpainLinNoComCerSum, SpainLinNoComNomValSum, SpainLeasingRenting,
-							SpainLeasingRentingValCurSum, SpainLeasingRentingCerSum, SpainLeasingRentingNomValSum,
-							SpainOverdrafts, SpainOverdraftsValCurSum, SpainOverdraftsCerSum, SpainOverdraftsNomValSum);
-
-					pais = rs.getNString(14);
-					contraparte.clear();
-					SpainBonos.clear();
-					SpainBonosNomValCurSum.clear();
-					SpainBonosCerSum.clear();
-					SpainBonosNomValSum.clear();
-					SpainCredDocu.clear();
-					SpainCredDocuNomValCurSum.clear();
-					SpainCredDocuCerSum.clear();
-					SpainCredDocuNomValSum.clear();
-					SpainExportImport.clear();
-					SpainExportImportNomValCurSum.clear();
-					SpainExportImportCerSum.clear();
-					SpainExportImportNomValSum.clear();
-					SpainComFor.clear();
-					SpainComForNomValCurSum.clear();
-					SpainComForCerSum.clear();
-					SpainComForNomValSum.clear();
-					SpainSindicado.clear();
-					SpainSindicadoNomValCurSum.clear();
-					SpainSindicadoCerSum.clear();
-					SpainSindicadoNomValSum.clear();
-					SpainConfir.clear();
-					SpainConfirNomValCurSum.clear();
-					SpainConfirCerSum.clear();
-					SpainConfirNomValSum.clear();
-					SpainDesc.clear();
-					SpainDescNomValCurSum.clear();
-					SpainDescCerSum.clear();
-					SpainDescNomValSum.clear();
-					SpainFac.clear();
-					SpainFacNomValCurSum.clear();
-					SpainFacCerSum.clear();
-					SpainFacNomValSum.clear();
-					SpainTar.clear();
-					SpainTarNomValCurSum.clear();
-					SpainTarCerSum.clear();
-					SpainTarNomValSum.clear();
-					SpainLinCom.clear();
-					SpainLinComNomValCurSum.clear();
-					SpainLinComCerSum.clear();
-					SpainLinComNomValSum.clear();
-					SpainGaran.clear();
-					SpainGaranNomValCurSum.clear();
-					SpainGaranCerSum.clear();
-					SpainGaranNomValSum.clear();
-					SpainAval.clear();
-					SpainAvalNomValCurSum.clear();
-					SpainAvalCerSum.clear();
-					SpainAvalNomValSum.clear();
-					SpainDer.clear();
-					SpainDerNomValCurSum.clear();
-					SpainDerCerSum.clear();
-					SpainDerNomValSum.clear();
-					SpainTotNomValCurSum.clear();
-					SpainTotCerSum.clear();
-					SpainTotNomValSum.clear();
-					SpainLinNoCom.clear();
-					SpainLinNoComNomValCurSum.clear();
-					SpainLinNoComCerSum.clear();
-					SpainLinNoComNomValSum.clear();
-					SpainLeasingRenting.clear();
-					SpainLeasingRentingValCurSum.clear();
-					SpainLeasingRentingCerSum.clear();
-					SpainLeasingRentingNomValSum.clear();
-					SpainOverdrafts.clear();
-					SpainOverdraftsValCurSum.clear();
-					SpainOverdraftsCerSum.clear();
-					SpainOverdraftsNomValSum.clear();
-
+				try {
+					valida.intrumentosParteUno(systCode, rs.getString(5), fechaConsumo, rs.getString(4),
+							rs.getString(14), rs.getString(9), rs.getString(10), rs.getString(11), nombreInterfaz,total);
+				} catch (Exception e) {
+					LOGGER.info(e);
 				}
 
 			} while (rs.next());
 			if (systCode.isEmpty()) {
 				systCode = "No existen registros para este grupo en la interfaz CONSULTA";
 			}
-
-			this.creaInterfaz(encabezado, SpainBonos, SpainBonosNomValCurSum, SpainBonosCerSum, SpainBonosNomValSum,
-					SpainCredDocu, SpainCredDocuNomValCurSum, SpainCredDocuCerSum, SpainCredDocuNomValSum,
-					SpainExportImport, SpainExportImportNomValCurSum, SpainExportImportCerSum,
-					SpainExportImportNomValSum, SpainComFor, SpainComForNomValCurSum, SpainComForCerSum,
-					SpainComForNomValSum, SpainSindicado, SpainSindicadoNomValCurSum, SpainSindicadoCerSum,
-					SpainSindicadoNomValSum, SpainConfir, SpainConfirNomValCurSum, SpainConfirCerSum,
-					SpainConfirNomValSum, SpainDesc, SpainDescNomValCurSum, SpainDescCerSum, SpainDescNomValSum,
-					SpainFac, SpainFacNomValCurSum, SpainFacCerSum, SpainFacNomValSum, SpainTar, SpainTarNomValCurSum,
-					SpainTarCerSum, SpainTarNomValSum, SpainLinCom, SpainLinComNomValCurSum, SpainLinComCerSum,
-					SpainLinComNomValSum, SpainGaran, SpainGaranNomValCurSum, SpainGaranCerSum, SpainGaranNomValSum,
-					SpainAval, SpainAvalNomValCurSum, SpainAvalCerSum, SpainAvalNomValSum, SpainDer,
-					SpainDerNomValCurSum, SpainDerCerSum, SpainDerNomValSum, SpainTotNomValCurSum, SpainTotCerSum,
-					SpainTotNomValSum, nombreInterfaz, pais, contraparte, SpainLinNoCom, SpainLinNoComNomValCurSum,
-					SpainLinNoComCerSum, SpainLinNoComNomValSum, SpainLeasingRenting, SpainLeasingRentingValCurSum,
-					SpainLeasingRentingCerSum, SpainLeasingRentingNomValSum, SpainOverdrafts, SpainOverdraftsValCurSum,
-					SpainOverdraftsCerSum, SpainOverdraftsNomValSum);
 
 		}
 

@@ -74,13 +74,17 @@ public class ValidaIntrumentos {
 	private ObjetosIntrumento objs = new ObjetosIntrumento();
 
 	/**
-	 * se declara contador 
-	 * que indicara que ya es el ultimo 
-	 * registro evaluado para mandarlo 
-	 * escribir
+	 * se declara contador que indicara que ya es el ultimo registro evaluado para
+	 * mandarlo escribir
 	 * 
 	 */
+
+	double sumatoriaNomValCur;
+	double sumatoriaCer;
+	double sumatoriaNomVal;
 	private int cont = 0;
+	String Validapais = null;
+	String cadenaMexicoGaran;
 
 	/**
 	 * metodo intrumentosParteUno evalua la primera parte de los instrumentos
@@ -98,6 +102,7 @@ public class ValidaIntrumentos {
 	 *                       escribe la interfaz
 	 * @throws Exception excepcion generar durante la ejecucion del proceso
 	 */
+
 	public void intrumentosParteUno(String systCode, String instrumentos, String fechaConsumo, String deal, String pais,
 			String nomValCur, String cer, String nomVal, String nombreInterfaz, Integer registros) throws Exception {
 
@@ -106,116 +111,122 @@ public class ValidaIntrumentos {
 		/**
 		 * se valida si es un bono
 		 */
-		if (constans.getBonos().contains(instrumentos)) {
-			obj.getBono().bonos(fechaConsumo, systCode, deal, pais, nomValCur, cer, nomVal);
-			obj.getSumatoria().bonos(fechaConsumo, systCode, deal, pais, nomValCur, cer, nomVal);
-			info = conection.getContraparte(fechaConsumo, deal, pais);
-			contraparte.addAll(info);
-			instrumento.add(obj.getBono());
-			instrumento.add(obj.getSumatoria());
-		}
-		/**
-		 * se valida si es un credito documentariado
-		 */
-		if (constans.getDocument().contains(instrumentos)) {
-			obj.getDocumentariado().bonos(fechaConsumo, systCode, deal, pais, nomValCur, cer, nomVal);
-			obj.getSumatoria().bonos(fechaConsumo, systCode, deal, pais, nomValCur, cer, nomVal);
-			info = conection.getContraparte(fechaConsumo, deal, pais);
-			contraparte.addAll(info);
-			instrumento.add(obj.getDocumentariado());
-			instrumento.add(obj.getSumatoria());
-		}
-		/**
-		 * se valida si es exportacion/importacion
-		 */
-		if (constans.getImpExp().contains(instrumentos)) {
-			obj.getImpexp().bonos(fechaConsumo, systCode, deal, pais, nomValCur, cer, nomVal);
-			obj.getSumatoria().bonos(fechaConsumo, systCode, deal, pais, nomValCur, cer, nomVal);
-			info = conection.getContraparte(fechaConsumo, deal, pais);
-			contraparte.addAll(info);
-			instrumento.add(obj.getImpexp());
-			instrumento.add(obj.getSumatoria());
-		}
-		/**
-		 * se valida si es comex
-		 */
-		if (constans.getComex().contains(instrumentos)) {
-			obj.getComex().bonos(fechaConsumo, systCode, deal, pais, nomValCur, cer, nomVal);
-			obj.getSumatoria().bonos(fechaConsumo, systCode, deal, pais, nomValCur, cer, nomVal);
-			info = conection.getContraparte(fechaConsumo, deal, pais);
-			contraparte.addAll(info);
-			instrumento.add(obj.getComex());
-			instrumento.add(obj.getSumatoria());
-		}
-		/**
-		 * se valida si es credito sindicado
-		 */
-		if (constans.getSindi().contains(instrumentos)) {
-			obj.getSindicado().bonos(fechaConsumo, systCode, deal, pais, nomValCur, cer, nomVal);
-			obj.getSumatoria().bonos(fechaConsumo, systCode, deal, pais, nomValCur, cer, nomVal);
-			info = conection.getContraparte(fechaConsumo, deal, pais);
-			contraparte.addAll(info);
-			instrumento.add(obj.getSindicado());
-			instrumento.add(obj.getSumatoria());
-		}
-		/**
-		 * se valida si es confirming
-		 */
-		if (constans.getConfirm().contains(instrumentos)) {
-			obj.getConfirming().bonos(fechaConsumo, systCode, deal, pais, nomValCur, cer, nomVal);
-			obj.getSumatoria().bonos(fechaConsumo, systCode, deal, pais, nomValCur, cer, nomVal);
-			info = conection.getContraparte(fechaConsumo, deal, pais);
-			contraparte.addAll(info);
-			instrumento.add(obj.getConfirming());
-			instrumento.add(obj.getSumatoria());
-		}
-		/**
-		 * se valida si es descuentos
-		 */
-		if (constans.getDescuen().contains(instrumentos)) {
-			obj.getDescuentos().bonos(fechaConsumo, systCode, deal, pais, nomValCur, cer, nomVal);
-			obj.getSumatoria().bonos(fechaConsumo, systCode, deal, pais, nomValCur, cer, nomVal);
-			info = conection.getContraparte(fechaConsumo, deal, pais);
-			contraparte.addAll(info);
-			instrumento.add(obj.getDescuentos());
-			instrumento.add(obj.getSumatoria());
-		}
-		/**
-		 * se valida si es factoring
-		 */
-		if (constans.getFactor().contains(instrumentos)) {
-			obj.getFactoring().bonos(fechaConsumo, systCode, deal, pais, nomValCur, cer, nomVal);
-			obj.getSumatoria().bonos(fechaConsumo, systCode, deal, pais, nomValCur, cer, nomVal);
-			info = conection.getContraparte(fechaConsumo, deal, pais);
-			contraparte.addAll(info);
-			instrumento.add(obj.getFactoring());
-			instrumento.add(obj.getSumatoria());
-		}
-		/**
-		 * se valida si son tarjetas de credito
-		 */
-		if (constans.getTarjeta().contains(instrumentos)) {
-			objs.getTarjeta().bonos(fechaConsumo, systCode, deal, pais, nomValCur, cer, nomVal);
-			obj.getSumatoria().bonos(fechaConsumo, systCode, deal, pais, nomValCur, cer, nomVal);
-			info = conection.getContraparte(fechaConsumo, deal, pais);
-			contraparte.addAll(info);
-			instrumento.add(objs.getTarjeta());
-			instrumento.add(obj.getSumatoria());
+		if (Validapais == null || pais.equals(Validapais)) {
+			Validapais = pais;
+			if (constans.getBonos().contains(instrumentos)) {
+				obj.getBono().bonos(fechaConsumo, systCode, deal, pais, nomValCur, cer, nomVal);
+				obj.getSumatoria().bonos(fechaConsumo, systCode, deal, pais, nomValCur, cer, nomVal);
+				info = conection.getContraparte(fechaConsumo, deal, pais);
+				contraparte.addAll(info);
+				instrumento.add(obj.getBono());
+				instrumento.add(obj.getSumatoria());
+			}
+			/**
+			 * se valida si es un credito documentariado
+			 */
+			if (constans.getDocument().contains(instrumentos)) {
+				obj.getDocumentariado().bonos(fechaConsumo, systCode, deal, pais, nomValCur, cer, nomVal);
+				obj.getSumatoria().bonos(fechaConsumo, systCode, deal, pais, nomValCur, cer, nomVal);
+				info = conection.getContraparte(fechaConsumo, deal, pais);
+				contraparte.addAll(info);
+				instrumento.add(obj.getDocumentariado());
+				instrumento.add(obj.getSumatoria());
+			}
+			/**
+			 * se valida si es exportacion/importacion
+			 */
+			if (constans.getImpExp().contains(instrumentos)) {
 
+				obj.getImpexp().bonos(fechaConsumo, systCode, deal, pais, nomValCur, cer, nomVal);
+				obj.getSumatoria().bonos(fechaConsumo, systCode, deal, pais, nomValCur, cer, nomVal);
+				info = conection.getContraparte(fechaConsumo, deal, pais);
+				contraparte.addAll(info);
+				instrumento.add(obj.getImpexp());
+				instrumento.add(obj.getSumatoria());
+			}
+			/**
+			 * se valida si es comex
+			 */
+			if (constans.getComex().contains(instrumentos)) {
+				obj.getComex().bonos(fechaConsumo, systCode, deal, pais, nomValCur, cer, nomVal);
+				obj.getSumatoria().bonos(fechaConsumo, systCode, deal, pais, nomValCur, cer, nomVal);
+				info = conection.getContraparte(fechaConsumo, deal, pais);
+				contraparte.addAll(info);
+				instrumento.add(obj.getComex());
+				instrumento.add(obj.getSumatoria());
+			}
+			/**
+			 * se valida si es credito sindicado
+			 */
+			if (constans.getSindi().contains(instrumentos)) {
+				obj.getSindicado().bonos(fechaConsumo, systCode, deal, pais, nomValCur, cer, nomVal);
+				obj.getSumatoria().bonos(fechaConsumo, systCode, deal, pais, nomValCur, cer, nomVal);
+				info = conection.getContraparte(fechaConsumo, deal, pais);
+				contraparte.addAll(info);
+				instrumento.add(obj.getSindicado());
+				instrumento.add(obj.getSumatoria());
+			}
+			/**
+			 * se valida si es confirming
+			 */
+			if (constans.getConfirm().contains(instrumentos)) {
+				obj.getConfirming().bonos(fechaConsumo, systCode, deal, pais, nomValCur, cer, nomVal);
+				obj.getSumatoria().bonos(fechaConsumo, systCode, deal, pais, nomValCur, cer, nomVal);
+				info = conection.getContraparte(fechaConsumo, deal, pais);
+				contraparte.addAll(info);
+				instrumento.add(obj.getConfirming());
+				instrumento.add(obj.getSumatoria());
+			}
+			/**
+			 * se valida si es descuentos
+			 */
+			if (constans.getDescuen().contains(instrumentos)) {
+				obj.getDescuentos().bonos(fechaConsumo, systCode, deal, pais, nomValCur, cer, nomVal);
+				obj.getSumatoria().bonos(fechaConsumo, systCode, deal, pais, nomValCur, cer, nomVal);
+				info = conection.getContraparte(fechaConsumo, deal, pais);
+				contraparte.addAll(info);
+				instrumento.add(obj.getDescuentos());
+				instrumento.add(obj.getSumatoria());
+			}
+			/**
+			 * se valida si es factoring
+			 */
+			if (constans.getFactor().contains(instrumentos)) {
+				obj.getFactoring().bonos(fechaConsumo, systCode, deal, pais, nomValCur, cer, nomVal);
+				obj.getSumatoria().bonos(fechaConsumo, systCode, deal, pais, nomValCur, cer, nomVal);
+				info = conection.getContraparte(fechaConsumo, deal, pais);
+				contraparte.addAll(info);
+				instrumento.add(obj.getFactoring());
+				instrumento.add(obj.getSumatoria());
+			}
+			/**
+			 * se valida si son tarjetas de credito
+			 */
+			if (constans.getTarjeta().contains(instrumentos)) {
+				objs.getTarjeta().bonos(fechaConsumo, systCode, deal, pais, nomValCur, cer, nomVal);
+				obj.getSumatoria().bonos(fechaConsumo, systCode, deal, pais, nomValCur, cer, nomVal);
+				info = conection.getContraparte(fechaConsumo, deal, pais);
+				contraparte.addAll(info);
+				instrumento.add(objs.getTarjeta());
+				instrumento.add(obj.getSumatoria());
+			}
+			/**
+			 * se valida si son lineas comprometidas
+			 */
+			if (constan.getComprome().contains(instrumentos)) {
+				obj.getComprome().bonos(fechaConsumo, systCode, deal, pais, nomValCur, cer, nomVal);
+				obj.getSumatoria().bonos(fechaConsumo, systCode, deal, pais, nomValCur, cer, nomVal);
+				info = conection.getContraparte(fechaConsumo, deal, pais);
+				contraparte.addAll(info);
+				instrumento.add(obj.getComprome());
+				instrumento.add(obj.getSumatoria());
+			}
+			this.intrumentosParteDos(systCode, instrumentos, fechaConsumo, deal, pais, nomValCur, cer, nomVal,
+					nombreInterfaz, registros);
+		} else {
+			this.intrumentosParteDos(systCode, instrumentos, fechaConsumo, deal, pais, nomValCur, cer, nomVal,
+					nombreInterfaz, registros);
 		}
-		/**
-		 * se valida si son lineas comprometidas
-		 */
-		if (constan.getComprome().contains(instrumentos)) {
-			obj.getComprome().bonos(fechaConsumo, systCode, deal, pais, nomValCur, cer, nomVal);
-			obj.getSumatoria().bonos(fechaConsumo, systCode, deal, pais, nomValCur, cer, nomVal);
-			info = conection.getContraparte(fechaConsumo, deal, pais);
-			contraparte.addAll(info);
-			instrumento.add(obj.getComprome());
-			instrumento.add(obj.getSumatoria());
-		}
-		this.intrumentosParteDos(systCode, instrumentos, fechaConsumo, deal, pais, nomValCur, cer, nomVal,
-				nombreInterfaz, registros);
 
 	}
 
@@ -238,107 +249,117 @@ public class ValidaIntrumentos {
 	public void intrumentosParteDos(String systCode, String instrumentos, String fechaConsumo, String deal, String pais,
 			String nomValCur, String cer, String nomVal, String nombreInterfaz, Integer registros) throws Exception {
 
-		double sumatoriaNomValCur = DecimalFormat.getNumberInstance().parse(nomValCur.trim()).doubleValue();
-		double sumatoriaCer = DecimalFormat.getNumberInstance().parse(cer.trim()).doubleValue();
-		double sumatoriaNomVal = DecimalFormat.getNumberInstance().parse(nomVal.trim()).doubleValue();
-		conection.conecGBO();
-
-		/**
-		 * se valida si son garantias
-		 */
-		if (constan.getGarantia().contains(instrumentos)) {
-			mexicoGaran.add(systCode);
-			obj.getSumatoria().bonos(fechaConsumo, systCode, deal, pais, nomValCur, cer, nomVal);
-			mexicoGaranValCurSum.add(sumatoriaNomValCur);
-			mexicoGaranCerSum.add(sumatoriaCer);
-			mexicoGaranNomValSum.add(sumatoriaNomVal);
-			instrumento.add(obj.getSumatoria());
-		}
-		/**
-		 * se valida si son avales
-		 */
-		if (constans.getAvales().contains(instrumentos)) {
-
-			objs.getAval().bonos(fechaConsumo, systCode, deal, pais, nomValCur, cer, nomVal);
-			obj.getSumatoria().bonos(fechaConsumo, systCode, deal, pais, nomValCur, cer, nomVal);
-			info = conection.getContraparte(fechaConsumo, deal, pais);
-			contraparte.addAll(info);
-			instrumento.add(objs.getAval());
-			instrumento.add(obj.getSumatoria());
-		}
-		/**
-		 * se valida si son derivados
-		 */
-		if (constan.getDeriva().contains(instrumentos)) {
-			objs.getDerivados().bonos(fechaConsumo, systCode, deal, pais, nomValCur, cer, nomVal);
-			obj.getSumatoria().bonos(fechaConsumo, systCode, deal, pais, nomValCur, cer, nomVal);
-			info = conection.getContraparte(fechaConsumo, deal, pais);
-			contraparte.addAll(info);
-			instrumento.add(objs.getDerivados());
-			instrumento.add(obj.getSumatoria());
-		}
-		/**
-		 * se valida son lineas no comprometidas
-		 */
-		if (constan.getNocomprome().contains(instrumentos)) {
-			objs.getNocompro().bonos(fechaConsumo, systCode, deal, pais, nomValCur, cer, nomVal);
-			obj.getSumatoria().bonos(fechaConsumo, systCode, deal, pais, nomValCur, cer, nomVal);
-			info = conection.getContraparte(fechaConsumo, deal, pais);
-			contraparte.addAll(info);
-			instrumento.add(objs.getNocompro());
-			instrumento.add(obj.getSumatoria());
-		}
-		/**
-		 * se valida si es leassing - reating
-		 */
-		if (constan.getLearent().contains(instrumentos)) {
-			objs.getLeasrent().bonos(fechaConsumo, systCode, deal, pais, nomValCur, cer, nomVal);
-			obj.getSumatoria().bonos(fechaConsumo, systCode, deal, pais, nomValCur, cer, nomVal);
-			info = conection.getContraparte(fechaConsumo, deal, pais);
-			contraparte.addAll(info);
-			instrumento.add(objs.getLeasrent());
-			instrumento.add(obj.getSumatoria());
-		}
-		/**
-		 * se valida son overdrafs
-		 */
-		if (constan.getOverdraf().contains(instrumentos)) {
-			objs.getOver().bonos(fechaConsumo, systCode, deal, pais, nomValCur, cer, nomVal);
-			obj.getSumatoria().bonos(fechaConsumo, systCode, deal, pais, nomValCur, cer, nomVal);
-			info = conection.getContraparte(fechaConsumo, deal, pais);
-			contraparte.addAll(info);
-			instrumento.add(objs.getOver());
-			instrumento.add(obj.getSumatoria());
-		}
-
-		/**
-		 * se valida que las garantias que se encuentren en una contraparte ya no se
-		 * repitan asi que se eliminan del array final antes de ser enviadas a escribir
-		 */
+		sumatoriaNomValCur = DecimalFormat.getNumberInstance().parse(nomValCur.trim()).doubleValue();
+		sumatoriaCer = DecimalFormat.getNumberInstance().parse(cer.trim()).doubleValue();
+		sumatoriaNomVal = DecimalFormat.getNumberInstance().parse(nomVal.trim()).doubleValue();
 		ArrayList<String> newList = new ArrayList<String>();
-		for (String element : mexicoGaran) {
-			if (!contraparte.contains(element)) {
-				newList.add(element);
-			}
-		}
 
-		/**
-		 * se obtienen los array que guardan las cantidades de nominal value cur, cer y
-		 * nominal value para ser sumados y enviados al metodo que realizara la
-		 * escritura de la unterfaz
-		 */
-		String cadenaMexicoGaran = newList.stream().collect(Collectors.joining(""));
 		double totalMexicoGaranValCurSum = mexicoGaranValCurSum.stream().mapToDouble(Double::doubleValue).sum();
 		double totalMexicoGaranCerSum = mexicoGaranCerSum.stream().mapToDouble(Double::doubleValue).sum();
 		double totalMexicoGaranNomValSum = mexicoGaranNomValSum.stream().mapToDouble(Double::doubleValue).sum();
 
-		cont++;
-		if (registros == cont) {
+		conection.conecGBO();
+		if (pais.equals(Validapais)) {
+			/**
+			 * se valida si son garantias
+			 */
+			if (constan.getGarantia().contains(instrumentos)) {
+				mexicoGaran.add(systCode);
+				obj.getSumatoria().bonos(fechaConsumo, systCode, deal, pais, nomValCur, cer, nomVal);
+				mexicoGaranValCurSum.add(sumatoriaNomValCur);
+				mexicoGaranCerSum.add(sumatoriaCer);
+				mexicoGaranNomValSum.add(sumatoriaNomVal);
+				instrumento.add(obj.getSumatoria());
+			}
+			/**
+			 * se valida si son avales
+			 */
+			if (constans.getAvales().contains(instrumentos)) {
+
+				objs.getAval().bonos(fechaConsumo, systCode, deal, pais, nomValCur, cer, nomVal);
+				obj.getSumatoria().bonos(fechaConsumo, systCode, deal, pais, nomValCur, cer, nomVal);
+				info = conection.getContraparte(fechaConsumo, deal, pais);
+				contraparte.addAll(info);
+				instrumento.add(objs.getAval());
+				instrumento.add(obj.getSumatoria());
+			}
+			/**
+			 * se valida si son derivados
+			 */
+			if (constan.getDeriva().contains(instrumentos)) {
+				objs.getDerivados().bonos(fechaConsumo, systCode, deal, pais, nomValCur, cer, nomVal);
+				obj.getSumatoria().bonos(fechaConsumo, systCode, deal, pais, nomValCur, cer, nomVal);
+				info = conection.getContraparte(fechaConsumo, deal, pais);
+				contraparte.addAll(info);
+				instrumento.add(objs.getDerivados());
+				instrumento.add(obj.getSumatoria());
+			}
+			/**
+			 * se valida son lineas no comprometidas
+			 */
+			if (constan.getNocomprome().contains(instrumentos)) {
+				objs.getNocompro().bonos(fechaConsumo, systCode, deal, pais, nomValCur, cer, nomVal);
+				obj.getSumatoria().bonos(fechaConsumo, systCode, deal, pais, nomValCur, cer, nomVal);
+				info = conection.getContraparte(fechaConsumo, deal, pais);
+				contraparte.addAll(info);
+				instrumento.add(objs.getNocompro());
+				instrumento.add(obj.getSumatoria());
+			}
+			/**
+			 * se valida si es leassing - reating
+			 */
+			if (constan.getLearent().contains(instrumentos)) {
+				objs.getLeasrent().bonos(fechaConsumo, systCode, deal, pais, nomValCur, cer, nomVal);
+				obj.getSumatoria().bonos(fechaConsumo, systCode, deal, pais, nomValCur, cer, nomVal);
+				info = conection.getContraparte(fechaConsumo, deal, pais);
+				contraparte.addAll(info);
+				instrumento.add(objs.getLeasrent());
+				instrumento.add(obj.getSumatoria());
+			}
+			/**
+			 * se valida son overdrafs
+			 */
+			if (constan.getOverdraf().contains(instrumentos)) {
+				objs.getOver().bonos(fechaConsumo, systCode, deal, pais, nomValCur, cer, nomVal);
+				obj.getSumatoria().bonos(fechaConsumo, systCode, deal, pais, nomValCur, cer, nomVal);
+				info = conection.getContraparte(fechaConsumo, deal, pais);
+				contraparte.addAll(info);
+				instrumento.add(objs.getOver());
+				instrumento.add(obj.getSumatoria());
+			}
+
+			/**
+			 * se valida que las garantias que se encuentren en una contraparte ya no se
+			 * repitan asi que se eliminan del array final antes de ser enviadas a escribir
+			 */
+
+			for (String element : mexicoGaran) {
+				if (!contraparte.contains(element)) {
+					newList.add(element);
+				}
+			}
+
+			/**
+			 * se obtienen los array que guardan las cantidades de nominal value cur, cer y
+			 * nominal value para ser sumados y enviados al metodo que realizara la
+			 * escritura de la unterfaz
+			 */
+			String cadenaMexicoGaran = newList.stream().collect(Collectors.joining(""));
+
+			cont++;
+			if (registros == cont) {
+				Csv interfazCsv = new Csv();
+				interfazCsv.interfazCsvPrimeraParte(instrumento, newList, cadenaMexicoGaran, nombreInterfaz,
+				totalMexicoGaranValCurSum, totalMexicoGaranCerSum, totalMexicoGaranNomValSum, pais);
+			}
+		} else {
 			Csv interfazCsv = new Csv();
 			interfazCsv.interfazCsvPrimeraParte(instrumento, newList, cadenaMexicoGaran, nombreInterfaz,
-					totalMexicoGaranValCurSum, totalMexicoGaranCerSum, totalMexicoGaranNomValSum, pais);
+					totalMexicoGaranValCurSum, totalMexicoGaranCerSum, totalMexicoGaranNomValSum, Validapais);
+			cont++;
+			Validapais = pais;
+			obj.getSumatoria().limpiar();
 		}
-
 	}
 
 }
