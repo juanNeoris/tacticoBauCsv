@@ -78,13 +78,40 @@ public class ValidaIntrumentos {
 	 * mandarlo escribir
 	 * 
 	 */
-
-	double sumatoriaNomValCur;
-	double sumatoriaCer;
-	double sumatoriaNomVal;
 	private int cont = 0;
-	String Validapais = null;
-	String cadenaMexicoGaran;
+	
+	/**
+	 * se declara la variable que 
+	 * llevara la sumatoria del NominalValueCur
+	 * 
+	 */
+	private double sumatoriaNomValCur;
+	/**
+	 * se declara la variable que 
+	 * llevara la sumatoria del cer
+	 * 
+	 */
+	private double sumatoriaCer;
+	/**
+	 * se declara la variable que 
+	 * llevara la sumatoria del NominalValue
+	 * 
+	 */
+	private double sumatoriaNomVal;
+	/**
+	 * se declara la variable que 
+	 * llevara el control del pais que se esta
+	 * evaluando
+	 * 
+	 */
+
+	private String validapais = null;
+	/**
+	 * se declara variable que 
+	 * gurdara la cedena de las garantias
+	 * 
+	 */
+	private String cadenaMexicoGaran;
 
 	/**
 	 * metodo intrumentosParteUno evalua la primera parte de los instrumentos
@@ -111,8 +138,8 @@ public class ValidaIntrumentos {
 		/**
 		 * se valida si es un bono
 		 */
-		if (Validapais == null || pais.equals(Validapais)) {
-			Validapais = pais;
+		if (validapais == null || pais.equals(validapais)) {
+			validapais = pais;
 			if (constans.getBonos().contains(instrumentos)) {
 				obj.getBono().bonos(fechaConsumo, systCode, deal, pais, nomValCur, cer, nomVal);
 				obj.getSumatoria().bonos(fechaConsumo, systCode, deal, pais, nomValCur, cer, nomVal);
@@ -259,7 +286,7 @@ public class ValidaIntrumentos {
 		double totalMexicoGaranNomValSum = mexicoGaranNomValSum.stream().mapToDouble(Double::doubleValue).sum();
 
 		conection.conecGBO();
-		if (pais.equals(Validapais)) {
+		if (pais.equals(validapais)) {
 			/**
 			 * se valida si son garantias
 			 */
@@ -344,7 +371,7 @@ public class ValidaIntrumentos {
 			 * nominal value para ser sumados y enviados al metodo que realizara la
 			 * escritura de la unterfaz
 			 */
-			String cadenaMexicoGaran = newList.stream().collect(Collectors.joining(""));
+			 cadenaMexicoGaran = newList.stream().collect(Collectors.joining(""));
 
 			cont++;
 			if (registros == cont) {
@@ -353,11 +380,16 @@ public class ValidaIntrumentos {
 				totalMexicoGaranValCurSum, totalMexicoGaranCerSum, totalMexicoGaranNomValSum, pais);
 			}
 		} else {
+			/**
+			 * en dado caso que el pais
+			 * cambie se escribira el pais evaluado 
+			 * con todos los instrumentos
+			 */
 			Csv interfazCsv = new Csv();
 			interfazCsv.interfazCsvPrimeraParte(instrumento, newList, cadenaMexicoGaran, nombreInterfaz,
-					totalMexicoGaranValCurSum, totalMexicoGaranCerSum, totalMexicoGaranNomValSum, Validapais);
+					totalMexicoGaranValCurSum, totalMexicoGaranCerSum, totalMexicoGaranNomValSum, validapais);
 			cont++;
-			Validapais = pais;
+			validapais = pais;
 			obj.getSumatoria().limpiar();
 		}
 	}

@@ -47,8 +47,6 @@ public class Csv {
 	public void interfazCsvPrimeraParte(List<AvalBonos> instrumento, List<String> newList, String cadenaMexicoGaran,
 			String nombreInterfaz, Double totalMexicoGaranValCurSum, Double totalMexicoGaranCerSum,
 			Double totalMexicoGaranNomValSum, String pais) throws IOException {
-
-		System.out.println("pais escrito"+pais);
 		/**
 		 * se genera la instancia del archivo temporal
 		 */
