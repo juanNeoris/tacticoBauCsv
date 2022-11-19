@@ -73,7 +73,6 @@ public class SSHConnector {
 			// Ejecutamos el comando.
 			channelExec.setCommand(command);
 			channelExec.connect();
-
 			// Obtenemos el texto impreso en la consola.
 			BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 			StringBuilder builder = new StringBuilder();

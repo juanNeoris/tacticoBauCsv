@@ -35,23 +35,12 @@ public class AvalBonos {
 	 */
 	@Getter
 	private double totalMexicoBonosNomVal;
-
+	
 	/**
 	 * mexicoBonos
 	 */
 	private List<String> mexicoBonos = new ArrayList<String>();
-	/**
-	 * mexicoBonosNomValCurSum
-	 */
-	private List<Double> mexicoBonosNomValCurSum = new ArrayList<Double>();
-	/**
-	 * totalMexicoBonosNomVal
-	 */
-	private List<Double> mexicoBonosCerSum = new ArrayList<Double>();
-	/**
-	 * mexicoBonosNomValSum
-	 */
-	private List<Double> mexicoBonosNomValSum = new ArrayList<Double>();
+	
 	/**
 	 * info
 	 */
@@ -91,40 +80,41 @@ public class AvalBonos {
 
 		double sumatoriaNomValCur = DecimalFormat.getNumberInstance().parse(rsGetString9.trim()).doubleValue();
 		double sumatoriaCer = DecimalFormat.getNumberInstance().parse(rsGetString10.trim()).doubleValue();
-		double sumatoriaNomVal = DecimalFormat.getNumberInstance().parse(rsGetString11.trim()).doubleValue();
-		// se agrega la dacena al array
+		double sumatoriaNomVal = DecimalFormat.getNumberInstance().parse(rsGetString11.trim()).doubleValue(); 
+		/**
+		 * se agrega la dacena al array
+		 */
 		mexicoBonos.add(systCode);
-		// se consulta la contraparte y se coloca debajo de su operacion
+		/**
+		 * se consulta la contraparte y se coloca debajo de su operacion
+		 */
 		conexion.conecGBO();
 		info = conexion.getContraparte(fechaConsumo, rsGetString4, rsGetString14);
 		mexicoBonos.addAll(info);
-
-		info.clear();
-		// se crea la sumatoria para el intrumento evaluado
-		mexicoBonosNomValCurSum.add(Double.valueOf(sumatoriaNomValCur));
-		mexicoBonosCerSum.add(Double.valueOf(sumatoriaCer));
-		mexicoBonosNomValSum.add(Double.valueOf(sumatoriaNomVal));
-		// se crea el stream para obtener las sumatorias
-		// y es lo que se usa para generar la interfaz
-		//
+		info.clear(); 
+		/**
+		 * se crea la sumatoria para el intrumento evaluado
+		 * y es lo que se usa para generar la interfaz 
+		 */
 		cadenaBonosMex = mexicoBonos.stream().collect(Collectors.joining(""));
-		totalMexicoBonosNomValCur = mexicoBonosNomValCurSum.stream().mapToDouble(Double::doubleValue).sum();
-		totalMexicoBonosCer = mexicoBonosCerSum.stream().mapToDouble(Double::doubleValue).sum();
-		totalMexicoBonosNomVal = mexicoBonosNomValSum.stream().mapToDouble(Double::doubleValue).sum();
+		totalMexicoBonosNomValCur = totalMexicoBonosNomValCur+sumatoriaNomValCur;
+		totalMexicoBonosCer = totalMexicoBonosCer+sumatoriaCer;
+		totalMexicoBonosNomVal = totalMexicoBonosNomVal+sumatoriaNomVal;
 
 	}
+	
+	
 	
 	/**
 	  * Metdo que limpiara los array para cuando se opere otros paises
 	  * metodo limpiar
 	  */
 	public void limpiar() {
-
 		mexicoBonos.clear();
-		mexicoBonosNomValCurSum.clear();
-		mexicoBonosCerSum.clear();
-		mexicoBonosNomValSum.clear();
-
+		totalMexicoBonosNomValCur=0;
+		totalMexicoBonosCer=0;
+		totalMexicoBonosNomVal=0;
+		
 	}
 		
 	

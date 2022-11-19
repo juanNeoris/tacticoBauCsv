@@ -34,13 +34,29 @@ public class ConexionFtp {
 
 	private static final Logger LOGGER = Logger.getLogger(ConexionFtp.class.getName());
 
-	// Inicia una variable de tipo sftp.session para poder realizar operaciones de
-	// tipo sftp
+	/**
+	 * variable que gurada la variable
+	 *  que valida si es estricto el uso de una key
+	 */
+	public static final String STRICTHOSTKEYCHECKING  = "StrictHostKeyChecking";
+	
+	/**
+	 * variable que gurada la variable
+	 *  que valida si es estricto el uso de una key
+	 */
+	public static final String TXT = ".txt";
+	
+	/**
+	 *  Inicia una variable de tipo sftp.session 
+	 *  para poder realizar operaciones de tipo sftp
+	 */
+	
 	private Session session;
 	/**
 	 * Se crea la instancia que carga los archivos Properties
 	 */
 	private ConfigProperties confPro = new ConfigProperties();
+	
 
 	/**
 	 * Metodo que valida la conexion SFTP
@@ -60,14 +76,14 @@ public class ConexionFtp {
 			// implementar la conexión cuando se utilice un key y knowhost
 			if (confPro.isStrictHKC() != true && confPro.isConectKnowHost() != true) {
 				this.session = jsch.getSession(confPro.getUsuario(), confPro.getHost(), confPro.getPuerto());
-				this.session.setConfig("StrictHostKeyChecking", "no");
+				this.session.setConfig(STRICTHOSTKEYCHECKING, "no");
 				this.session.setPassword(confPro.getPassword());
 			} else {
 				jsch.addIdentity(confPro.getKey());
 				this.session = jsch.getSession(confPro.getUsuario(), confPro.getHost(), confPro.getPuerto());
 				this.session.setConfig("PreferredAuthentications", "publickey,keyboard-interactive,password");
 				java.util.Properties config = new java.util.Properties();
-				config.put("StrictHostKeyChecking", "no");
+				config.put(STRICTHOSTKEYCHECKING, "no");
 				session.setConfig(config);
 				LOGGER.info("conexion con key activa");
 			}
@@ -138,7 +154,7 @@ public class ConexionFtp {
 			sesion.setPassword(confPro.getPassword());
 
 			Properties config = new Properties();
-			config.put("StrictHostKeyChecking", "no");
+			config.put(STRICTHOSTKEYCHECKING, "no");
 			sesion.setConfig(config);
 
 			sesion.connect(10000);
@@ -151,29 +167,29 @@ public class ConexionFtp {
 			ChannelSftp sftpChannel = (ChannelSftp) channel;
 			sftpChannel.put(
 					"\\\\mx2ct1hnascifnfsevs1.mx.corp\\ExtraccionesMIR\\rtra\\"
-							+ "rtra-cream-ges-dolphin-europa_mexico_" + dateShelRTRA + ".txt",
+							+ "rtra-cream-ges-dolphin-europa_mexico_" + dateShelRTRA + TXT,
 					"/planPGTMEX/procesos/RISK/interfaces");
 			sftpChannel.put(
 					"\\\\mx2ct1hnascifnfsevs1.mx.corp\\ExtraccionesMIR\\rtra\\"
-							+ "rtra-cream-ges-victoria-europa_mexico_" + dateShelRTRA + ".txt",
+							+ "rtra-cream-ges-victoria-europa_mexico_" + dateShelRTRA + TXT,
 					"/planPGTMEX/procesos/RISK/interfaces");
+				
 			sftpChannel.exit();
 			sftpChannel.disconnect();
-
+			
 			/**
 			 * establecemos las variables de conexion se valida que existan las interfaces
 			 * en la ruta: /planPGTMEX/procesos/RISK/interfaces
 			 */
 			SSHConnector sshConnector = new SSHConnector();
 			sshConnector.connect(confPro.getUsuario(), confPro.getPassword(), confPro.getHost(), confPro.getPuerto());
-
 			String resultVic = sshConnector.executeCommand(
 					"cd /planPGTMEX/procesos/RISK/interfaces; ls -ltr rtra-cream-ges-victoria-europa_mexico_"
-							+ dateShelRTRA + ".txt ");
+							+ dateShelRTRA + TXT);
 			String resultDolp = sshConnector.executeCommand(
 					"cd /planPGTMEX/procesos/RISK/interfaces; ls -ltr rtra-cream-ges-dolphin-europa_mexico_"
-							+ dateShelRTRA + ".txt ");
-
+							+ dateShelRTRA + TXT);
+			
 			if (resultVic.isEmpty() && resultDolp.isEmpty()) {
 				vista.textField1.setText("No existen tus ficheros RTRA's en el FileShare");
 				vista.textField1.update(vista.textField1.getGraphics());
@@ -202,10 +218,10 @@ public class ConexionFtp {
 
 			sshConnector
 					.executeCommand("cd /planPGTMEX/procesos/RISK/interfaces; rm rtra-cream-ges-victoria-europa_mexico_"
-							+ dateShelRTRA + ".txt ");
+							+ dateShelRTRA + TXT);
 			sshConnector
 					.executeCommand("cd /planPGTMEX/procesos/RISK/interfaces; rm rtra-cream-ges-dolphin-europa_mexico_"
-							+ dateShelRTRA + ".txt ");
+							+ dateShelRTRA + TXT);
 
 			sshConnector.disconnect();
 			/**
@@ -224,8 +240,7 @@ public class ConexionFtp {
 				vista.textField1.setText("Proceso finalizado, indique grupo");
 				vista.textField1.update(vista.textField1.getGraphics());
 			}
-
-		} catch (RuntimeException | JSchException | IllegalAccessException | IOException | SftpException
+		} catch (RuntimeException | JSchException | IllegalAccessException | IOException |SftpException
 				| InterruptedException e1) {
 			try {
 				vista.textField1.setText("No se pudo realizar la carga de archivos RTRA's");
@@ -254,7 +269,7 @@ public class ConexionFtp {
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(formatoFecha);
 		String pathUsuario = System.getProperty("user.dir");
 		String fechaArchivo = simpleDateFormat.format(new Date());
-		File fichero = new File(pathUsuario, nombreFichero + fechaArchivo + ".txt");
+		File fichero = new File(pathUsuario, nombreFichero + fechaArchivo + TXT);
 		escribeArchivo(String.valueOf(fichero), datosAEscribir);
 
 		return fichero.createNewFile();

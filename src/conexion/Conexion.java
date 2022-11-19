@@ -34,6 +34,7 @@ public class Conexion {
 	private ResultSet rs;
 	private StringBuilder strbSql;
 	private Properties getPro = cargaProperties();
+	
 
 	public Conexion() {
 
@@ -319,8 +320,7 @@ public class Conexion {
 	public String getNombreGrupo(String grupo, String date) throws SQLException {
 		strbSql = new StringBuilder();
 		String systCode = "";
-		strbSql.append("SELECT lastparentfname  AS nominalvalue\r\n"
-				+ "from PGT_MEX.T_PGT_MEX_CONSUMOSC_D WHERE LastParentF ='" + grupo + "' and FECHACARGA='" + date
+		strbSql.append("SELECT lastparentfname  AS nominalvalue from PGT_MEX.T_PGT_MEX_CONSUMOSC_D WHERE LastParentF ='" + grupo + "' and FECHACARGA='" + date
 				+ "' AND foldercountryname='Mexico'");
 		try {
 			pstmt = con.prepareStatement(strbSql.toString());
@@ -332,11 +332,7 @@ public class Conexion {
 			}
 		} catch (SQLException e) {
 			LOGGER.info(e);
-
-		} catch (Exception e) {
-			LOGGER.info(e);
-		}
-
+		} 
 		return systCode;
 	}
 

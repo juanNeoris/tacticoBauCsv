@@ -1,5 +1,4 @@
 package interfaz;
-
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -7,7 +6,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+import org.apache.log4j.Logger;
+
+import lombok.Getter;
+import lombok.Setter;
+import validacion.Sumatoria;
+
 
 /**
  * Clase que escribe los intrumentos validados
@@ -15,11 +21,36 @@ import java.util.stream.Collectors;
 
 public class Csv {
 
+	private static final Logger LOGGER = Logger.getLogger(Csv.class.getName());
 	/**
 	 * variable que nos permite aplicar un formato a las cantidades nominal value
 	 * cur cer nominal value
 	 */
 	public static final DecimalFormat DFORMATO = new DecimalFormat("###,###,###.##");
+	
+	/**
+	 * variable que nos permite aplicar un formato a las fechas
+	 */
+	public static final String TOTAL = "TOTAL ";
+	/**
+	 * variable que nos permite validar
+	 * si es una garantia
+	 */
+	public static final String GARANTIAS = "GARANTIAS";
+	/**
+	 * variable que nos permite validar
+	 * si es una garantia
+	 */
+	public static final String GARANTIA = "- GARANTIAS";
+	
+	/**
+	 * Instancia de la sumatoria 
+	 * 
+	 */
+	@Getter
+	@Setter
+	private Sumatoria suma= new Sumatoria();
+	
 	/**
 	 * Array que contiene el encabezado de nuestra interfaz final
 	 */
@@ -44,13 +75,15 @@ public class Csv {
 	 * @param nombreInterfaz            generar la interfaz temporal
 	 * @throws IOException atrapa la excepcion durante tiempo de ejecucion
 	 */
-	public void interfazCsvPrimeraParte(List<AvalBonos> instrumento, List<String> newList, String cadenaMexicoGaran,
+	public void interfazCsvPrimeraParte(Map<String,AvalBonos>instrumento, List<String> newList, String cadenaMexicoGaran,
 			String nombreInterfaz, Double totalMexicoGaranValCurSum, Double totalMexicoGaranCerSum,
-			Double totalMexicoGaranNomValSum, String pais) throws IOException {
+			Double totalMexicoGaranNomValSum, String pais) {
 		/**
 		 * se genera la instancia del archivo temporal
 		 */
-		FileWriter writer = new FileWriter(nombreInterfaz, true);
+		
+		try (FileWriter writer = new FileWriter(nombreInterfaz, true)){
+		
 		encabezado.add(cadenaEncabezado);
 		String cadenaEncabeza = encabezado.stream().collect(Collectors.joining(""));
 		AvalBonos intrumentoProcesado;
@@ -69,12 +102,12 @@ public class Csv {
 		Iterator<String> nombreIterator = grades.iterator();
 		while (nombreIterator.hasNext()) {
 			String elemento = nombreIterator.next();
-			if (elemento.equals("GARANTIAS") && !newList.isEmpty()) {
+			if (elemento.equals(GARANTIAS) && !newList.isEmpty()) {
 
-				writer.write("MEXICO - GARANTIAS\n");
+				writer.write(pais.toUpperCase() +"  -  "+GARANTIAS+"\n");
 				writer.write(cadenaEncabeza);
 				writer.write(cadenaMexicoGaran);
-				writer.write("TOTAL "+pais.toUpperCase() +"- GARANTIAS" + "|" + "|" + "|" + "|" + "TOTAL GARANTIAS" + "|" + "|" + "|"
+				writer.write("TOTALES "+pais.toUpperCase() +GARANTIA + "|" + "|" + "|" + "|" + "TOTAL GARANTIAS" + "|" + "|" + "|"
 						+ "|" + DFORMATO.format(totalMexicoGaranValCurSum).toString() + "|"
 						+ DFORMATO.format(totalMexicoGaranCerSum).toString() + "|"
 						+ DFORMATO.format(totalMexicoGaranNomValSum).toString() + "|" + "|" + "|" + "|" + "|" + "|"
@@ -84,13 +117,13 @@ public class Csv {
 
 			}
 
-			intrumentoProcesado = getInstrumento(elemento, instrumento);
-
+			intrumentoProcesado = instrumento.get(elemento);
+			
 			if (intrumentoProcesado != null && intrumentoProcesado.getCadenaBonosMex() != null) {
-				writer.write(pais.toUpperCase() + " - " + elemento + "\n");
+				writer.write(pais.toUpperCase() + "  -  " + elemento + "\n");
 				writer.write(cadenaEncabeza);
 				writer.write(intrumentoProcesado.getCadenaBonosMex().toString());
-				writer.write("TOTAL " + pais.toUpperCase() + " - " + elemento + "|" + "|" + "|" + "|" + "TOTAL "
+				writer.write("TOTALES "+ pais.toUpperCase() + " - " + elemento + "|" + "|" + "|" + "|" + TOTAL
 						+ elemento + "|" + "|" + "|" + "|"
 						+ DFORMATO.format(intrumentoProcesado.getTotalMexicoBonosNomValCur()).toString() + "|"
 						+ DFORMATO.format(intrumentoProcesado.getTotalMexicoBonosCer()).toString() + "|"
@@ -99,39 +132,24 @@ public class Csv {
 				writer.write("\n");
 				writer.write("\n");
 			}
-
-		}
-
+		}	
 		/* el total general de todos los intrumentos para un pais */
-		intrumentoProcesado = getInstrumento("sumatoria", instrumento);
-		if (intrumentoProcesado != null && intrumentoProcesado.getCadenaBonosMex() != null) {
-			writer.write("TOTAL "+pais.toUpperCase() + "|" + "|" + "|" + "|" + "TOTAL GENERAL" + "|" + "|" + "|" + "|"
-					+ DFORMATO.format(intrumentoProcesado.getTotalMexicoBonosNomValCur()).toString() + "|"
-					+ DFORMATO.format(intrumentoProcesado.getTotalMexicoBonosCer()).toString() + "|"
-					+ DFORMATO.format(intrumentoProcesado.getTotalMexicoBonosNomVal()).toString() + "|" + "|" + "|"
+     	if(suma.getTotalGenBonosNomValCur() > Math.abs(0.0)) {
+			writer.write(TOTAL+pais.toUpperCase() + "|" + "|" + "|" + "|" + "TOTAL GENERAL" + "|" + "|" + "|" + "|"
+					+ DFORMATO.format(suma.getTotalGenBonosNomValCur()).toString() + "|"
+					+ DFORMATO.format(suma.getTotalGenBonosCer()).toString() + "|"
+					+ DFORMATO.format(suma.getTotalGenBonosNomVal()).toString() + "|" + "|" + "|"
 					+ "|" + "|" + "|" + "_");
 			writer.write("\n");
 			writer.write("\n");
-		}
+     	}
 		writer.flush();
-		writer.close();
 		instrumento.clear();
-	}
-
-	/**
-	 * Metodo AvalBonos que obtiene la cadena y el total de las sumatorias
-	 * 
-	 * @param nombreInstrumento que se va a evaluar
-	 * @param instrumento       es el array de objetos con las cadenas y sumatorias
-	 */
-	private AvalBonos getInstrumento(String nombreInstrumento, List<AvalBonos> instrumento) {
-
-		for (AvalBonos avalBonos : instrumento) {
-			if (avalBonos.getInstrumento().equals(nombreInstrumento)) {
-				return avalBonos;
-			}
+		} catch (IOException e) {
+			LOGGER.info("Problemas escribir archivo" + e);
+		} finally {
+			LOGGER.info("archivo cerrado");
 		}
-
-		return null;
 	}
+
 }
