@@ -92,6 +92,7 @@ public class AvalBonos {
 		info = conexion.getContraparte(fechaConsumo, rsGetString4, rsGetString14);
 		mexicoBonos.addAll(info);
 		info.clear(); 
+		conexion.disconect();
 		/**
 		 * se crea la sumatoria para el intrumento evaluado
 		 * y es lo que se usa para generar la interfaz 

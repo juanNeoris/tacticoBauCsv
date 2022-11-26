@@ -19,6 +19,8 @@ import lombok.Getter;
  */
 public class ConstanstUtils {
 
+	/** Obtencion del nombre de log */
+	public static final String LOG_NAME = "/Bau_log4j.xml";
 	/**
 	 * Getter
 	 * array que almacena instrumentos garantias

@@ -6,6 +6,7 @@ import conexion.Conexion;
 import validacion.Validaficheros;
 import interfaz.CsvToExcel;
 import sftp.ConexionFtp;
+import util.ConstanstUtils;
 import util.ConstantsUtil;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -31,7 +32,7 @@ import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.Color;
-
+import org.apache.log4j.xml.DOMConfigurator;
 /**
  * Interfaz grafica con
  * la que el usaurio interactua
@@ -66,6 +67,7 @@ public class vista extends JFrame {
 	Date date = new Date();
 	private Conexion conection = new Conexion();
 	/**
+	 * 
 	 * variables que almacenan 
 	 * result´s de consultas a la BBDD
 	 */
@@ -111,7 +113,9 @@ public class vista extends JFrame {
 		f.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowOpened(WindowEvent e) {
-
+				
+				DOMConfigurator.configure(System.getenv("DIR_PROG") + ConstanstUtils.LOG_NAME);			
+				
 				SimpleDateFormat sdf = new SimpleDateFormat(FORMFEC);
 				String date = sdf.format(dateChooser.getDate().getTime());
 				/**
@@ -126,6 +130,7 @@ public class vista extends JFrame {
 					conection.conecGBO();
 					victoria = conection.getCargaVictoria();
 					dolphing = conection.getCargaDolphing();
+					conection.disconect();
 					/**
 					 * Erro atrapado en caso de 
 					 * conexion no establecida con VPN
@@ -211,6 +216,7 @@ public class vista extends JFrame {
 						conection.conecGBO();
 						String res = conection.getConsultaMexico(grupo, nombreInterfaz, date);
 						conection.getConsultaOtrosPaises(grupo, nombreInterfaz, date);
+						conection.disconect();
 						/**
 						 * se valida si el grupo que se
 						 *  esta consultando tiene informacion 
@@ -250,8 +256,9 @@ public class vista extends JFrame {
 							String nameMonth = cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.ENGLISH);
 							String last3 = nameMonth.substring(0, 3);
 							String mesnum = date.substring(2, 4);
-
+							conection.conecGBO();
 							String Empresa = conection.getNombreGrupo(grupo, date);
+							conection.disconect();
 							String directoryName = System.getProperty("user.dir");
 
 							String[] interfazExle = nombreInterfaz.split("\\-");
@@ -310,6 +317,9 @@ public class vista extends JFrame {
 					textField1.setText("No se pudo generar la interfaz CONSULTA");
 					textField1.update(textField1.getGraphics());
 					LOGGER.info(e1);
+					LOGGER.error("error conexion");
+					LOGGER.error(e1.getMessage(), e1);
+					LOGGER.error(e1.getStackTrace());
 				}
 
 			}
@@ -405,8 +415,7 @@ public class vista extends JFrame {
 							conection.conecGBO();
 							victoria = conection.getCargaVictoriaHistorico(date);
 							dolphing = conection.getCargaDolphingHistorico(date);
-							
-							
+							conection.disconect();							
 
 							/**
 							 * se valida si tiene la ultima 

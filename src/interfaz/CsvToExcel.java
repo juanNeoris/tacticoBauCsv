@@ -39,7 +39,7 @@ public class CsvToExcel {
 	/**
 	 * Instancia de la LOGGER para mostrar mensajes
 	 */
-	private static final Logger LOGGER = Logger.getLogger(vista.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(CsvToExcel.class.getName());
 	/**
 	 * Instancia de la variable workbook
 	 */
@@ -158,7 +158,7 @@ public class CsvToExcel {
 				cell.setCellStyle(styles.getStyleGc());
 				cell.setCellValue(data);
 			} else if (p == 5 || p == 6) {
-				if (!data.trim().equals(VALOR)) {
+				if (!data.trim().equals(VALOR) && !data.isEmpty()) {
 					SimpleDateFormat formatter2 = new SimpleDateFormat("dd-MMM-yy");
 					Date date2 = formatter2.parse(data);
 					cell.setCellStyle(styles.getStyleFc());
@@ -296,7 +296,7 @@ public class CsvToExcel {
 		conection.conecGBO();
 		String empresa = conection.getNombreGrupo(grupo, date);
 		String directoryName = System.getProperty("user.dir");
-
+		conection.disconect();
 		/**
 		 * crea el directorio sobre el que se va a depositar el archivo
 		 */

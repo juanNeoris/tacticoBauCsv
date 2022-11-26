@@ -13,21 +13,27 @@ import lombok.Setter;
  */
 public class Sumatoria {
 	
-	@Setter
-	@Getter
-	private double totalGenBonosNomValCur;
 	/**
-	 * totalMexicoBonosCer
+	 * totalGenBonosNomValCur
+	 * Total para nominal value cur
 	 */
 	@Setter
 	@Getter
-	private double totalGenBonosCer;
+	public static double totalGenBonosNomValCur;
 	/**
-	 * totalMexicoBonosNomVal
+	 * totalGenBonosCer
+	 * total para cer
 	 */
 	@Setter
 	@Getter
-	private double totalGenBonosNomVal;
+	public static double totalGenBonosCer;
+	/**
+	 * totalGenBonosNomVal
+	 * total para nominal value
+	 */
+	@Setter
+	@Getter
+	public static double totalGenBonosNomVal;
 	
    /**
 	 * metodo sumatoria se encarga de sumar para todos los 

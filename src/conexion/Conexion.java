@@ -10,13 +10,10 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.ParseException;
 import java.util.ArrayList;
-
 import java.util.List;
 import java.util.Properties;
-
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-
 import oracle.jdbc.pool.OracleDataSource;
 import validacion.ValidaIntrumentos;
 
@@ -37,7 +34,6 @@ public class Conexion {
 	
 
 	public Conexion() {
-
 		super();
 		this.con = null;
 		this.pstmt = null;
@@ -64,9 +60,9 @@ public class Conexion {
 	 * @throws Exception
 	 */
 	public void conecGBO() throws Exception {
-
+		
 		OracleDataSource ods = new OracleDataSource();
-
+		
 		String connString = getPro.getProperty("bbdd.jdbc") + getPro.getProperty("bbdd.host") + ":"
 				+ getPro.getProperty("bbdd.puerto") + ":" + getPro.getProperty("bbdd.sid");
 
@@ -89,12 +85,10 @@ public class Conexion {
 			rs.close();
 			rs = null;
 		}
-
 		if (pstmt != null) {
 			pstmt.close();
 			pstmt = null;
 		}
-
 		if (stmt != null) {
 			stmt.close();
 			stmt = null;
@@ -107,9 +101,7 @@ public class Conexion {
 	 * @throws SQLException
 	 */
 	public void disconect() throws SQLException {
-
 		closeResources();
-
 		if (con != null && !con.isClosed()) {
 			con.close();
 			con = null;
@@ -136,6 +128,8 @@ public class Conexion {
 			} else {
 				systCode = "No hay ultima carga";
 			}
+			pstmt.close();
+			rs.close();
 		} catch (SQLException e) {
 
 			LOGGER.info(e);
@@ -157,12 +151,12 @@ public class Conexion {
 	public String getConsultaMexico(String grupo, String nombreInterfaz, String fechaConsumo) throws SQLException {
 		Statement sta = con.createStatement();
 		ValidaIntrumentos valida = new ValidaIntrumentos();
-
+		LOGGER.info("empezando Mexico");
 		String systCode = "SELECT cptyparent, NVL(cptyparentrating, 'SIN RATING'),cptyparentname,dealstamp,instrumentname,TO_CHAR(TO_DATE(valuedate,  'YYYY-MM-DD'), 'DD-mon-YY'),TO_CHAR(TO_DATE(maturitydate,  'YYYY-MM-DD'), 'DD-mon-YY'),currency,to_char(DECODE(nominalvaluecur,null, '0.0',nominalvaluecur), '999,999,999,999.99')  AS nominalvaluecur,to_char(DECODE(CER,null, '0.0',CER), '999,999,999,999.99')  AS CER,to_char(DECODE(nominalvalue,null, '0.0',nominalvalue), '999,999,999,999.99')  AS nominalvalue,oneoff,cptyname,foldercountryname,cptycountry,cptyparentcountry,foldercountry from PGT_MEX.T_PGT_MEX_CONSUMOSC_V WHERE LastParentF ='"
 				+ grupo + "' and FECHACARGA='" + fechaConsumo
 				+ "' AND foldercountryname='Mexico' UNION ALL SELECT cptyparent, NVL(cptyparentrating, 'SIN RATING'),cptyparentname,dealstamp,instrumentname,TO_CHAR(TO_DATE(valuedate,  'YYYY-MM-DD'), 'DD-mon-YY'),TO_CHAR(TO_DATE(maturitydate,  'YYYY-MM-DD'), 'DD-mon-YY'),currency,to_char(DECODE(nominalvaluecur,null, '0.0',nominalvaluecur), '999,999,999,999.99')  AS nominalvaluecur,to_char(DECODE(CER,null, '0.0',CER), '999,999,999,999.99')  AS CER,to_char(DECODE(nominalvalue,null, '0.0',nominalvalue), '999,999,999,999.99')  AS nominalvalue,oneoff,cptyname,foldercountryname,cptycountry,cptyparentcountry,foldercountry from PGT_MEX.T_PGT_MEX_CONSUMOSC_D WHERE LastParentF ='"
 				+ grupo + "' and FECHACARGA='" + fechaConsumo
-				+ "' AND foldercountryname='Mexico' ORDER BY foldercountryname,instrumentname ";
+				+ "' AND foldercountryname='Mexico' ORDER BY foldercountryname,instrumentname";
 		ResultSet rs = sta.executeQuery(systCode);
 		int total = getQueryRowCount(systCode);
 
@@ -178,21 +172,22 @@ public class Conexion {
 						+ "\"" + rs.getString(15) + "\"" + "|" + rs.getString(16) + "|" + rs.getString(17) + "\n";
 
 				// cadena obtener la sumatoria
-				try {
+				try {		
 					valida.intrumentosParteUno(systCode, rs.getString(5), fechaConsumo, rs.getString(4),
 							rs.getString(14), rs.getString(9), rs.getString(10), rs.getString(11), nombreInterfaz,
-							total);
+							total);					
 				} catch (Exception e) {
-					LOGGER.info(e);
+					LOGGER.error(e);
+					LOGGER.error(e.getMessage(), e);
+					LOGGER.error(e.getStackTrace());
 				}
 
 			} while (rs.next());
 			if (systCode.isEmpty()) {
 				systCode = "No existen registros para este grupo en la interfaz CONSULTA";
-			}
-
+			}	
+			LOGGER.info("terminado Mexico");
 		}
-
 		return systCode;
 	}
 
@@ -223,12 +218,12 @@ public class Conexion {
 	public String getConsultaOtrosPaises(String grupo, String nombreInterfaz, String fechaConsumo) throws Exception {
 
 		Statement sta = con.createStatement();
-
+		LOGGER.info("empezando Otros Paises");
 		String systCode = "SELECT cptyparent, NVL(cptyparentrating, 'SIN RATING'),cptyparentname,dealstamp,instrumentname,TO_CHAR(TO_DATE(valuedate,  'YYYY-MM-DD'), 'DD-mon-YY'),TO_CHAR(TO_DATE(maturitydate,  'YYYY-MM-DD'), 'DD-mon-YY'),currency,to_char(DECODE(nominalvaluecur,null, '0.0',nominalvaluecur), '999,999,999,999.99')  AS nominalvaluecur,to_char(DECODE(CER,null, '0.0',CER), '999,999,999,999.99')  AS CER,to_char(DECODE(nominalvalue,null, '0.0',nominalvalue), '999,999,999,999.99')  AS nominalvalue,oneoff,cptyname,foldercountryname,cptycountry,cptyparentcountry,foldercountry from PGT_MEX.T_PGT_MEX_CONSUMOSC_V WHERE LastParentF ='"
 				+ grupo + "' and FECHACARGA='" + fechaConsumo
 				+ "' AND foldercountryname<>'Mexico' UNION ALL SELECT cptyparent, NVL(cptyparentrating, 'SIN RATING'),cptyparentname,dealstamp,instrumentname,TO_CHAR(TO_DATE(valuedate,  'YYYY-MM-DD'), 'DD-mon-YY'),TO_CHAR(TO_DATE(maturitydate,  'YYYY-MM-DD'), 'DD-mon-YY'),currency,to_char(DECODE(nominalvaluecur,null, '0.0',nominalvaluecur), '999,999,999,999.99')  AS nominalvaluecur,to_char(DECODE(CER,null, '0.0',CER), '999,999,999,999.99')  AS CER,to_char(DECODE(nominalvalue,null, '0.0',nominalvalue), '999,999,999,999.99')  AS nominalvalue,oneoff,cptyname,foldercountryname,cptycountry,cptyparentcountry,foldercountry from PGT_MEX.T_PGT_MEX_CONSUMOSC_D WHERE LastParentF ='"
 				+ grupo + "' and FECHACARGA='" + fechaConsumo
-				+ "' AND foldercountryname<>'Mexico' ORDER BY foldercountryname ,instrumentname ";
+				+ "' AND foldercountryname<>'Mexico' ORDER BY foldercountryname ,instrumentname";
 		ResultSet rs = sta.executeQuery(systCode);
 		ValidaIntrumentos valida = new ValidaIntrumentos();
 		int total = getQueryRowCount(systCode);
@@ -248,16 +243,18 @@ public class Conexion {
 					valida.intrumentosParteUno(systCode, rs.getString(5), fechaConsumo, rs.getString(4),
 							rs.getString(14), rs.getString(9), rs.getString(10), rs.getString(11), nombreInterfaz,total);
 				} catch (Exception e) {
-					LOGGER.info(e);
+					LOGGER.error(e);
+					LOGGER.error(e.getMessage(), e);
+					LOGGER.error(e.getStackTrace());
 				}
 
 			} while (rs.next());
 			if (systCode.isEmpty()) {
 				systCode = "No existen registros para este grupo en la interfaz CONSULTA";
 			}
-
+			
 		}
-
+		LOGGER.info("terminado otros Paises");
 		return systCode;
 	}
 
@@ -272,7 +269,6 @@ public class Conexion {
 	 */
 	public List<String> getContraparte(String fechaConsumo, String deal, String pais) {
 		strbSql = new StringBuilder();
-
 		List<String> registrosInterfaz;
 		registrosInterfaz = new ArrayList<String>();
 		String systCode = "";
@@ -293,7 +289,7 @@ public class Conexion {
 						+ rs.getString(8) + "|" + rs.getString(9) + "|" + rs.getString(10) + "|" + rs.getString(11)
 						+ "|" + rs.getString(12) + "|" + "\"" + rs.getString(13) + "\"" + "|" + rs.getString(14) + "|"
 						+ "\"" + rs.getString(15) + "\"" + "|" + rs.getString(16) + "|" + rs.getString(17) + "\n";
-
+				
 				registrosInterfaz.add(systCode);
 			}
 			pstmt.close();
@@ -301,7 +297,6 @@ public class Conexion {
 		} catch (SQLException e) {
 			LOGGER.info("error en query " + e);
 		}
-
 		return registrosInterfaz;
 	}
 
@@ -330,6 +325,8 @@ public class Conexion {
 			} else {
 				systCode = "No hay ultima carga";
 			}
+			pstmt.close();
+			rs.close();
 		} catch (SQLException e) {
 			LOGGER.info(e);
 		} 
@@ -356,6 +353,8 @@ public class Conexion {
 			} else {
 				systCode = "No hay ultima carga";
 			}
+			pstmt.close();
+			rs.close();
 		} catch (SQLException e) {
 			LOGGER.info(e);
 		}
@@ -383,6 +382,8 @@ public class Conexion {
 			} else {
 				systCode = "No hay ultima carga";
 			}
+			pstmt.close();
+			rs.close();
 		} catch (SQLException e) {
 			LOGGER.info(e);
 		}
@@ -409,6 +410,8 @@ public class Conexion {
 			} else {
 				systCode = "No hay ultima carga";
 			}
+			pstmt.close();
+			rs.close();
 		} catch (SQLException e) {
 			LOGGER.info(e);
 		}

@@ -9,9 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.apache.log4j.Logger;
-
-import lombok.Getter;
-import lombok.Setter;
 import validacion.Sumatoria;
 
 
@@ -42,14 +39,6 @@ public class Csv {
 	 * si es una garantia
 	 */
 	public static final String GARANTIA = "- GARANTIAS";
-	
-	/**
-	 * Instancia de la sumatoria 
-	 * 
-	 */
-	@Getter
-	@Setter
-	private Sumatoria suma= new Sumatoria();
 	
 	/**
 	 * Array que contiene el encabezado de nuestra interfaz final
@@ -102,8 +91,7 @@ public class Csv {
 		Iterator<String> nombreIterator = grades.iterator();
 		while (nombreIterator.hasNext()) {
 			String elemento = nombreIterator.next();
-			if (elemento.equals(GARANTIAS) && !newList.isEmpty()) {
-
+			if (elemento.equals(GARANTIAS) && !cadenaMexicoGaran.isEmpty()) {
 				writer.write(pais.toUpperCase() +"  -  "+GARANTIAS+"\n");
 				writer.write(cadenaEncabeza);
 				writer.write(cadenaMexicoGaran);
@@ -114,11 +102,8 @@ public class Csv {
 						+ "_");
 				writer.write("\n");
 				writer.write("\n");
-
 			}
-
 			intrumentoProcesado = instrumento.get(elemento);
-			
 			if (intrumentoProcesado != null && intrumentoProcesado.getCadenaBonosMex() != null) {
 				writer.write(pais.toUpperCase() + "  -  " + elemento + "\n");
 				writer.write(cadenaEncabeza);
@@ -134,17 +119,17 @@ public class Csv {
 			}
 		}	
 		/* el total general de todos los intrumentos para un pais */
-     	if(suma.getTotalGenBonosNomValCur() > Math.abs(0.0)) {
+     	if(Sumatoria.getTotalGenBonosNomValCur() > Math.abs(0.0)) {
 			writer.write(TOTAL+pais.toUpperCase() + "|" + "|" + "|" + "|" + "TOTAL GENERAL" + "|" + "|" + "|" + "|"
-					+ DFORMATO.format(suma.getTotalGenBonosNomValCur()).toString() + "|"
-					+ DFORMATO.format(suma.getTotalGenBonosCer()).toString() + "|"
-					+ DFORMATO.format(suma.getTotalGenBonosNomVal()).toString() + "|" + "|" + "|"
+					+ DFORMATO.format(Sumatoria.getTotalGenBonosNomValCur()).toString()+ "|"
+					+ DFORMATO.format(Sumatoria.getTotalGenBonosCer()).toString() + "|"
+					+ DFORMATO.format(Sumatoria.getTotalGenBonosNomVal()).toString()+ "|" + "|" + "|"
 					+ "|" + "|" + "|" + "_");
 			writer.write("\n");
 			writer.write("\n");
      	}
 		writer.flush();
-		instrumento.clear();
+		instrumento.clear();	
 		} catch (IOException e) {
 			LOGGER.info("Problemas escribir archivo" + e);
 		} finally {
