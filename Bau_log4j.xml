@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+	<appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
+		<param name="Threshold" value="DEBUG"/>
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{yyyy-MM-dd - HH:mm:ss.SSS} - %c - %L : %m%n"/>
+		</layout>
+	</appender>
+		<appender name="error_file"
+		class="org.apache.log4j.RollingFileAppender">
+		<param name="File" value="tuApplicationNameErrorFile.log" />
+		<param name="MaxFileSize" value="2000000" />
+		<param name="MaxBackupIndex" value="5" />
+		<param name="Threshold" value="WARN" />
+ 
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern"
+				value="%n%d{yyyy-MM-dd HH:mm:ss} [%-5p] [%l] %n%m%n" />
+		</layout>
+	</appender>
+ 
+	<appender name="debug_file"
+		class="org.apache.log4j.RollingFileAppender">
+		<param name="File" value="tuApplicationName.log" />
+		<param name="MaxFileSize" value="5000000" />
+		<param name="MaxBackupIndex" value="5" />
+ 
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern"
+				value="%n%d{yyyy-MM-dd HH:mm:ss} [%-5p] [%l] %n%m%n" />
+		</layout>
+	</appender>
+ 
+	<appender name="error_file1"
+		class="org.apache.log4j.RollingFileAppender">
+		<param name="File" value="tuApplicationNameErrorFile1.log" />
+		<param name="MaxFileSize" value="2000000" />
+		<param name="MaxBackupIndex" value="5" />
+		<param name="Threshold" value="WARN" />
+ 
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern"
+				value="%n%d{yyyy-MM-dd HH:mm:ss} [%-5p] [%l] %n%m%n" />
+		</layout>
+	</appender>
+	
+	<appender name="error_file2"
+		class="org.apache.log4j.RollingFileAppender">
+		<param name="File" value="tuApplicationNameErrorFile2.log" />
+		<param name="MaxFileSize" value="2000000" />
+		<param name="MaxBackupIndex" value="5" />
+		<param name="Threshold" value="WARN" />
+ 
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern"
+				value="%n%d{yyyy-MM-dd HH:mm:ss} [%-5p] [%l] %n%m%n" />
+		</layout>
+	</appender>
+ 
+	<category name="org.apache">
+  		<priority value="ERROR"/>
+	</category>
+	<root>
+		<appender-ref ref="CONSOLE"/>
+	</root>
+</log4j:configuration>
