@@ -127,6 +127,7 @@ public class Csv {
 					+ "|" + "|" + "|" + "_");
 			writer.write("\n");
 			writer.write("\n");
+			writer.write("");
      	}
 		writer.flush();
 		instrumento.clear();	

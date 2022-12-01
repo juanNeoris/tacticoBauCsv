@@ -40,7 +40,8 @@ public class ValidaIntrumentos {
 
 	private ArrayList<String> contraparte = new ArrayList<String>();
 	/**
-	 * instancia de instrumento constans
+	 * instancia de instrumento constans que guarda 
+	 * los array de los instumentos Aval, Bonos, garantias...etc
 	 */
 
 	private ConstantsUtil constans = new ConstantsUtil();
@@ -309,8 +310,7 @@ public class ValidaIntrumentos {
 				sumatoria.suma(nomValCur, cer, nomVal);
 				mexicoGaranValCurSum.add(sumatoriaNomValCur);
 				mexicoGaranCerSum.add(sumatoriaCer);
-				mexicoGaranNomValSum.add(sumatoriaNomVal);
-				
+				mexicoGaranNomValSum.add(sumatoriaNomVal);		
 			} 
 			/**
 			 * se valida si son avales
@@ -419,7 +419,12 @@ public class ValidaIntrumentos {
 			cadenaMexicoGaran="";
 		}
 	}
-	
+	/**
+	 * Metodo limpiarObjetos que se encargara de limpiar 
+	 * todos los objetos una vez que se escribieron en la 
+	 * interfaz csv asi como la sumatoria del todos los 
+	 * instrumentos para cada pais
+	 */
 	public void limpiarObjetos() {
 		obj.getSumatoria().limpiar();
 		instrumento.clear();
