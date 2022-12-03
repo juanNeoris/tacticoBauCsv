@@ -11,7 +11,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
@@ -157,10 +156,6 @@ public class Conexion {
 		String pais = "Mexico";
 		String syscode = "";
 		List<BeanIntrumento> operaciones = new ArrayList<BeanIntrumento>();
-		// LLAMAR A LOS PAISES ENLAZADOS A LA FECHA METODO RETUN ARRAY ITERARLO
-		// LLAMAR A LA FUNCION POR CADA UNO METODO RETUN ARRAY ITERARLO PARA OTROS
-		// PAISES
-		// LLAMAR AL TOTAL GENERAL
 		ArrayList<String> instrumentos = this.consultaInstrumentos();
 
 		Iterator<String> nombreIterator = instrumentos.iterator();
@@ -212,13 +207,12 @@ public class Conexion {
 				/**
 				 * cierra el while que recorre los intrumentos
 				 */
-				Instrumento.interfazCsv(operaciones,nombreInterfaz,pais,elemento);
+				Instrumento.interfazCsv(operaciones, nombreInterfaz, pais, elemento);
 				operaciones.clear();
 			}
 
-			
 		}
-		
+		this.consulTotalGral(fechaConsumo,nombreInterfaz, grupo, pais);
 		syscode = "terminado Mexico";
 		LOGGER.info("terminado Mexico");
 		return syscode;
@@ -259,6 +253,58 @@ public class Conexion {
 			} while (rs.next());
 		}
 		return instrumentos;
+
+	}
+//fechaConsumo,nombreInterfaz, grupo, pais
+	public List<BeanIntrumento> consulTotalGral(String fechaConsumo, String nombreInterfaz,String grupo, String pais) throws SQLException {
+
+		List<BeanIntrumento> operaciones = new ArrayList<BeanIntrumento>();
+		
+		System.out.println("fechaConsumo :" +fechaConsumo + "nombreInterfaz :" + nombreInterfaz + "grupo :" + grupo + "pais :" + pais);
+		CallableStatement cs = con.prepareCall("{? = call pgt_mex.PKG_CONSUMOS_RTRA.F_CONSUMO_FINALMOUNT_S(?,?,?)}");
+		cs.registerOutParameter(1, -10);
+		cs.setString(2, fechaConsumo);
+		cs.setString(3, grupo);
+		cs.setString(4, pais);
+		cs.executeQuery();
+		
+		ResultSet rs = (ResultSet) cs.getObject(1);
+
+		if (rs.equals(null) || rs.next() == false) {
+			String syscode = "No existen registros para este grupo en la interfaz CONSULTA";
+		} else {
+			do {
+				try {
+					BeanIntrumento bean = new BeanIntrumento();
+					bean.setCptyparent(rs.getString(3));
+					bean.setCptyparentrating(rs.getString(4));
+					bean.setCptyparentname(rs.getString(5));
+					bean.setDealstamp(rs.getString(6));
+					bean.setInstrumentname(rs.getString(7));
+					bean.setValuedate(rs.getString(8));
+					bean.setMaturitydate(rs.getString(9));
+					bean.setCurrency(rs.getString(10));
+					bean.setNominalvaluecur(rs.getString(11));
+					bean.setCer(rs.getString(12));
+					bean.setNominalvalue(rs.getString(13));
+					bean.setOneoff(rs.getString(14));
+					bean.setCptyname(rs.getString(15));
+					bean.setFoldercountryname(rs.getString(16));
+					bean.setCptycountry(rs.getString(17));
+					bean.setCptyparentcountry(rs.getString(18));
+					bean.setFoldercountry(rs.getString(19));
+					operaciones.add(bean);
+				} catch (Exception e) {
+					LOGGER.error(e);
+					LOGGER.error(e.getMessage(), e);
+					LOGGER.error(e.getStackTrace());
+				}
+
+			} while (rs.next());
+			Instrumento.interfazCsvTotales(operaciones, nombreInterfaz, pais);
+			operaciones.clear();
+		}
+		return operaciones;
 
 	}
 
