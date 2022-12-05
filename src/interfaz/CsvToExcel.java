@@ -129,6 +129,8 @@ public class CsvToExcel {
 				cell.setCellStyle(stylesC.getStyleDg());
 				cell.setCellValue(d);
 			} else {
+				data = data.replaceAll("\"", "");
+				data = data.replaceAll("null", "");
 				row.setHeightInPoints(15);
 				cell.setCellStyle(stylesC.getStyleG());
 				cell.setCellValue(data);

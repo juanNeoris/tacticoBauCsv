@@ -260,7 +260,7 @@ public class Conexion {
 
 		List<BeanIntrumento> operaciones = new ArrayList<BeanIntrumento>();
 		
-		System.out.println("fechaConsumo :" +fechaConsumo + "nombreInterfaz :" + nombreInterfaz + "grupo :" + grupo + "pais :" + pais);
+		
 		CallableStatement cs = con.prepareCall("{? = call pgt_mex.PKG_CONSUMOS_RTRA.F_CONSUMO_FINALMOUNT_S(?,?,?)}");
 		cs.registerOutParameter(1, -10);
 		cs.setString(2, fechaConsumo);
@@ -276,23 +276,23 @@ public class Conexion {
 			do {
 				try {
 					BeanIntrumento bean = new BeanIntrumento();
-					bean.setCptyparent(rs.getString(3));
-					bean.setCptyparentrating(rs.getString(4));
-					bean.setCptyparentname(rs.getString(5));
-					bean.setDealstamp(rs.getString(6));
-					bean.setInstrumentname(rs.getString(7));
-					bean.setValuedate(rs.getString(8));
-					bean.setMaturitydate(rs.getString(9));
-					bean.setCurrency(rs.getString(10));
+					bean.setCptyparent("TOTAL "+pais.toUpperCase());
+					bean.setCptyparentrating("");
+					bean.setCptyparentname("");
+					bean.setDealstamp("");
+					bean.setInstrumentname("TOTAL GENERAL");
+					bean.setValuedate("");
+					bean.setMaturitydate("");
+					bean.setCurrency("");
 					bean.setNominalvaluecur(rs.getString(11));
 					bean.setCer(rs.getString(12));
 					bean.setNominalvalue(rs.getString(13));
-					bean.setOneoff(rs.getString(14));
-					bean.setCptyname(rs.getString(15));
-					bean.setFoldercountryname(rs.getString(16));
-					bean.setCptycountry(rs.getString(17));
-					bean.setCptyparentcountry(rs.getString(18));
-					bean.setFoldercountry(rs.getString(19));
+					bean.setOneoff("");
+					bean.setCptyname("");
+					bean.setFoldercountryname("");
+					bean.setCptycountry("");
+					bean.setCptyparentcountry("");
+					bean.setFoldercountry("_");
 					operaciones.add(bean);
 				} catch (Exception e) {
 					LOGGER.error(e);
