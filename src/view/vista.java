@@ -6,7 +6,6 @@ import conexion.Conexion;
 import validacion.Validaficheros;
 import interfaz.CsvToExcel;
 import sftp.ConexionFtp;
-import util.ConstanstUtils;
 import util.ConstantsUtil;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -114,7 +113,7 @@ public class vista extends JFrame {
 			@Override
 			public void windowOpened(WindowEvent e) {
 				
-				DOMConfigurator.configure(System.getenv("DIR_PROG") + ConstanstUtils.LOG_NAME);			
+				DOMConfigurator.configure(System.getenv("DIR_PROG") + ConstantsUtil.LOG_NAME);			
 				
 				SimpleDateFormat sdf = new SimpleDateFormat(FORMFEC);
 				String date = sdf.format(dateChooser.getDate().getTime());

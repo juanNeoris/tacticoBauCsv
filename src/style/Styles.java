@@ -118,6 +118,7 @@ public class Styles {
 	 * @param workbook recive el excel sobre el cual se aplicara el style
 	 * @return tituloIns regresa el style ya definido
 	 */
+	
 	public CellStyle createTituto(HSSFWorkbook workbook) {		
 		CellStyle tituloIns = workbook.createCellStyle();
 		HSSFFont fontR = workbook.createFont();

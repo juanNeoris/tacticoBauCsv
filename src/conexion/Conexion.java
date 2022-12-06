@@ -19,7 +19,7 @@ import org.apache.log4j.Logger;
 import gettersetter.BeanIntrumento;
 import interfaz.Instrumento;
 import oracle.jdbc.pool.OracleDataSource;
-import validacion.ValidaIntrumentos;
+import util.ConstantsUtil;
 
 /**
  * Clase conexión para BD vía Wallet
@@ -155,68 +155,31 @@ public class Conexion {
 		LOGGER.info("empezando Mexico");
 		String pais = "Mexico";
 		String syscode = "";
-		List<BeanIntrumento> operaciones = new ArrayList<BeanIntrumento>();
 		ArrayList<String> instrumentos = this.consultaInstrumentos();
 
 		Iterator<String> nombreIterator = instrumentos.iterator();
 		while (nombreIterator.hasNext()) {
 			String elemento = nombreIterator.next();
-			System.out.println("elemento  :" + elemento);
-			CallableStatement cs = con.prepareCall("{? = call pgt_mex.PKG_CONSUMOS_RTRA.F_CONSUMO_GENERAL_S(?,?,?,?)}");
-			cs.registerOutParameter(1, -10);
-			cs.setString(2, fechaConsumo);
-			cs.setString(3, grupo);
-			cs.setString(4, elemento);
-			cs.setString(5, pais);
-			cs.executeQuery();
-			ResultSet rs = (ResultSet) cs.getObject(1);
+			try (CallableStatement cs = con
+					.prepareCall("{? = call pgt_mex.PKG_CONSUMOS_RTRA.F_CONSUMO_GENERAL_S(?,?,?,?)}")) {
+				cs.registerOutParameter(1, -10);
+				cs.setString(2, fechaConsumo);
+				cs.setString(3, grupo);
+				cs.setString(4, elemento);
+				cs.setString(5, pais);
+				cs.executeQuery();
+				ResultSet rs = (ResultSet) cs.getObject(1);
+				syscode = this.operaciones(rs, nombreInterfaz, pais, elemento);
 
-			if (rs.equals(null) || rs.next() == false) {
-				syscode = "No existen registros para este grupo en la interfaz CONSULTA";
-			} else {
-				System.err.println(rs.getString(7));
-				do {
-					try {
-						BeanIntrumento bean = new BeanIntrumento();
-						bean.setCptyparent(rs.getString(3));
-						bean.setCptyparentrating(rs.getString(4));
-						bean.setCptyparentname(rs.getString(5));
-						bean.setDealstamp(rs.getString(6));
-						bean.setInstrumentname(rs.getString(7));
-						bean.setValuedate(rs.getString(8));
-						bean.setMaturitydate(rs.getString(9));
-						bean.setCurrency(rs.getString(10));
-						bean.setNominalvaluecur(rs.getString(11));
-						bean.setCer(rs.getString(12));
-						bean.setNominalvalue(rs.getString(13));
-						bean.setOneoff(rs.getString(14));
-						bean.setCptyname(rs.getString(15));
-						bean.setFoldercountryname(rs.getString(16));
-						bean.setCptycountry(rs.getString(17));
-						bean.setCptyparentcountry(rs.getString(18));
-						bean.setFoldercountry(rs.getString(19));
-						operaciones.add(bean);
-					} catch (Exception e) {
-						LOGGER.error(e);
-						LOGGER.error(e.getMessage(), e);
-						LOGGER.error(e.getStackTrace());
-					}
-					/**
-					 * cierra el while que obtiene el bloque de datos para el intrumento
-					 */
-				} while (rs.next());
-				/**
-				 * cierra el while que recorre los intrumentos
-				 */
-				rs.close();
-				cs.close();
-				Instrumento.interfazCsv(operaciones, nombreInterfaz, pais, elemento);
-				operaciones.clear();
+			} catch (SQLException e) {
+				LOGGER.error(e);
+				LOGGER.error(e.getMessage(), e);
+				LOGGER.error(e.getStackTrace());
+			} finally {
+				LOGGER.info(ConstantsUtil.CIERRA);
 			}
-
 		}
 		this.consulTotalGral(fechaConsumo, nombreInterfaz, grupo, pais);
-		syscode = "terminado Mexico";
 		LOGGER.info("terminado Mexico");
 		return syscode;
 	}
@@ -229,51 +192,65 @@ public class Conexion {
 	 * @throws SQLException atrapa las excepciones generadas por la ejecucion del
 	 *                      paquete
 	 */
-	public ArrayList<String> consultaInstrumentos() throws SQLException {
+	public ArrayList<String> consultaInstrumentos() {
 
 		ArrayList<String> instrumentos = new ArrayList();
 
-		CallableStatement cs = con.prepareCall("{? = call pgt_mex.PKG_CONSUMOS_RTRA.F_CONSUMO_INSTR_S()}");
-		cs.registerOutParameter(1, -10);
-		cs.executeQuery();
-		ResultSet rs = (ResultSet) cs.getObject(1);
+		try (CallableStatement cs = con.prepareCall("{? = call pgt_mex.PKG_CONSUMOS_RTRA.F_CONSUMO_INSTR_S()}")) {
+			cs.registerOutParameter(1, -10);
+			cs.executeQuery();
+			ResultSet rs = (ResultSet) cs.getObject(1);
 
-		if (rs.equals(null) || rs.next() == false) {
-			String syscode = "No existen registros para este grupo en la interfaz CONSULTA";
-		} else {
-			do {
-				try {
-					if (!rs.getString(1).equals("No existen registros para este grupo en la interfaz CONSULTA")) {
-						instrumentos.add(rs.getString(1));
-						LOGGER.info(rs.getString(1));
-					}
-				} catch (Exception e) {
-					LOGGER.error(e);
-					LOGGER.error(e.getMessage(), e);
-					LOGGER.error(e.getStackTrace());
-				}
-
-			} while (rs.next());
+			if (rs == null || rs.next() == false) {
+				LOGGER.info(ConstantsUtil.NOREGISTROS);
+			} else {
+				do {
+					instrumentos.add(rs.getString(1));
+				} while (rs.next());
+			}
+		} catch (SQLException e) {
+			LOGGER.error(e);
+			LOGGER.error(e.getMessage(), e);
+			LOGGER.error(e.getStackTrace());
+		} finally {
+			LOGGER.info(ConstantsUtil.CIERRA);
 		}
 		return instrumentos;
 
 	}
 
+	/**
+	 * metodo consulTotalGral que se encarga de obtener el total general del pais
+	 * evaluado
+	 * 
+	 * @param fechaConsumo   enviada como parametro para la ejecucion del paquete
+	 *                       que obtiene el total
+	 * @param nombreInterfaz sobre la cual se va a escribir el total del pais
+	 *                       evaluado
+	 * @param grupo          enviada como parametro para la ejecucion del paquete
+	 *                       que obtiene el total
+	 * @param pais           enviada como parametro para la ejecucion del paquete
+	 *                       que obtiene el total
+	 * @return operaciones regresa en un Array el registro con el total
+	 * @throws SQLException atrapa y muestra la excepcion generada por la ejecucion
+	 *                      del paquete
+	 */
 	public List<BeanIntrumento> consulTotalGral(String fechaConsumo, String nombreInterfaz, String grupo, String pais)
 			throws SQLException {
 		List<BeanIntrumento> operaciones = new ArrayList<BeanIntrumento>();
-		CallableStatement cs = con.prepareCall("{? = call pgt_mex.PKG_CONSUMOS_RTRA.F_CONSUMO_FINALMOUNT_S(?,?,?)}");
-		cs.registerOutParameter(1, -10);
-		cs.setString(2, fechaConsumo);
-		cs.setString(3, grupo);
-		cs.setString(4, pais);
-		cs.executeQuery();
-		ResultSet rs = (ResultSet) cs.getObject(1);
-		if (rs.equals(null) || rs.next() == false) {
-			String syscode = "No existen registros para este grupo en la interfaz CONSULTA";
-		} else {
-			do {
-				try {
+		try (CallableStatement cs = con
+				.prepareCall("{? = call pgt_mex.PKG_CONSUMOS_RTRA.F_CONSUMO_FINALMOUNT_S(?,?,?)}")) {
+			cs.registerOutParameter(1, -10);
+			cs.setString(2, fechaConsumo);
+			cs.setString(3, grupo);
+			cs.setString(4, pais);
+			cs.executeQuery();
+			ResultSet rs = (ResultSet) cs.getObject(1);
+			if (rs == null || rs.next() == false) {
+				LOGGER.info(ConstantsUtil.NOREGISTROS);
+			} else {
+				do {
+
 					BeanIntrumento bean = new BeanIntrumento();
 					bean.setCptyparent("TOTAL " + pais.toUpperCase());
 					bean.setCptyparentrating("");
@@ -293,17 +270,19 @@ public class Conexion {
 					bean.setCptyparentcountry("");
 					bean.setFoldercountry("_");
 					operaciones.add(bean);
-				} catch (Exception e) {
-					LOGGER.error(e);
-					LOGGER.error(e.getMessage(), e);
-					LOGGER.error(e.getStackTrace());
-				}
 
-			} while (rs.next());
-			rs.close();
-			cs.close();
-			Instrumento.interfazCsvTotales(operaciones, nombreInterfaz, pais);
-			operaciones.clear();
+				} while (rs.next());
+				rs.close();
+				cs.close();
+				Instrumento.interfazCsvTotales(operaciones, nombreInterfaz);
+				operaciones.clear();
+			}
+		} catch (SQLException e) {
+			LOGGER.error(e);
+			LOGGER.error(e.getMessage(), e);
+			LOGGER.error(e.getStackTrace());
+		} finally {
+			LOGGER.info(ConstantsUtil.CIERRA);
 		}
 		return operaciones;
 
@@ -322,74 +301,97 @@ public class Conexion {
 	 *                        a double
 	 * @return systCode regresa lo que obtiene de ejecutar el query
 	 */
-	public String getConsultaOtrosPaises(String grupo, String nombreInterfaz, String fechaConsumo) throws Exception {
-		LOGGER.info("empezando Mexico");
+	public String getConsultaOtrosPaises(String grupo, String nombreInterfaz, String fechaConsumo) throws SQLException {
+		LOGGER.info("Empezando Otros Paises");
 
-		String pais = "Mexico";
+		String syscode = "";
+
+		ArrayList<String> paises = this.getPaisesDisponibles(fechaConsumo, grupo);
+		Iterator<String> nombrePais = paises.iterator();
+		while (nombrePais.hasNext()) {
+			String paisDisponible = nombrePais.next();
+
+			ArrayList<String> instrumentos = this.consultaInstrumentos();
+			Iterator<String> nombreIntrumento = instrumentos.iterator();
+			while (nombreIntrumento.hasNext()) {
+				String elemento = nombreIntrumento.next();
+				try (CallableStatement cs = con
+						.prepareCall("{? = call pgt_mex.PKG_CONSUMOS_RTRA.F_CONSUMO_GENERAL_S(?,?,?,?)}")) {
+					cs.registerOutParameter(1, -10);
+					cs.setString(2, fechaConsumo);
+					cs.setString(3, grupo);
+					cs.setString(4, elemento);
+					cs.setString(5, paisDisponible);
+					cs.executeQuery();
+					ResultSet rs = (ResultSet) cs.getObject(1);
+					syscode = this.operaciones(rs, nombreInterfaz, paisDisponible, elemento);
+				} catch (SQLException e) {
+					LOGGER.error(e);
+					LOGGER.error(e.getMessage(), e);
+					LOGGER.error(e.getStackTrace());
+				} finally {
+					LOGGER.info(ConstantsUtil.CIERRA);
+				}
+			}
+			this.consulTotalGral(fechaConsumo, nombreInterfaz, grupo, paisDisponible);
+		}
+		LOGGER.info("Terminado Otros Paises");
+		return syscode;
+	}
+
+	/**
+	 * Metodo operaciones que se encargara de almacenar en un objeto el result
+	 * obyenido de la ejecucion del paquete
+	 * 
+	 * @param rs             result enviado de la ejecucion del paquete
+	 * @param nombreInterfaz con la que se generara la interfaz
+	 * @param paisDisponible enviado de la ejecucion del paquete que obtiene los
+	 *                       paises disponibles
+	 * @param elemento       Intrumento evaluado
+	 * @return syscode regresa un string que permitira validar si existe o no
+	 *         informacion para generar no generar la interfaz vacia
+	 * @throws SQLException atrapada y mostrada durante la ejecucion del paquete
+	 */
+	public String operaciones(ResultSet rs, String nombreInterfaz, String paisDisponible, String elemento)
+			throws SQLException {
 		String syscode = "";
 		List<BeanIntrumento> operaciones = new ArrayList<BeanIntrumento>();
-		ArrayList<String> instrumentos = this.consultaInstrumentos();
+		if (rs == null || rs.next() == false) {
+			syscode = ConstantsUtil.NOREGISTROS;
+		} else {
+			do {
 
-		Iterator<String> nombreIterator = instrumentos.iterator();
-		while (nombreIterator.hasNext()) {
-			String elemento = nombreIterator.next();
-			System.out.println("elemento  :" + elemento);
-			CallableStatement cs = con.prepareCall("{? = call pgt_mex.PKG_CONSUMOS_RTRA.F_CONSUMO_GENERAL_S(?,?,?,?)}");
-			cs.registerOutParameter(1, -10);
-			cs.setString(2, fechaConsumo);
-			cs.setString(3, grupo);
-			cs.setString(4, elemento);
-			cs.setString(5, pais);
-			cs.executeQuery();
-			ResultSet rs = (ResultSet) cs.getObject(1);
+				BeanIntrumento bean = new BeanIntrumento();
+				bean.setCptyparent(rs.getString(3));
+				bean.setCptyparentrating(rs.getString(4));
+				bean.setCptyparentname(rs.getString(5));
+				bean.setDealstamp(rs.getString(6));
+				bean.setInstrumentname(rs.getString(7));
+				bean.setValuedate(rs.getString(8));
+				bean.setMaturitydate(rs.getString(9));
+				bean.setCurrency(rs.getString(10));
+				bean.setNominalvaluecur(rs.getString(11));
+				bean.setCer(rs.getString(12));
+				bean.setNominalvalue(rs.getString(13));
+				bean.setOneoff(rs.getString(14));
+				bean.setCptyname(rs.getString(15));
+				bean.setFoldercountryname(rs.getString(16));
+				bean.setCptycountry(rs.getString(17));
+				bean.setCptyparentcountry(rs.getString(18));
+				bean.setFoldercountry(rs.getString(19));
+				operaciones.add(bean);
 
-			if (rs.equals(null) || rs.next() == false) {
-				syscode = "No existen registros para este grupo en la interfaz CONSULTA";
-			} else {
-				System.err.println(rs.getString(7));
-				do {
-					try {
-						BeanIntrumento bean = new BeanIntrumento();
-						bean.setCptyparent(rs.getString(3));
-						bean.setCptyparentrating(rs.getString(4));
-						bean.setCptyparentname(rs.getString(5));
-						bean.setDealstamp(rs.getString(6));
-						bean.setInstrumentname(rs.getString(7));
-						bean.setValuedate(rs.getString(8));
-						bean.setMaturitydate(rs.getString(9));
-						bean.setCurrency(rs.getString(10));
-						bean.setNominalvaluecur(rs.getString(11));
-						bean.setCer(rs.getString(12));
-						bean.setNominalvalue(rs.getString(13));
-						bean.setOneoff(rs.getString(14));
-						bean.setCptyname(rs.getString(15));
-						bean.setFoldercountryname(rs.getString(16));
-						bean.setCptycountry(rs.getString(17));
-						bean.setCptyparentcountry(rs.getString(18));
-						bean.setFoldercountry(rs.getString(19));
-						operaciones.add(bean);
-					} catch (Exception e) {
-						LOGGER.error(e);
-						LOGGER.error(e.getMessage(), e);
-						LOGGER.error(e.getStackTrace());
-					}
-					/**
-					 * cierra el while que obtiene el bloque de datos para el intrumento
-					 */
-				} while (rs.next());
 				/**
-				 * cierra el while que recorre los intrumentos
+				 * cierra el while que obtiene el bloque de datos para el intrumento
 				 */
-				rs.close();
-				cs.close();
-				Instrumento.interfazCsv(operaciones, nombreInterfaz, pais, elemento);
-				operaciones.clear();
-			}
-
+			} while (rs.next());
+			/**
+			 * cierra el while que recorre los intrumentos
+			 */
+			rs.close();
+			Instrumento.interfazCsv(operaciones, nombreInterfaz, paisDisponible, elemento);
+			operaciones.clear();
 		}
-		this.consulTotalGral(fechaConsumo, nombreInterfaz, grupo, pais);
-		syscode = "terminado Mexico";
-		LOGGER.info("terminado Mexico");
 		return syscode;
 	}
 
@@ -400,35 +402,35 @@ public class Conexion {
 	 * @param fechaConsumo se valida con la fecha que se esta evaluando
 	 * @param deal         usa para validar la garantia
 	 * @param pais         otra condicion es que sea del pais
+	 * @param grupo        se envia como parametro para la ejecucion del paquete
 	 * @return registrosInterfaz regresa el array con las contrapartes
-	 * @throws SQLException atrapa y muestra las excepciones generadas por la ejecucion del paquete
+	 * @throws SQLException atrapa y muestra las excepciones generadas por la
+	 *                      ejecucion del paquete
 	 */
-	public ArrayList<String> getPaisesDisponibles(String fechaConsumo, String deal, String pais) throws SQLException {
-		ArrayList<String> instrumentos = new ArrayList();
+	public ArrayList<String> getPaisesDisponibles(String fechaConsumo, String grupo) throws SQLException {
+		ArrayList<String> paisesDisponibles = new ArrayList<String>();
 
-		CallableStatement cs = con.prepareCall("{? = call pgt_mex.PKG_CONSUMOS_RTRA.F_CONSUMO_INSTR_S()}");
-		cs.registerOutParameter(1, -10);
-		cs.executeQuery();
-		ResultSet rs = (ResultSet) cs.getObject(1);
-
-		if (rs.equals(null) || rs.next() == false) {
-			String syscode = "No existen registros para este grupo en la interfaz CONSULTA";
-		} else {
-			do {
-				try {
-					if (!rs.getString(1).equals("No existen registros para este grupo en la interfaz CONSULTA")) {
-						instrumentos.add(rs.getString(1));
-						LOGGER.info(rs.getString(1));
-					}
-				} catch (Exception e) {
-					LOGGER.error(e);
-					LOGGER.error(e.getMessage(), e);
-					LOGGER.error(e.getStackTrace());
-				}
-
-			} while (rs.next());
+		try (CallableStatement cs = con.prepareCall("{? = call pgt_mex.PKG_CONSUMOS_RTRA.F_CONSUMO_COUNTRY_S(?,?)}")) {
+			cs.registerOutParameter(1, -10);
+			cs.setString(2, fechaConsumo);
+			cs.setString(3, grupo);
+			cs.executeQuery();
+			ResultSet rs = (ResultSet) cs.getObject(1);
+			if (rs == null || rs.next() == false) {
+				LOGGER.info(ConstantsUtil.NOREGISTROS);
+			} else {
+				do {
+					paisesDisponibles.add(rs.getString(1));
+				} while (rs.next());
+			}
+		} catch (SQLException e) {
+			LOGGER.error(e);
+			LOGGER.error(e.getMessage(), e);
+			LOGGER.error(e.getStackTrace());
+		} finally {
+			LOGGER.info(ConstantsUtil.CIERRA);
 		}
-		return instrumentos;
+		return paisesDisponibles;
 	}
 
 	/**
