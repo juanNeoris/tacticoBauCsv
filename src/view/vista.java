@@ -223,6 +223,7 @@ public class vista extends JFrame {
 						 * no ser asi la interfaz no
 						 *  se puede generar vacia
 						 */
+						
 						if (res.equals("No existen registros para este grupo en la interfaz CONSULTA")) {
 							textField1.setText("No se encontro el grupo");
 							textField1.update(textField1.getGraphics());
@@ -233,7 +234,8 @@ public class vista extends JFrame {
 							textField1.setText("Proceso finalizado, indique grupo");
 							textField1.update(textField1.getGraphics());
 						} else {
-
+							
+							
 							/**
 							 * parte que implementara los Estilos 
 							 * a la primera interfaz generada csv se

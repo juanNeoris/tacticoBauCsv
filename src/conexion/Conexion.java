@@ -35,6 +35,8 @@ public class Conexion {
 	private ResultSet rs;
 	private StringBuilder strbSql;
 	private Properties getPro = cargaProperties();
+	private String validaVacio = "";
+	private String validaNoVacio = "";
 
 	public Conexion() {
 		super();
@@ -301,10 +303,8 @@ public class Conexion {
 	 *                        a double
 	 * @return systCode regresa lo que obtiene de ejecutar el query
 	 */
-	public String getConsultaOtrosPaises(String grupo, String nombreInterfaz, String fechaConsumo) throws SQLException {
+	public void getConsultaOtrosPaises(String grupo, String nombreInterfaz, String fechaConsumo) throws SQLException {
 		LOGGER.info("Empezando Otros Paises");
-
-		String syscode = "";
 
 		ArrayList<String> paises = this.getPaisesDisponibles(fechaConsumo, grupo);
 		Iterator<String> nombrePais = paises.iterator();
@@ -324,7 +324,7 @@ public class Conexion {
 					cs.setString(5, paisDisponible);
 					cs.executeQuery();
 					ResultSet rs = (ResultSet) cs.getObject(1);
-					syscode = this.operaciones(rs, nombreInterfaz, paisDisponible, elemento);
+					this.operaciones(rs, nombreInterfaz, paisDisponible, elemento);
 				} catch (SQLException e) {
 					LOGGER.error(e);
 					LOGGER.error(e.getMessage(), e);
@@ -336,7 +336,7 @@ public class Conexion {
 			this.consulTotalGral(fechaConsumo, nombreInterfaz, grupo, paisDisponible);
 		}
 		LOGGER.info("Terminado Otros Paises");
-		return syscode;
+
 	}
 
 	/**
@@ -352,15 +352,17 @@ public class Conexion {
 	 *         informacion para generar no generar la interfaz vacia
 	 * @throws SQLException atrapada y mostrada durante la ejecucion del paquete
 	 */
+
 	public String operaciones(ResultSet rs, String nombreInterfaz, String paisDisponible, String elemento)
 			throws SQLException {
-		String syscode = "";
+
 		List<BeanIntrumento> operaciones = new ArrayList<BeanIntrumento>();
 		if (rs == null || rs.next() == false) {
-			syscode = ConstantsUtil.NOREGISTROS;
+			validaVacio = ConstantsUtil.NOREGISTROS;
 		} else {
-			do {
 
+			do {
+				validaNoVacio = "no vacio";
 				BeanIntrumento bean = new BeanIntrumento();
 				bean.setCptyparent(rs.getString(3));
 				bean.setCptyparentrating(rs.getString(4));
@@ -391,8 +393,13 @@ public class Conexion {
 			rs.close();
 			Instrumento.interfazCsv(operaciones, nombreInterfaz, paisDisponible, elemento);
 			operaciones.clear();
+
 		}
-		return syscode;
+		if (!validaNoVacio.isEmpty()) {
+			return validaNoVacio;
+		} else {
+			return validaVacio;
+		}
 	}
 
 	/**
