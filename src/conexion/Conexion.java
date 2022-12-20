@@ -162,6 +162,7 @@ public class Conexion {
 		Iterator<String> nombreIterator = instrumentos.iterator();
 		while (nombreIterator.hasNext()) {
 			String elemento = nombreIterator.next();
+			LOGGER.info("evaluando elemento" +elemento);
 			try (CallableStatement cs = con
 					.prepareCall("{? = call pgt_mex.PKG_CONSUMOS_RTRA.F_CONSUMO_GENERAL_S(?,?,?,?)}")) {
 				cs.registerOutParameter(1, -10);
@@ -178,7 +179,7 @@ public class Conexion {
 				LOGGER.error(e.getMessage(), e);
 				LOGGER.error(e.getStackTrace());
 			} finally {
-				LOGGER.info(ConstantsUtil.CIERRA);
+				//LOGGER.info(ConstantsUtil.CIERRA);
 			}
 		}
 		this.consulTotalGral(fechaConsumo, nombreInterfaz, grupo, pais);
@@ -391,6 +392,8 @@ public class Conexion {
 			 * cierra el while que recorre los intrumentos
 			 */
 			rs.close();
+			LOGGER.info("elemento escrito " + elemento);
+			LOGGER.info("pais escrito "+paisDisponible);
 			Instrumento.interfazCsv(operaciones, nombreInterfaz, paisDisponible, elemento);
 			operaciones.clear();
 
