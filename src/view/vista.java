@@ -179,7 +179,7 @@ public class vista extends JFrame {
 			}
 		});
 		f.setIconImage(Toolkit.getDefaultToolkit()
-				.getImage("C:\\Users\\z363772\\Downloads\\bau\\tacticoBAU\\sources\\santecLogo.png"));
+				.getImage("src/util/santecLogo.png"));
 		f.setSize(357, 338);
 		f.getContentPane().setLayout(null);
 		/**

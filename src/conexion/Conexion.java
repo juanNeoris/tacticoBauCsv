@@ -363,6 +363,8 @@ public class Conexion {
 		} else {
 
 			do {
+				//cpty	lastparent	lastparentname	lastparentcountry	lastparentrating	foldername	guaranteepercent_cpty	 addoncur 	guaranteedparentrating	 recequivalente 	 recbruto 	lastparentf	lastparentfname	lastparentfcountryname	lastparentfrating	 dispuesto 	 cer2 	collateralagreement
+
 				validaNoVacio = "no vacio";
 				BeanIntrumento bean = new BeanIntrumento();
 				bean.setCptyparent(rs.getString(3));
