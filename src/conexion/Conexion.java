@@ -162,7 +162,6 @@ public class Conexion {
 		Iterator<String> nombreIterator = instrumentos.iterator();
 		while (nombreIterator.hasNext()) {
 			String elemento = nombreIterator.next();
-			LOGGER.info("evaluando elemento" +elemento);
 			try (CallableStatement cs = con
 					.prepareCall("{? = call pgt_mex.PKG_CONSUMOS_RTRA.F_CONSUMO_GENERAL_S(?,?,?,?)}")) {
 				cs.registerOutParameter(1, -10);
@@ -179,7 +178,7 @@ public class Conexion {
 				LOGGER.error(e.getMessage(), e);
 				LOGGER.error(e.getStackTrace());
 			} finally {
-				//LOGGER.info(ConstantsUtil.CIERRA);
+				LOGGER.info(ConstantsUtil.CIERRA);
 			}
 		}
 		this.consulTotalGral(fechaConsumo, nombreInterfaz, grupo, pais);
@@ -271,7 +270,25 @@ public class Conexion {
 					bean.setFoldercountryname("");
 					bean.setCptycountry("");
 					bean.setCptyparentcountry("");
-					bean.setFoldercountry("_");
+					bean.setFoldercountry("");
+					bean.setCpty("");
+					bean.setLastparent("");
+					bean.setLastparentname("");
+					bean.setLastparentcountry("");
+					bean.setLastparentrating("");
+					bean.setFoldername("");
+					bean.setGuaranteepercent_cpty("");
+					bean.setAddoncur("");
+					bean.setGuaranteedparentrating("");
+					bean.setRecequivalente("");
+					bean.setRecbruto("");
+					bean.setLastparentf("");
+					bean.setLastparentfname("");
+					bean.setLastparentfcountryname("");
+					bean.setLastparentfrating("");
+					bean.setDispuesto("");
+					bean.setCer2("");
+					bean.setCollateralagreement("_");
 					operaciones.add(bean);
 
 				} while (rs.next());
@@ -363,8 +380,7 @@ public class Conexion {
 		} else {
 
 			do {
-				//cpty	lastparent	lastparentname	lastparentcountry	lastparentrating	foldername	guaranteepercent_cpty	 addoncur 	guaranteedparentrating	 recequivalente 	 recbruto 	lastparentf	lastparentfname	lastparentfcountryname	lastparentfrating	 dispuesto 	 cer2 	collateralagreement
-
+			
 				validaNoVacio = "no vacio";
 				BeanIntrumento bean = new BeanIntrumento();
 				bean.setCptyparent(rs.getString(3));
@@ -375,17 +391,35 @@ public class Conexion {
 				bean.setValuedate(rs.getString(8));
 				bean.setMaturitydate(rs.getString(9));
 				bean.setCurrency(rs.getString(10));
-				bean.setNominalvaluecur(rs.getString(11));
-				bean.setCer(rs.getString(12));
-				bean.setNominalvalue(rs.getString(13));
+				bean.setNominalvaluecur(rs.getString(11)); //8
+				bean.setCer(rs.getString(12));             //9
+				bean.setNominalvalue(rs.getString(13));    //10
 				bean.setOneoff(rs.getString(14));
 				bean.setCptyname(rs.getString(15));
 				bean.setFoldercountryname(rs.getString(16));
 				bean.setCptycountry(rs.getString(17));
 				bean.setCptyparentcountry(rs.getString(18));
 				bean.setFoldercountry(rs.getString(19));
+				bean.setCpty(rs.getString(20));
+				bean.setLastparent(rs.getString(21));
+				bean.setLastparentname(rs.getString(22));
+				bean.setLastparentcountry(rs.getString(23));
+				bean.setLastparentrating(rs.getString(24));
+				bean.setFoldername(rs.getString(25));
+				bean.setGuaranteepercent_cpty(rs.getString(26));
+				bean.setAddoncur(rs.getString(27));
+				bean.setGuaranteedparentrating(rs.getString(28));
+				bean.setRecequivalente(rs.getString(29));  //numerico 26
+				bean.setRecbruto(rs.getString(30));        //numerico 27
+				bean.setLastparentf(rs.getString(31));
+				bean.setLastparentfname(rs.getString(32));
+				bean.setLastparentfcountryname(rs.getString(33));
+				bean.setLastparentfrating(rs.getString(34));
+				bean.setDispuesto(rs.getString(35));
+				bean.setCer2(rs.getString(36));          //numerico 33
+				bean.setCollateralagreement(rs.getString(37));
 				operaciones.add(bean);
-
+				
 				/**
 				 * cierra el while que obtiene el bloque de datos para el intrumento
 				 */
@@ -394,8 +428,6 @@ public class Conexion {
 			 * cierra el while que recorre los intrumentos
 			 */
 			rs.close();
-			LOGGER.info("elemento escrito " + elemento);
-			LOGGER.info("pais escrito "+paisDisponible);
 			Instrumento.interfazCsv(operaciones, nombreInterfaz, paisDisponible, elemento);
 			operaciones.clear();
 

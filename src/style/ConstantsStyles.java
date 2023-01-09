@@ -55,7 +55,15 @@ public class ConstantsStyles {
 	 */
 
 	@Getter
-	private ArrayList<Integer> centrados = new ArrayList<>(Arrays.asList(0, 1, 3, 7, 11, 13, 14, 15, 16));
+	private ArrayList<Integer> centrados = new ArrayList<>(Arrays.asList(0, 1, 3, 7, 11, 13, 14, 15, 16,17,18,19,20,21,22,24,25,28,29,30,31,34));
+
+	/**
+	 * constante que guarda las posiciones que son numericos
+	 * 
+	 */
+
+	@Getter
+	private ArrayList<Integer> numericos = new ArrayList<>(Arrays.asList( 8,9,10,23,24,26, 27,32,33));
 
 	/**
 	 * Contructor que recibe el 

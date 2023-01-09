@@ -222,6 +222,12 @@ public class BeanIntrumento {
 	@Setter
 	private String collateralagreement;
 
+	/**
+	 * metodo toString que armara la cadena para cada registro de 
+	 * cada pais
+	 * 
+	 * @return cadena armada
+	 */
 	@Override
 	public String toString() {
 		return this.cptyparent + "|" + this.cptyparentrating + "|" + this.cptyparentname + "|" + this.dealstamp + "|"

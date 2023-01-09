@@ -43,7 +43,7 @@ public class CsvToExcel {
 	/**
 	 * Instancia de la variable workbook
 	 */
-	public static final HSSFWorkbook hwb = new HSSFWorkbook();
+	public static HSSFWorkbook hwb = new HSSFWorkbook();
 	/**
 	 * Instancia de la stylesC para obtener los styles
 	 */
@@ -68,7 +68,8 @@ public class CsvToExcel {
 	  */
 	public static void csvToExcel(String nombreInterfaz, String grupo, String date) throws Exception {
 		ArrayList arList = extraeCSV(nombreInterfaz);
-		HSSFSheet sheet = hwb.createSheet("Reporte");
+		HSSFSheet sheet = hwb.createSheet(grupo);
+						  
 		defaultColumnStyle(hwb, sheet);
 		for (int k = 0; k < arList.size(); k++) {
 			ArrayList ardata = (ArrayList) arList.get(k);
@@ -83,7 +84,10 @@ public class CsvToExcel {
 			vista.progressBar.update(vista.progressBar.getGraphics());
 		}
 		autoSizeStyle(sheet);
-		cierraExcel(nombreInterfaz, date, grupo, hwb);
+		
+		cierraExcel(nombreInterfaz, date, grupo, hwb);	
+		hwb.close();
+		hwb.removeSheetAt(0);
 	}
 
 
@@ -169,7 +173,7 @@ public class CsvToExcel {
 					data = data.replaceAll("null", "-");
 					cell.setCellValue(data);
 				}
-			} else if (p == 8 || p == 9 || p == 10) {
+			} else if (stylesC.getNumericos().contains(p)&&!data.trim().equals(VALOR) && !data.isEmpty()) {
 				double d = DecimalFormat.getNumberInstance().parse(data.trim()).doubleValue();
 				cell.setCellStyle(styles.getStyleGd());
 				cell.setCellValue(d);
@@ -190,7 +194,7 @@ public class CsvToExcel {
 					cell.setCellStyle(styles.getStyleF());
 					cell.setCellValue(date2);
 				}
-			} else if (p == 8 || p == 9 || p == 10) {
+			} else if (stylesC.getNumericos().contains(p)&& !data.trim().equals(VALOR) && !data.isEmpty()) {
 				double d = DecimalFormat.getNumberInstance().parse(data.trim()).doubleValue();
 				cell.setCellStyle(styles.getStyleD());
 				cell.setCellValue(d);
@@ -313,7 +317,10 @@ public class CsvToExcel {
 			if (directorio.mkdirs()) {
 				FileOutputStream fileOut = new FileOutputStream(directorio + ConstantsStyles.BARRA + part1 + ".xls");
 				hwb.write(fileOut);
+				fileOut.flush();
+				hwb.close();
 				fileOut.close();
+				 System.gc();       
 				LOGGER.info("Directorio creado");
 			} else {
 				LOGGER.info("Error al crear directorio");
@@ -324,7 +331,10 @@ public class CsvToExcel {
 		 */
 		FileOutputStream fileOut = new FileOutputStream(directorio + ConstantsStyles.BARRA + part1 + ".xls");
 		hwb.write(fileOut);
+		fileOut.flush();
+		hwb.close();
 		fileOut.close();
+		 System.gc();	
 		LOGGER.info("Excel generado");
 	}
 
@@ -354,6 +364,24 @@ public class CsvToExcel {
 		sheet.setDefaultColumnStyle(14, cellStyle5);
 		sheet.setDefaultColumnStyle(15, cellStyle5);
 		sheet.setDefaultColumnStyle(16, cellStyle5);
+		sheet.setDefaultColumnStyle(17, cellStyle5);
+		sheet.setDefaultColumnStyle(18, cellStyle5);
+		sheet.setDefaultColumnStyle(19, cellStyle5);
+		sheet.setDefaultColumnStyle(20, cellStyle5);
+		sheet.setDefaultColumnStyle(21, cellStyle5);
+		sheet.setDefaultColumnStyle(22, cellStyle5);
+		sheet.setDefaultColumnStyle(23, cellStyle5);
+		sheet.setDefaultColumnStyle(24, cellStyle5);
+		sheet.setDefaultColumnStyle(25, cellStyle5);
+		sheet.setDefaultColumnStyle(26, cellStyle5);
+		sheet.setDefaultColumnStyle(27, cellStyle5); 
+		sheet.setDefaultColumnStyle(28, cellStyle5);
+		sheet.setDefaultColumnStyle(29, cellStyle5);
+		sheet.setDefaultColumnStyle(30, cellStyle5);
+		sheet.setDefaultColumnStyle(31, cellStyle5);
+		sheet.setDefaultColumnStyle(32, cellStyle5);
+		sheet.setDefaultColumnStyle(33, cellStyle5);
+		sheet.setDefaultColumnStyle(34, cellStyle5);
 	}
 
    /**
@@ -382,5 +410,23 @@ public class CsvToExcel {
 		sheet.autoSizeColumn(14);
 		sheet.autoSizeColumn(15);
 		sheet.autoSizeColumn(16);
+		sheet.autoSizeColumn(17);
+		sheet.autoSizeColumn(18);
+		sheet.autoSizeColumn(19);
+		sheet.autoSizeColumn(20);
+		sheet.autoSizeColumn(21);
+		sheet.autoSizeColumn(22);
+		sheet.autoSizeColumn(23);
+		sheet.autoSizeColumn(24);
+		sheet.autoSizeColumn(25);
+		sheet.autoSizeColumn(26);
+		sheet.autoSizeColumn(27);
+		sheet.autoSizeColumn(28);
+		sheet.autoSizeColumn(29);
+		sheet.autoSizeColumn(30);
+		sheet.autoSizeColumn(31);
+		sheet.autoSizeColumn(32);
+		sheet.autoSizeColumn(33);
+		sheet.autoSizeColumn(34);
 	}
 }
